@@ -18,6 +18,9 @@ public:
 		add_parameter(std_params::sliders::pan());
 		add_parameter(std_params::sliders::pitch());
 
+		add_parameter(std_params::toggles::loop());
+		add_parameter(std_params::toggles::reverse());
+
 		OptionSpec test_option;
 
 		test_option.uuid = "";
