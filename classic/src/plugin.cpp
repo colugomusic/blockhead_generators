@@ -1,6 +1,7 @@
 #include <blkhdgen/bind.hpp>
 #include <blkhdgen/math.hpp>
 #include <blkhdgen/standard_parameters.hpp>
+#include <blkhdgen/standard_traversers/classic.hpp>
 
 using namespace blkhdgen;
 
@@ -12,11 +13,12 @@ public:
 	{
 		add_parameter(std_params::envelopes::amp());
 		add_parameter(std_params::envelopes::pan());
-		add_parameter(std_params::envelopes::pitch());
+		pitch_envelope_ = add_parameter(std_params::envelopes::pitch());
 
 		add_parameter(std_params::sliders::amp());
 		add_parameter(std_params::sliders::pan());
-		add_parameter(std_params::sliders::pitch());
+		pitch_slider_ = add_parameter(std_params::sliders::pitch());
+		sample_offset_slider_ = add_parameter(std_params::sliders::sample_offset());
 
 		add_parameter(std_params::toggles::loop());
 		add_parameter(std_params::toggles::reverse());
@@ -41,7 +43,7 @@ public:
 		return "Classic";
 	}
 
-	blkhdgen_Error process(const blkhdgen_Position* pos, float** out) override
+	blkhdgen_Error process(blkhdgen_SR song_rate, blkhdgen_SR sample_rate, const blkhdgen_Position* pos, float** out) override
 	{
 		// TODO: implement
 		return BLKHDGEN_OK;
@@ -51,8 +53,21 @@ public:
 	{
 		return "Unknown error";
 	}
-};
 
+	blkhdgen_Position get_waveform_position(blkhdgen_Position block_position) const override
+	{
+		return waveform_traverser_(pitch_slider_->get(), pitch_envelope_->get_point_data(), block_position, sample_offset_slider_->get());
+	}
+	
+private:
+
+	mutable std_traversers::Classic traverser_;
+	mutable std_traversers::Classic waveform_traverser_;
+
+	std::shared_ptr<EnvelopeParameter> pitch_envelope_;
+	std::shared_ptr<SliderParameter<float>> pitch_slider_;
+	std::shared_ptr<SliderParameter<int>> sample_offset_slider_;
+};
 
 blkhdgen_Generator make_generator()
 {
