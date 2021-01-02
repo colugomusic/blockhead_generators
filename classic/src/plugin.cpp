@@ -3,10 +3,6 @@
 #include <blkhdgen/standard_parameters.hpp>
 #include <blkhdgen/standard_traversers/classic.hpp>
 
-#pragma warning(push, 0)
-#include <DSP/MLDSPOps.h>
-#pragma warning(pop)
-
 using namespace blkhdgen;
 
 class Classic : public Generator
@@ -33,13 +29,45 @@ public:
 		return "Classic";
 	}
 
-	blkhdgen_Error process(blkhdgen_SR song_rate, blkhdgen_SR sample_rate, const blkhdgen_Position* pos, float** out) override
+	blkhdgen_Error process(blkhdgen_SR song_rate, blkhdgen_SR sample_rate, const blkhdgen_Position* block_pos, float** out) override
 	{
 		ml::DSPVectorArray<2> out_vec;
-		
-		// TODO: implement this
+		ml::DSPVector env_amp;
 
-		stereo_pan(out_vec, pan_slider_->get(), pan_envelope_, pos);
+		const auto data_offset = get_data_offset();
+
+		audio_block_traverser_.generate(block_pos, data_offset);
+
+		const auto sample_info = get_sample_info();
+
+		auto sample_pos = audio_position_traverser_.get_positions(pitch_slider_->get(), pitch_envelope_->get_point_data(), &audio_block_traverser_, sample_offset_slider_->get());
+
+		sample_pos /= float(song_rate) / sample_info->SR;
+
+		env_amp = amp_envelope_->get_mod_values(&audio_block_traverser_);
+
+		if (reverse_toggle_.get())
+		{
+			sample_pos = float(sample_info->num_frames - 1) - sample_pos;
+		}
+
+		if (sample_info->num_channels > 0)
+		{
+			out_vec.row(0) = read_sample_frames_interp(0, sample_pos, loop_toggle_.get());
+		}
+
+		if (sample_info->num_channels > 1)
+		{
+			out_vec.row(1) = read_sample_frames_interp(1, sample_pos, loop_toggle_.get());
+		}
+		else
+		{
+			out_vec.row(1) = out_vec.row(0);
+		}
+
+		stereo_pan(out_vec, pan_slider_->get(), pan_envelope_, &audio_block_traverser_);
+
+		out_vec *= ml::repeatRows<2>(env_amp);
 
 		ml::store(out_vec.constRow(0), out[0]);
 		ml::store(out_vec.constRow(1), out[1]);
@@ -54,20 +82,18 @@ public:
 
 	blkhdgen_Position get_waveform_position(blkhdgen_Position block_position, float* derivative = nullptr) const override
 	{
-		return waveform_traverser_(pitch_slider_->get(), pitch_envelope_->get_point_data(), block_position, sample_offset_slider_->get(), derivative);
-	}
+		gui_block_traverser_.generate(block_position, get_data_offset());
 
-	void set_data_offset(int offset) override
-	{
-		pan_envelope_->set_data_offset(offset);
-		traverser_.set_data_offset(offset);
-		waveform_traverser_.set_data_offset(offset);
+		return gui_position_traverser_.get_position(pitch_slider_->get(), pitch_envelope_->get_point_data(), &gui_block_traverser_, sample_offset_slider_->get(), derivative);
 	}
 	
 private:
 
-	mutable std_traversers::Classic traverser_;
-	mutable std_traversers::Classic waveform_traverser_;
+	Traverser audio_block_traverser_;
+	mutable Traverser gui_block_traverser_;
+
+	mutable std_traversers::Classic audio_position_traverser_;
+	mutable std_traversers::Classic gui_position_traverser_;
 
 	std::shared_ptr<EnvelopeParameter> amp_envelope_;
 	std::shared_ptr<EnvelopeParameter> pan_envelope_;
@@ -79,35 +105,6 @@ private:
 	std::shared_ptr<ToggleParameter> loop_toggle_;
 	std::shared_ptr<ToggleParameter> reverse_toggle_;
 };
-
-static ml::DSPVectorArray<2> stereo_pan(const ml::DSPVectorArray<2> in, float pan, std::shared_ptr<EnvelopeParameter> pan_envelope, const blkhdgen_Position* pos)
-{
-	auto out = in;
-
-	ml::DSPVector env_pan;
-
-	for (int i = 0; i < kFloatsPerDSPVector; i++)
-	{
-		env_pan[i] = pan_envelope->get_mod_value(pos[i]);
-	}
-
-	const auto zero = ml::DSPVector(0.0f);
-	const auto one = ml::DSPVector(1.0f);
-
-	env_pan = ml::clamp(env_pan + pan, ml::DSPVector(-1.0f), ml::DSPVector(1.0f));
-
-	const auto pan_amp_L = ml::lerp(one, zero, ml::max(zero, env_pan));
-	const auto pan_amp_R = ml::lerp(one, zero, ml::max(zero, 0.0f - env_pan));
-
-	const auto pan_vec = ml::concatRows(pan_amp_L, pan_amp_R);
-
-	out *= pan_vec;
-
-	out.row(0) += out.row(1) * (1.0f - pan_amp_R);
-	out.row(1) += out.row(0) * (1.0f - pan_amp_L);
-
-	return out;
-}
 
 blkhdgen_Generator make_generator()
 {
