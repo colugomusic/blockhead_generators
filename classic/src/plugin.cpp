@@ -80,11 +80,15 @@ public:
 		return "Unknown error";
 	}
 
-	blkhdgen_Position get_waveform_position(blkhdgen_Position block_position, float* derivative = nullptr) const override
+	blkhdgen_Error get_waveform_positions(const blkhdgen_Position* block_positions, float* out, float* derivatives = nullptr) const override
 	{
-		gui_block_traverser_.generate(block_position, get_data_offset());
+		gui_block_traverser_.generate(block_positions, get_data_offset());
 
-		return gui_position_traverser_.get_position(pitch_slider_->get(), pitch_envelope_->get_point_data(), &gui_block_traverser_, sample_offset_slider_->get(), derivative);
+		const auto positions = gui_position_traverser_.get_positions(pitch_slider_->get(), pitch_envelope_->get_point_data(), &gui_block_traverser_, sample_offset_slider_->get(), derivatives);
+
+		ml::store(positions, out);
+
+		return BLKHDGEN_OK; 
 	}
 	
 private:
