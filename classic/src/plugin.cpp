@@ -69,8 +69,8 @@ public:
 
 		out_vec *= ml::repeatRows<2>(env_amp);
 
-		ml::store(out_vec.constRow(0), out[0]);
-		ml::store(out_vec.constRow(1), out[1]);
+		ml::storeAligned(out_vec.constRow(0), out[0]);
+		ml::storeAligned(out_vec.constRow(1), out[1]);
 
 		return BLKHDGEN_OK;
 	}
@@ -86,11 +86,21 @@ public:
 
 		const auto positions = gui_position_traverser_.get_positions(pitch_slider_->get(), pitch_envelope_->get_point_data(), &gui_block_traverser_, sample_offset_slider_->get(), derivatives);
 
-		ml::store(positions, out);
+		ml::storeAligned(positions, out);
 
 		return BLKHDGEN_OK; 
 	}
-	
+
+	size_t get_required_aux_buffer_size() const override
+	{
+		return 0;
+	}
+
+	blkhdgen_Error preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks) const
+	{
+		return BLKHDGEN_OK;
+	}
+
 private:
 
 	Traverser audio_block_traverser_;
