@@ -41,7 +41,7 @@ public:
 
 		const auto sample_info = get_sample_info();
 
-		auto sample_pos = audio_position_traverser_.get_positions(pitch_slider_->get(), pitch_envelope_->get_point_data(), &audio_block_traverser_, sample_offset_slider_->get());
+		auto sample_pos = audio_position_traverser_.get_positions(pitch_slider_->get(), *pitch_envelope_.get(), &audio_block_traverser_, sample_offset_slider_->get());
 
 		sample_pos /= float(song_rate) / sample_info->SR;
 
@@ -85,7 +85,7 @@ public:
 	{
 		gui_block_traverser_.generate(block_positions, get_data_offset());
 
-		const auto positions = gui_position_traverser_.get_positions(pitch_slider_->get(), pitch_envelope_->get_point_data(), &gui_block_traverser_, sample_offset_slider_->get(), derivatives);
+		const auto positions = gui_position_traverser_.get_positions(pitch_slider_->get(), *pitch_envelope_.get(), &gui_block_traverser_, sample_offset_slider_->get(), derivatives);
 
 		ml::storeAligned(positions, out);
 
