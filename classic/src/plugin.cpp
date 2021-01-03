@@ -1,3 +1,5 @@
+#define BLKHDGEN_EXPORT
+
 #include <blkhdgen/bind.hpp>
 #include <blkhdgen/math.hpp>
 #include <blkhdgen/standard_parameters.hpp>
@@ -8,6 +10,10 @@ using namespace blkhdgen;
 class Classic : public Generator
 {
 public:
+
+	static constexpr auto UUID = "bd64e4c8-f788-433b-a42a-d375afd92503";
+	static constexpr auto NAME = "Classic";
+	static constexpr auto REQUIRES_PREPROCESS = false;
 
 	Classic()
 	{
@@ -22,11 +28,6 @@ public:
 
 		loop_toggle_    = add_parameter(std_params::toggles::loop());
 		reverse_toggle_ = add_parameter(std_params::toggles::reverse());
-	}
-
-	const char* get_name() const override
-	{
-		return "Classic";
 	}
 
 	blkhdgen_Error process(blkhdgen_SR song_rate, blkhdgen_SR sample_rate, const blkhdgen_Position* block_pos, float** out) override
