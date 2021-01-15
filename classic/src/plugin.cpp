@@ -121,12 +121,22 @@ private:
 	std::shared_ptr<ToggleParameter> reverse_toggle_;
 };
 
-blkhdgen_Generator make_generator()
+blkhdgen_UUID blkhdgen_get_plugin_uuid()
+{
+	return Classic::UUID;
+}
+
+blkhdgen_Bool blkhdgen_is_sampler()
+{
+	return true;
+}
+
+blkhdgen_Generator blkhdgen_make_generator()
 {
 	return bind::make_generator<Classic>();
 }
 
-blkhdgen_Error destroy_generator(blkhdgen_Generator generator)
+blkhdgen_Error blkhdgen_destroy_generator(blkhdgen_Generator generator)
 {
 	return bind::destroy_generator(generator);
 }
