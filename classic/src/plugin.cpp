@@ -1,5 +1,6 @@
 #define BLKHDGEN_EXPORT
 
+#include <blkhdgen_sampler.h>
 #include <blkhdgen/bind.hpp>
 #include <blkhdgen/math.hpp>
 #include <blkhdgen/standard_parameters.hpp>
@@ -7,7 +8,7 @@
 
 using namespace blkhdgen;
 
-class Classic : public Generator
+class Classic : public Sampler
 {
 public:
 
@@ -92,11 +93,6 @@ public:
 		return BLKHDGEN_OK; 
 	}
 
-	size_t get_required_aux_buffer_size() const override
-	{
-		return 0;
-	}
-
 	blkhdgen_Error preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks) const
 	{
 		return BLKHDGEN_OK;
@@ -126,17 +122,12 @@ blkhdgen_UUID blkhdgen_get_plugin_uuid()
 	return Classic::UUID;
 }
 
-blkhdgen_Bool blkhdgen_is_sampler()
+blkhdgen_Sampler blkhdgen_make_sampler()
 {
-	return true;
+	return bind::make_sampler<Classic>();
 }
 
-blkhdgen_Generator blkhdgen_make_generator()
+blkhdgen_Error blkhdgen_destroy_sampler(blkhdgen_Sampler sampler)
 {
-	return bind::make_generator<Classic>();
-}
-
-blkhdgen_Error blkhdgen_destroy_generator(blkhdgen_Generator generator)
-{
-	return bind::destroy_generator(generator);
+	return bind::destroy_sampler(sampler);
 }
