@@ -122,6 +122,11 @@ blkhdgen_UUID blkhdgen_get_plugin_uuid()
 	return Classic::UUID;
 }
 
+blkhdgen_UUID blkhdgen_get_plugin_name()
+{
+	return Classic::NAME;
+}
+
 blkhdgen_Sampler blkhdgen_make_sampler()
 {
 	return bind::make_sampler<Classic>();
