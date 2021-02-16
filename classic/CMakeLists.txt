@@ -21,6 +21,11 @@ FetchContent_Declare(
 FetchContent_Populate(madronalib)
 
 list(APPEND SRC
+    ./src/audio.h
+    ./src/audio.cpp
+    ./src/gui.h
+    ./src/gui.cpp
+    ./src/plugin.h
     ./src/plugin.cpp
 )
 

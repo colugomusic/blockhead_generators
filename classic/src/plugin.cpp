@@ -1,121 +1,41 @@
 #define BLKHDGEN_EXPORT
+#include "plugin.h"
 
-#include <blkhdgen_sampler.h>
 #include <blkhdgen/bind.hpp>
 #include <blkhdgen/math.hpp>
 #include <blkhdgen/standard_parameters.hpp>
-#include <blkhdgen/standard_traversers/classic.hpp>
+
+#include "audio.h"
 
 using namespace blkhdgen;
 
-class Classic : public Sampler
+Classic::Classic()
 {
-public:
+	env_amp_ = add_parameter(std_params::envelopes::amp());
+	env_pan_ = add_parameter(std_params::envelopes::pan());
+	env_pitch_ = add_parameter(std_params::envelopes::pitch());
 
-	static constexpr auto UUID = "bd64e4c8-f788-433b-a42a-d375afd92503";
-	static constexpr auto NAME = "Classic";
-	static constexpr auto REQUIRES_PREPROCESS = false;
+	sld_amp_ = add_parameter(std_params::sliders::amp());
+	sld_pan_ = add_parameter(std_params::sliders::pan());
+	sld_pitch_ = add_parameter(std_params::sliders::pitch());
+	sld_sample_offset_ = add_parameter(std_params::sliders::sample_offset());
 
-	Classic()
-	{
-		amp_envelope_   = add_parameter(std_params::envelopes::amp());
-		pan_envelope_   = add_parameter(std_params::envelopes::pan());
-		pitch_envelope_ = add_parameter(std_params::envelopes::pitch());
+	tog_loop_ = add_parameter(std_params::toggles::loop());
+	tog_revers_ = add_parameter(std_params::toggles::reverse());
+}
 
-		amp_slider_           = add_parameter(std_params::sliders::amp());
-		pan_slider_           = add_parameter(std_params::sliders::pan());
-		pitch_slider_         = add_parameter(std_params::sliders::pitch());
-		sample_offset_slider_ = add_parameter(std_params::sliders::sample_offset());
+GUI& Classic::gui()
+{
+	return gui_;
+}
 
-		loop_toggle_    = add_parameter(std_params::toggles::loop());
-		reverse_toggle_ = add_parameter(std_params::toggles::reverse());
-	}
-
-	blkhdgen_Error process(blkhdgen_SR song_rate, blkhdgen_SR sample_rate, const blkhdgen_Position* block_pos, float** out) override
-	{
-		ml::DSPVectorArray<2> out_vec;
-		ml::DSPVector env_amp;
-
-		const auto data_offset = get_data_offset();
-
-		audio_block_traverser_.generate(block_pos, data_offset);
-
-		const auto sample_info = get_sample_info();
-
-		auto sample_pos = audio_position_traverser_.get_positions(pitch_slider_->get(), *pitch_envelope_.get(), &audio_block_traverser_, sample_offset_slider_->get());
-
-		sample_pos /= float(song_rate) / sample_info->SR;
-
-		env_amp = amp_envelope_->get_mod_values(&audio_block_traverser_);
-
-		if (reverse_toggle_.get())
-		{
-			sample_pos = float(sample_info->num_frames - 1) - sample_pos;
-		}
-
-		if (sample_info->num_channels > 0)
-		{
-			out_vec.row(0) = read_sample_frames_interp(0, sample_pos, loop_toggle_.get());
-		}
-
-		if (sample_info->num_channels > 1)
-		{
-			out_vec.row(1) = read_sample_frames_interp(1, sample_pos, loop_toggle_.get());
-		}
-		else
-		{
-			out_vec.row(1) = out_vec.row(0);
-		}
-
-		stereo_pan(out_vec, pan_slider_->get(), pan_envelope_, &audio_block_traverser_);
-
-		out_vec *= ml::repeatRows<2>(env_amp);
-
-		ml::storeAligned(out_vec.constRow(0), out[0]);
-		ml::storeAligned(out_vec.constRow(1), out[1]);
-
-		return BLKHDGEN_OK;
-	}
-
-	const char* get_error_string(blkhdgen_Error error) const override
-	{
-		return "Unknown error";
-	}
-
-	blkhdgen_Error get_waveform_positions(const blkhdgen_Position* block_positions, float* out, float* derivatives = nullptr) const override
-	{
-		gui_block_traverser_.generate(block_positions, get_data_offset());
-
-		const auto positions = gui_position_traverser_.get_positions(pitch_slider_->get(), *pitch_envelope_.get(), &gui_block_traverser_, sample_offset_slider_->get(), derivatives);
-
-		ml::storeAligned(positions, out);
-
-		return BLKHDGEN_OK; 
-	}
-
-	blkhdgen_Error preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks) const
-	{
-		return BLKHDGEN_OK;
-	}
-
-private:
-
-	Traverser audio_block_traverser_;
-	mutable Traverser gui_block_traverser_;
-
-	mutable std_traversers::Classic audio_position_traverser_;
-	mutable std_traversers::Classic gui_position_traverser_;
-
-	std::shared_ptr<EnvelopeParameter> amp_envelope_;
-	std::shared_ptr<EnvelopeParameter> pan_envelope_;
-	std::shared_ptr<EnvelopeParameter> pitch_envelope_;
-	std::shared_ptr<SliderParameter<float>> amp_slider_;
-	std::shared_ptr<SliderParameter<float>> pan_slider_;
-	std::shared_ptr<SliderParameter<float>> pitch_slider_;
-	std::shared_ptr<SliderParameter<int>> sample_offset_slider_;
-	std::shared_ptr<ToggleParameter> loop_toggle_;
-	std::shared_ptr<ToggleParameter> reverse_toggle_;
+enum class Error
+{
+	AlreadyInitialized,
+	NotInitialized,
 };
+
+Classic* g_plugin = nullptr;
 
 blkhdgen_UUID blkhdgen_get_plugin_uuid()
 {
@@ -127,12 +47,102 @@ blkhdgen_UUID blkhdgen_get_plugin_name()
 	return Classic::NAME;
 }
 
+blkhdgen_Error blkhdgen_init()
+{
+	if (g_plugin) return blkhdgen_Error(Error::AlreadyInitialized);
+
+	g_plugin = new Classic();
+
+	return BLKHDGEN_OK;
+}
+
+blkhdgen_Error blkhdgen_terminate()
+{
+	if (!g_plugin) return blkhdgen_Error(Error::NotInitialized);
+
+	delete g_plugin;
+
+	return BLKHDGEN_OK;
+}
+
 blkhdgen_Sampler blkhdgen_make_sampler()
 {
-	return bind::make_sampler<Classic>();
+	if (!g_plugin) return { 0 };
+
+	return bind::make_sampler<Audio>(g_plugin);
 }
 
 blkhdgen_Error blkhdgen_destroy_sampler(blkhdgen_Sampler sampler)
 {
 	return bind::destroy_sampler(sampler);
+}
+
+blkhdgen_Bool blkhdgen_sampler_requires_preprocessing()
+{
+	return Audio::REQUIRES_PREPROCESS ? BLKHDGEN_TRUE : BLKHDGEN_FALSE;
+}
+
+blkhdgen_Error blkhdgen_sampler_preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks, const blkhdgen_SampleInfo* sample_info)
+{
+	// TODO:
+	return -1;
+}
+
+blkhdgen_Error blkhdgen_sampler_sample_deleted(blkhdgen_ID sample_id)
+{
+	// TODO:
+	return -1;
+}
+
+int blkhdgen_get_num_groups()
+{
+	if (!g_plugin) return 0;
+
+	return g_plugin->get_num_groups();
+}
+
+int blkhdgen_get_num_parameters()
+{
+	if (!g_plugin) return 0;
+
+	return g_plugin->get_num_parameters();
+}
+
+blkhdgen_Group blkhdgen_get_group(blkhdgen_Index index)
+{
+	return bind::group(g_plugin->get_group(index));
+}
+
+blkhdgen_Group blkhdgen_get_group_by_id(blkhdgen_ID id)
+{
+	return bind::group(g_plugin->get_group_by_id(id));
+}
+
+blkhdgen_Parameter blkhdgen_get_parameter(blkhdgen_Index index)
+{
+	return bind::parameter(g_plugin->get_parameter(index));
+}
+
+blkhdgen_Parameter blkhdgen_get_parameter_by_uuid(blkhdgen_UUID uuid)
+{
+	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+}
+
+const char* blkhdgen_get_error_string(blkhdgen_Error error)
+{
+	switch (Error(error))
+	{
+		case Error::AlreadyInitialized: return "already initialized";
+		case Error::NotInitialized: return "not initialized";
+		default: return "unknown error";
+	}
+}
+
+blkhdgen_Error blkhdgen_sampler_get_waveform_positions(const blkhdgen_ParameterData* parameter_data, int data_offset, const blkhdgen_Position* pos, float* out, float* derivatives)
+{
+	if (!g_plugin) return blkhdgen_Error(Error::NotInitialized);
+
+	g_plugin->gui().get_waveform_positions(g_plugin, parameter_data, data_offset, pos, out, derivatives);
+
+	return BLKHDGEN_OK;
 }
