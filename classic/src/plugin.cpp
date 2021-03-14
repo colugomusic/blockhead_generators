@@ -138,11 +138,11 @@ const char* blkhdgen_get_error_string(blkhdgen_Error error)
 	}
 }
 
-blkhdgen_Error blkhdgen_sampler_get_waveform_positions(const blkhdgen_ParameterData* parameter_data, int data_offset, const blkhdgen_Position* pos, float* out, float* derivatives)
+blkhdgen_Error blkhdgen_sampler_get_waveform_positions(const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives)
 {
 	if (!g_plugin) return blkhdgen_Error(Error::NotInitialized);
 
-	g_plugin->gui().get_waveform_positions(g_plugin, parameter_data, data_offset, pos, out, derivatives);
+	g_plugin->gui().get_waveform_positions(g_plugin, buffer, n, out, derivatives);
 
 	return BLKHDGEN_OK;
 }
