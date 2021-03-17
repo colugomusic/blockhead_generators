@@ -12,7 +12,7 @@ blkhdgen_Error Audio::process(const blkhdgen_SamplerBuffer* buffer, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
-	block_traverser_.generate(buffer->positions, buffer->data_offset);
+	block_traverser_.generate(buffer->positions, kFloatsPerDSPVector, buffer->data_offset);
 
 	struct Data
 	{
