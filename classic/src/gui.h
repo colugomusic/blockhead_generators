@@ -9,7 +9,7 @@ class GUI
 {
 public:
 
-	blkhdgen_Error get_waveform_positions(const Classic* plugin, const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives);
+	blkhdgen_Error get_waveform_positions(const Classic* plugin, const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives, float* amp);
 
 private:
 

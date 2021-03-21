@@ -3,15 +3,16 @@
 
 using namespace blkhdgen;
 
-blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives)
+blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives, float* amp)
 {
 	gui_block_traverser_.set_reset(0);
 
-	const auto data_slider_pitch = buffer->parameter_data ? &buffer->parameter_data[int(Classic::ParameterIndex::Sld_Pitch)].slider : nullptr;
-	const auto data_envelope_pitch = buffer->parameter_data ? &buffer->parameter_data[int(Classic::ParameterIndex::Env_Pitch)].envelope : nullptr;
-	const auto data_slider_sample_offset = buffer->parameter_data ? &buffer->parameter_data[int(Classic::ParameterIndex::Sld_SampleOffset)].int_slider : nullptr;
-	const auto data_toggle_loop = buffer->parameter_data ? &buffer->parameter_data[int(Classic::ParameterIndex::Tog_Loop)].toggle : nullptr;
-	const auto data_toggle_reverse = buffer->parameter_data ? &buffer->parameter_data[int(Classic::ParameterIndex::Tog_Reverse)].toggle : nullptr;
+	const auto data_slider_amp           = Plugin::get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Amp));
+	const auto data_slider_pitch         = Plugin::get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pitch));
+	const auto data_envelope_pitch       = Plugin::get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pitch));
+	const auto data_slider_sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_SampleOffset));
+	const auto data_toggle_loop          = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
+	const auto data_toggle_reverse       = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
 
 	auto frames_remaining = n;
 	int index = 0;
@@ -27,7 +28,6 @@ blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen
 		auto positions =
 			gui_position_traverser_.get_positions(
 				data_slider_pitch ? data_slider_pitch->value : 0,
-				plugin->env_pitch(),
 				data_envelope_pitch ? &data_envelope_pitch->points : nullptr,
 				&gui_block_traverser_,
 				data_slider_sample_offset ? data_slider_sample_offset->value : 0,
@@ -54,7 +54,15 @@ blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen
 		positions /= (float(buffer->song_rate) / buffer->sample_info->SR);
 
 		std::copy(positions.getConstBuffer(), positions.getConstBuffer() + count, out + index);
+
 		if (derivatives) std::copy(derivatives_vec.getConstBuffer(), derivatives_vec.getConstBuffer() + count, derivatives + index);
+
+		if (amp && data_slider_amp)
+		{
+			ml::DSPVector amp_vec(data_slider_amp->value);
+
+			std::copy(amp_vec.getConstBuffer(), amp_vec.getConstBuffer() + count, amp + index);
+		}
 
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;
