@@ -1,10 +1,10 @@
-#include <blkhdgen_sampler.h>
-#include <blkhdgen/sampler.hpp>
-#include <blkhdgen/standard_traversers/classic.hpp>
+#include <blink_sampler.h>
+#include <blink/sampler.hpp>
+#include <blink/standard_traversers/classic.hpp>
 
 class Classic;
 
-class Audio : public blkhdgen::Sampler
+class Audio : public blink::Sampler
 {
 public:
 
@@ -12,13 +12,13 @@ public:
 
 	Audio(const Classic* plugin);
 
-	blkhdgen_Error process(const blkhdgen_SamplerBuffer* buffer, float* out) override;
-	blkhdgen_Error preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks) const;
+	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
+	blink_Error preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const;
 
 private:
 
 	const Classic* plugin_;
-	blkhdgen::Traverser block_traverser_;
-	blkhdgen::std_traversers::Classic position_traverser_;
+	blink::Traverser block_traverser_;
+	blink::std_traversers::Classic position_traverser_;
 
 };

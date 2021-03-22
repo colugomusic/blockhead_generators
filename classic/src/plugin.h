@@ -1,10 +1,10 @@
 #pragma once
 
-#include <blkhdgen/plugin.hpp>
+#include <blink/plugin.hpp>
 
 #include "gui.h"
 
-class Classic : public blkhdgen::Plugin
+class Classic : public blink::Plugin
 {
 public:
 
@@ -30,23 +30,23 @@ public:
 
 	GUI& gui();
 
-	const blkhdgen::EnvelopeParameter& env_amp() const { return *env_amp_; }
-	const blkhdgen::EnvelopeParameter& env_pan() const { return *env_pan_; }
-	const blkhdgen::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
+	const blink::EnvelopeParameter& env_amp() const { return *env_amp_; }
+	const blink::EnvelopeParameter& env_pan() const { return *env_pan_; }
+	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 
-	const blkhdgen::SliderParameter<float>& slider_pitch() const { return *sld_pitch_; }
+	const blink::SliderParameter<float>& slider_pitch() const { return *sld_pitch_; }
 
 private:
 
 	GUI gui_;
 
-	std::shared_ptr<blkhdgen::EnvelopeParameter> env_amp_;
-	std::shared_ptr<blkhdgen::EnvelopeParameter> env_pan_;
-	std::shared_ptr<blkhdgen::EnvelopeParameter> env_pitch_;
-	std::shared_ptr<blkhdgen::SliderParameter<float>> sld_amp_;
-	std::shared_ptr<blkhdgen::SliderParameter<float>> sld_pan_;
-	std::shared_ptr<blkhdgen::SliderParameter<float>> sld_pitch_;
-	std::shared_ptr<blkhdgen::SliderParameter<int>> sld_sample_offset_;
-	std::shared_ptr<blkhdgen::ToggleParameter> tog_loop_;
-	std::shared_ptr<blkhdgen::ToggleParameter> tog_revers_;
+	std::shared_ptr<blink::EnvelopeParameter> env_amp_;
+	std::shared_ptr<blink::EnvelopeParameter> env_pan_;
+	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
+	std::shared_ptr<blink::SliderParameter<float>> sld_amp_;
+	std::shared_ptr<blink::SliderParameter<float>> sld_pan_;
+	std::shared_ptr<blink::SliderParameter<float>> sld_pitch_;
+	std::shared_ptr<blink::SliderParameter<int>> sld_sample_offset_;
+	std::shared_ptr<blink::ToggleParameter> tog_loop_;
+	std::shared_ptr<blink::ToggleParameter> tog_revers_;
 };

@@ -1,9 +1,9 @@
 #include "gui.h"
 #include "plugin.h"
 
-using namespace blkhdgen;
+using namespace blink;
 
-blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen_SamplerBuffer* buffer, blkhdgen_FrameCount n, float* out, float* derivatives, float* amp)
+blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp)
 {
 	gui_block_traverser_.set_reset(0);
 
@@ -68,5 +68,5 @@ blkhdgen_Error GUI::get_waveform_positions(const Classic* plugin, const blkhdgen
 		index += kFloatsPerDSPVector;
 	}
 
-	return BLKHDGEN_OK;
+	return BLINK_OK;
 }

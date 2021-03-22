@@ -1,14 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
 
-using namespace blkhdgen;
+using namespace blink;
 
 Audio::Audio(const Classic* plugin)
 	: plugin_(plugin)
 {
 }
 
-blkhdgen_Error Audio::process(const blkhdgen_SamplerBuffer* buffer, float* out)
+blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
@@ -16,15 +16,15 @@ blkhdgen_Error Audio::process(const blkhdgen_SamplerBuffer* buffer, float* out)
 
 	struct Data
 	{
-		const blkhdgen_EnvelopeData* env_amp;
-		const blkhdgen_EnvelopeData* env_pan;
-		const blkhdgen_EnvelopeData* env_pitch;
-		const blkhdgen_SliderData* slider_amp;
-		const blkhdgen_SliderData* slider_pan;
-		const blkhdgen_SliderData* slider_pitch;
-		const blkhdgen_IntSliderData* slider_sample_offset;
-		const blkhdgen_ToggleData* toggle_loop;
-		const blkhdgen_ToggleData* toggle_reverse;
+		const blink_EnvelopeData* env_amp;
+		const blink_EnvelopeData* env_pan;
+		const blink_EnvelopeData* env_pitch;
+		const blink_SliderData* slider_amp;
+		const blink_SliderData* slider_pan;
+		const blink_SliderData* slider_pitch;
+		const blink_IntSliderData* slider_sample_offset;
+		const blink_ToggleData* toggle_loop;
+		const blink_ToggleData* toggle_reverse;
 	} data;
 
 	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Amp));
@@ -71,10 +71,10 @@ blkhdgen_Error Audio::process(const blkhdgen_SamplerBuffer* buffer, float* out)
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
 
-	return BLKHDGEN_OK;
+	return BLINK_OK;
 }
 
-blkhdgen_Error Audio::preprocess_sample(void* host, blkhdgen_PreprocessCallbacks callbacks) const
+blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const
 {
-	return BLKHDGEN_OK;
+	return BLINK_OK;
 }
