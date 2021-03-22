@@ -41,7 +41,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
 
-	SampleData sample_data(buffer->sample_info);
+	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
 	const auto amp = plugin_->env_amp().get_mod_values(&block_traverser_, data.env_amp) * data.slider_amp->value;
 
@@ -50,18 +50,13 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		sample_pos = float(buffer->sample_info->num_frames - 1) - sample_pos;
 	}
 
-	if (buffer->sample_info->num_channels > 0)
-	{
-		out_vec.row(0) = sample_data.read_frames_interp(0, sample_pos, data.toggle_loop->value);
-	}
-
 	if (buffer->sample_info->num_channels > 1)
 	{
-		out_vec.row(1) = sample_data.read_frames_interp(1, sample_pos, data.toggle_loop->value);
+		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 	else
 	{
-		out_vec.row(1) = out_vec.row(0);
+		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, &block_traverser_);
@@ -74,7 +69,37 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	return BLINK_OK;
 }
 
+ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
+{
+	ml::DSPVectorArray<2> out;
+
+	switch (sample_data.get_channel_mode())
+	{
+		default:
+		case blink_ChannelMode_Stereo:
+		{
+			return sample_data.read_frames_interp<2>(sample_pos, loop);
+		}
+
+		case blink_ChannelMode_Left:
+		{
+			return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
+		}
+
+		case blink_ChannelMode_Right:
+		{
+			return ml::repeatRows<2>(sample_data.read_frames_interp(1, sample_pos, loop));
+		}
+	}
+}
+
+ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
+{
+	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
+}
+
 blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const
 {
 	return BLINK_OK;
 }
+
