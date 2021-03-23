@@ -63,6 +63,10 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 
 			std::copy(amp_vec.getConstBuffer(), amp_vec.getConstBuffer() + count, amp + index);
 		}
+		else
+		{
+			std::fill(amp + index, amp + index + count, 1.0f);
+		}
 
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;
