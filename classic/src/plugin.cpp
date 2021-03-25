@@ -11,9 +11,17 @@ using namespace blink;
 
 Classic::Classic()
 {
-	env_amp_ = add_parameter(std_params::envelopes::amp());
-	env_pan_ = add_parameter(std_params::envelopes::pan());
-	env_pitch_ = add_parameter(std_params::envelopes::pitch());
+	auto spec_env_amp = std_params::envelopes::amp();
+	auto spec_env_pan = std_params::envelopes::pan();
+	auto spec_env_pitch = std_params::envelopes::pitch();
+
+	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
+	spec_env_pan.flags |= blink_EnvelopeFlags_DefaultActive;
+	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
+
+	env_amp_ = add_parameter(spec_env_amp);
+	env_pan_ = add_parameter(spec_env_pan);
+	env_pitch_ = add_parameter(spec_env_pitch);
 
 	sld_amp_ = add_parameter(std_params::sliders::amp());
 	sld_pan_ = add_parameter(std_params::sliders::pan());
@@ -22,6 +30,26 @@ Classic::Classic()
 
 	tog_loop_ = add_parameter(std_params::toggles::loop());
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
+
+	auto test_group = add_group("Test Group");
+
+	blink::EnvelopeSpec test_env;
+
+	test_env.uuid = "40d536fe-8305-4d84-a671-0d7899280db2";
+	test_env.name = "Test Envelope";
+	test_env.display_value = std_params::display_number;
+	test_env.from_string = std_params::find_number<float>;
+	test_env.group_index = test_group;
+
+	add_parameter(test_env);
+
+	test_env.uuid = "e171f2c5-b62c-4887-8075-63f920bb46ea";
+	test_env.name = "Another parameter";
+	test_env.display_value = std_params::display_number;
+	test_env.from_string = std_params::find_number<float>;
+	test_env.group_index = test_group;
+
+	add_parameter(test_env);
 }
 
 GUI& Classic::gui()
@@ -111,11 +139,6 @@ int blink_get_num_parameters()
 blink_Group blink_get_group(blink_Index index)
 {
 	return bind::group(g_plugin->get_group(index));
-}
-
-blink_Group blink_get_group_by_id(blink_ID id)
-{
-	return bind::group(g_plugin->get_group_by_id(id));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)

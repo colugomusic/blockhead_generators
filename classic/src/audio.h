@@ -24,6 +24,7 @@ private:
 
 	const Classic* plugin_;
 	blink::Traverser block_traverser_;
+	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	blink::std_traversers::Classic position_traverser_;
 
 };

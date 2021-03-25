@@ -37,7 +37,9 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
 	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
 
-	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, &data.env_pitch->points, &block_traverser_, data.slider_sample_offset->value);
+	traverser_resetter_.check(data.env_pitch, &block_traverser_);
+
+	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value);
 
 	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
 
