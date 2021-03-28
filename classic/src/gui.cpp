@@ -20,6 +20,7 @@ struct Data
 
 	struct Envelopes
 	{
+		const blink_EnvelopeData* amp;
 		const blink_EnvelopeData* pitch;
 	} envelopes;
 };
@@ -33,6 +34,7 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_SampleOffset));
 	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
 	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
+	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Amp));
 	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pitch));
 
 	return out;
@@ -81,18 +83,21 @@ static void calculate_positions(
 	if (out_derivatives) std::copy(derivatives_vec.getConstBuffer(), derivatives_vec.getConstBuffer() + count, out_derivatives);
 }
 
-static void calculate_amp(const Data& data, int count, float* out)
+static void calculate_amp(const Classic* plugin, const Data& data, const float* positions, int count, float prev_pos, float* out)
 {
+	ml::DSPVector amp(1.0f);
+
+	if (data.envelopes.amp)
+	{
+		plugin->env_amp().search_vec(data.envelopes.amp, positions, count, prev_pos, amp.getBuffer());
+	}
+
 	if (data.sliders.amp)
 	{
-		ml::DSPVector amp_vec(data.sliders.amp->value);
+		amp *= data.sliders.amp->value;
+	}
 
-		std::copy(amp_vec.getConstBuffer(), amp_vec.getConstBuffer() + count, out);
-	}
-	else
-	{
-		std::fill(out, out + count, 1.0f);
-	}
+	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + count, out);
 }
 
 blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp)
@@ -103,6 +108,7 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 
 	auto frames_remaining = n;
 	int index = 0;
+	float prev_pos = 0.0f;
 
 	while (frames_remaining > 0 && frames_remaining <= buffer->sample_info->num_frames)
 	{
@@ -122,8 +128,11 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 			out + index,
 			derivatives ? derivatives + index : nullptr);
 
-		calculate_amp(data, count, amp + index);
+		const auto positions = block_traverser_.get_read_position().getConstBuffer();
 
+		calculate_amp(plugin, data, positions, count, prev_pos, amp + index);
+
+		prev_pos = positions[count - 1];
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;
 	}

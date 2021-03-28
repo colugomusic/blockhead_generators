@@ -23,10 +23,10 @@ Classic::Classic()
 	env_pan_ = add_parameter(spec_env_pan);
 	env_pitch_ = add_parameter(spec_env_pitch);
 
-	sld_amp_ = add_parameter(std_params::sliders::amp());
-	sld_pan_ = add_parameter(std_params::sliders::pan());
-	sld_pitch_ = add_parameter(std_params::sliders::pitch());
-	sld_sample_offset_ = add_parameter(std_params::sliders::sample_offset());
+	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
+	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());
+	sld_pitch_ = add_parameter(std_params::sliders::parameters::pitch());
+	sld_sample_offset_ = add_parameter(std_params::sliders::parameters::sample_offset());
 
 	tog_loop_ = add_parameter(std_params::toggles::loop());
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
@@ -37,19 +37,22 @@ Classic::Classic()
 
 	test_env.uuid = "40d536fe-8305-4d84-a671-0d7899280db2";
 	test_env.name = "Test Envelope";
-	test_env.display_value = std_params::display_number;
+	test_env.display_value = std_params::display_number<float>;
 	test_env.from_string = std_params::find_number<float>;
 	test_env.group_index = test_group;
+	test_env.value_slider = std_params::sliders::pitch();
 
 	add_parameter(test_env);
 
 	test_env.uuid = "e171f2c5-b62c-4887-8075-63f920bb46ea";
 	test_env.name = "Another parameter";
-	test_env.display_value = std_params::display_number;
+	test_env.display_value = std_params::display_number<float>;
 	test_env.from_string = std_params::find_number<float>;
 	test_env.group_index = test_group;
+	test_env.value_slider = std_params::sliders::pitch();
 
 	add_parameter(test_env);
+	add_parameter(std_params::envelopes::speed());
 }
 
 GUI& Classic::gui()

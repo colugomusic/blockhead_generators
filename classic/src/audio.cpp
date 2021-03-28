@@ -12,6 +12,8 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
+	const auto prev_pos = block_traverser_.get_read_position()[kFloatsPerDSPVector - 1];
+
 	block_traverser_.generate(buffer->positions, kFloatsPerDSPVector, buffer->data_offset);
 
 	struct Data
@@ -45,7 +47,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
-	const auto amp = plugin_->env_amp().get_mod_values(&block_traverser_, data.env_amp) * data.slider_amp->value;
+	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_traverser_.get_read_position(), prev_pos) * data.slider_amp->value;
 
 	if (data.toggle_reverse->value)
 	{
@@ -61,7 +63,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
-	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, &block_traverser_);
+	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_traverser_.get_read_position(), prev_pos);
 
 	out_vec *= ml::repeatRows<2>(amp);
 
