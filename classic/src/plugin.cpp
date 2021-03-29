@@ -41,6 +41,8 @@ Classic::Classic()
 	test_env.from_string = std_params::find_number<float>;
 	test_env.group_index = test_group;
 	test_env.value_slider = std_params::sliders::pitch();
+	test_env.search_binary = std_params::envelopes::generic_search_binary;
+	test_env.search_forward = std_params::envelopes::generic_search_forward;
 
 	add_parameter(test_env);
 
@@ -50,6 +52,8 @@ Classic::Classic()
 	test_env.from_string = std_params::find_number<float>;
 	test_env.group_index = test_group;
 	test_env.value_slider = std_params::sliders::pitch();
+	test_env.search_binary = std_params::envelopes::generic_search_binary;
+	test_env.search_forward = std_params::envelopes::generic_search_forward;
 
 	add_parameter(test_env);
 	add_parameter(std_params::envelopes::speed());

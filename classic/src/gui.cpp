@@ -58,11 +58,12 @@ static void calculate_positions(
 			data.envelopes.pitch,
 			block_traverser,
 			data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
+			count,
 			out_derivatives ? derivatives_vec.getBuffer() : nullptr);
 
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
-		for (int i = 0; i < kFloatsPerDSPVector; i++)
+		for (int i = 0; i < count; i++)
 		{
 			if (positions[i] > sample_info.num_frames - 1)
 			{
@@ -108,7 +109,7 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 
 	auto frames_remaining = n;
 	int index = 0;
-	float prev_pos = 0.0f;
+	auto prev_pos = std::numeric_limits<float>::max();
 
 	while (frames_remaining > 0 && frames_remaining <= buffer->sample_info->num_frames)
 	{

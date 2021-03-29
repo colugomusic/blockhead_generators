@@ -12,7 +12,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
-	const auto prev_pos = block_traverser_.get_read_position()[kFloatsPerDSPVector - 1];
+	const auto prev_pos = block_traverser_.get_last_pos();
 
 	block_traverser_.generate(buffer->positions, kFloatsPerDSPVector, buffer->data_offset);
 
@@ -41,7 +41,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	traverser_resetter_.check(data.env_pitch, &block_traverser_);
 
-	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value);
+	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
 
 	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
 
