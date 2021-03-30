@@ -11,6 +11,8 @@ using namespace blink;
 
 Classic::Classic()
 {
+	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
+
 	auto spec_env_amp = std_params::envelopes::amp();
 	auto spec_env_pan = std_params::envelopes::pan();
 	auto spec_env_pitch = std_params::envelopes::pitch();
@@ -23,6 +25,18 @@ Classic::Classic()
 	env_pan_ = add_parameter(spec_env_pan);
 	env_pitch_ = add_parameter(spec_env_pitch);
 
+	auto group_noise = add_group("Noise");
+	auto spec_env_noise_amount = std_params::envelopes::noise_amount();
+	auto spec_env_noise_color = std_params::envelopes::noise_color();
+
+	spec_env_noise_amount.group_index = group_noise;
+	spec_env_noise_color.group_index = group_noise;
+	spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+	spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+
+	env_noise_amount_ = add_parameter(spec_env_noise_amount);
+	env_noise_color_ = add_parameter(spec_env_noise_color);
+
 	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
 	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());
 	sld_pitch_ = add_parameter(std_params::sliders::parameters::pitch());
@@ -31,32 +45,6 @@ Classic::Classic()
 	tog_loop_ = add_parameter(std_params::toggles::loop());
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
 
-	auto test_group = add_group("Test Group");
-
-	blink::EnvelopeSpec test_env;
-
-	test_env.uuid = "40d536fe-8305-4d84-a671-0d7899280db2";
-	test_env.name = "Test Envelope";
-	test_env.display_value = std_params::display_number<float>;
-	test_env.from_string = std_params::find_number<float>;
-	test_env.group_index = test_group;
-	test_env.value_slider = std_params::sliders::pitch();
-	test_env.search_binary = std_params::envelopes::generic_search_binary;
-	test_env.search_forward = std_params::envelopes::generic_search_forward;
-
-	add_parameter(test_env);
-
-	test_env.uuid = "e171f2c5-b62c-4887-8075-63f920bb46ea";
-	test_env.name = "Another parameter";
-	test_env.display_value = std_params::display_number<float>;
-	test_env.from_string = std_params::find_number<float>;
-	test_env.group_index = test_group;
-	test_env.value_slider = std_params::sliders::pitch();
-	test_env.search_binary = std_params::envelopes::generic_search_binary;
-	test_env.search_forward = std_params::envelopes::generic_search_forward;
-
-	add_parameter(test_env);
-	add_parameter(std_params::envelopes::speed());
 }
 
 GUI& Classic::gui()

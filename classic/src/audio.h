@@ -3,6 +3,8 @@
 #include <blink/sampler.hpp>
 #include <blink/standard_traversers/classic.hpp>
 #include <blink/sample_data.hpp>
+#include <DSP/MLDSPFilters.h>
+#include <DSP/MLDSPGens.h>
 
 class Classic;
 
@@ -21,10 +23,12 @@ private:
 
 	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
 	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
-
+	ml::DSPVectorArray<2> add_noise(const ml::DSPVectorArray<2>& in, int mode, const blink_EnvelopeData* env_noise_amount, const blink_EnvelopeData* env_noise_color, const ml::DSPVector& block_positions, float prev_pos);
+	
 	const Classic* plugin_;
 	blink::Traverser block_traverser_;
 	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	blink::std_traversers::Classic position_traverser_;
-
+	ml::NoiseGen noise_gen_;
+	ml::OnePole noise_filter_;
 };

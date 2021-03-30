@@ -16,11 +16,16 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	block_traverser_.generate(buffer->positions, kFloatsPerDSPVector, buffer->data_offset);
 
+	const auto& block_positions = block_traverser_.get_read_position();
+
 	struct Data
 	{
+		const blink_OptionData* option_noise_mode;
 		const blink_EnvelopeData* env_amp;
 		const blink_EnvelopeData* env_pan;
 		const blink_EnvelopeData* env_pitch;
+		const blink_EnvelopeData* env_noise_amount;
+		const blink_EnvelopeData* env_noise_color;
 		const blink_SliderData* slider_amp;
 		const blink_SliderData* slider_pan;
 		const blink_SliderData* slider_pitch;
@@ -29,9 +34,12 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		const blink_ToggleData* toggle_reverse;
 	} data;
 
+	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Classic::ParameterIndex::Option_NoiseMode));
 	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Amp));
 	data.env_pan              = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pan));
 	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pitch));
+	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_NoiseAmount));
+	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_NoiseColor));
 	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Amp));
 	data.slider_pan           = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pan));
 	data.slider_pitch         = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pitch));
@@ -47,7 +55,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
-	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_traverser_.get_read_position(), prev_pos) * data.slider_amp->value;
+	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions, prev_pos) * data.slider_amp->value;
 
 	if (data.toggle_reverse->value)
 	{
@@ -63,8 +71,8 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
-	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_traverser_.get_read_position(), prev_pos);
-
+	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, block_positions, prev_pos);
+	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
 	out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);
@@ -100,6 +108,43 @@ ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data
 ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
 {
 	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
+}
+
+ml::DSPVectorArray<2> Audio::add_noise(const ml::DSPVectorArray<2>& in, int mode, const blink_EnvelopeData* env_noise_amount, const blink_EnvelopeData* env_noise_color, const ml::DSPVector& block_positions, float prev_pos)
+{
+	ml::DSPVectorArray<2> out;
+
+	if (env_noise_amount->points.count < 1)
+	{
+		return in;
+	}
+
+	const auto noise_amount = plugin_->env_noise_amount().search_vec(env_noise_amount, block_positions, prev_pos);
+
+	if (ml::sum(noise_amount) < 0.0001f)
+	{
+		return in;
+	}
+
+	float noise_color;
+
+	plugin_->env_noise_color().search_vec(env_noise_color, block_positions.getConstBuffer(), 1, prev_pos, &noise_color);
+
+	noise_filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(noise_color, 2.0f) * 0.6f));
+
+	constexpr auto MULTIPLY = 0;
+	constexpr auto ADD = 1;
+
+	const auto noise = noise_filter_(noise_gen_());
+
+	if (mode == MULTIPLY)
+	{
+		return in * ml::repeatRows<2>(ml::lerp(ml::DSPVector(1.0f), noise, noise_amount));
+	}
+	else
+	{
+		return in + ml::repeatRows<2>(noise * noise_amount);
+	}
 }
 
 blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const
