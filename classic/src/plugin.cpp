@@ -9,9 +9,29 @@
 
 using namespace blink;
 
+namespace parameters {
+namespace sliders {
+
+SliderParameterSpec<float> noise_width()
+{
+	SliderParameterSpec<float> out;
+
+	out.uuid = "84e18fd3-03f1-49c2-a713-12e7e24dc03f";
+	out.name = "Noise Width";
+
+	out.slider = std_params::sliders::percentage();
+
+	out.flags = blink_SliderFlags_NonGlobal;
+
+	return out;
+}
+
+}
+}
 Classic::Classic()
 {
 	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
+	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
 
 	auto spec_env_amp = std_params::envelopes::amp();
 	auto spec_env_pan = std_params::envelopes::pan();
@@ -31,6 +51,8 @@ Classic::Classic()
 
 	spec_env_noise_amount.group_index = group_noise;
 	spec_env_noise_color.group_index = group_noise;
+	spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+	spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 	spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 	spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 

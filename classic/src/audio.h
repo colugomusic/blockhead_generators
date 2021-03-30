@@ -23,7 +23,14 @@ private:
 
 	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
 	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
-	ml::DSPVectorArray<2> add_noise(const ml::DSPVectorArray<2>& in, int mode, const blink_EnvelopeData* env_noise_amount, const blink_EnvelopeData* env_noise_color, const ml::DSPVector& block_positions, float prev_pos);
+	ml::DSPVectorArray<2> add_noise(
+		const ml::DSPVectorArray<2>& in,
+		int mode,
+		const blink_EnvelopeData* env_noise_amount,
+		const blink_EnvelopeData* env_noise_color,
+		const blink_SliderData* sld_noise_width,
+		const ml::DSPVector& block_positions,
+		float prev_pos);
 	
 	const Classic* plugin_;
 	blink::Traverser block_traverser_;

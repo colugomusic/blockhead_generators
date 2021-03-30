@@ -30,6 +30,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		const blink_SliderData* slider_pan;
 		const blink_SliderData* slider_pitch;
 		const blink_IntSliderData* slider_sample_offset;
+		const blink_SliderData* slider_noise_width;
 		const blink_ToggleData* toggle_loop;
 		const blink_ToggleData* toggle_reverse;
 	} data;
@@ -44,6 +45,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.slider_pan           = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pan));
 	data.slider_pitch         = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pitch));
 	data.slider_sample_offset = plugin_->get_int_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_SampleOffset));
+	data.slider_noise_width   = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_NoiseWidth));
 	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
 	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
 
@@ -71,7 +73,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
-	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, block_positions, prev_pos);
+	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
 	out_vec *= ml::repeatRows<2>(amp);
 
@@ -110,7 +112,14 @@ ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, 
 	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
 }
 
-ml::DSPVectorArray<2> Audio::add_noise(const ml::DSPVectorArray<2>& in, int mode, const blink_EnvelopeData* env_noise_amount, const blink_EnvelopeData* env_noise_color, const ml::DSPVector& block_positions, float prev_pos)
+ml::DSPVectorArray<2> Audio::add_noise(
+	const ml::DSPVectorArray<2>& in,
+	int mode,
+	const blink_EnvelopeData* env_noise_amount,
+	const blink_EnvelopeData* env_noise_color,
+	const blink_SliderData* sld_noise_width,
+	const ml::DSPVector& block_positions,
+	float prev_pos)
 {
 	ml::DSPVectorArray<2> out;
 
@@ -133,17 +142,30 @@ ml::DSPVectorArray<2> Audio::add_noise(const ml::DSPVectorArray<2>& in, int mode
 	noise_filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(noise_color, 2.0f) * 0.6f));
 
 	constexpr auto MULTIPLY = 0;
-	constexpr auto ADD = 1;
+	constexpr auto MIX = 1;
 
-	const auto noise = noise_filter_(noise_gen_());
+	const auto noise_L = noise_filter_(noise_gen_());
 
-	if (mode == MULTIPLY)
+	ml::DSPVectorArray<2> noise;
+
+	if (sld_noise_width->value > 0.0f)
 	{
-		return in * ml::repeatRows<2>(ml::lerp(ml::DSPVector(1.0f), noise, noise_amount));
+		const auto noise_R = noise_filter_(noise_gen_());
+
+		noise = ml::concatRows(noise_L, ml::lerp(noise_L, noise_R, sld_noise_width->value));
 	}
 	else
 	{
-		return in + ml::repeatRows<2>(noise * noise_amount);
+		noise = ml::repeatRows<2>(noise_L);
+	}
+
+	if (mode == MULTIPLY)
+	{
+		return in * ml::lerp(ml::DSPVectorArray<2>(1.0f), noise, ml::repeatRows<2>(noise_amount));
+	}
+	else
+	{
+		return ml::lerp(in, noise, ml::repeatRows<2>(noise_amount));
 	}
 }
 

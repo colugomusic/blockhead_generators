@@ -14,20 +14,21 @@ public:
 	enum class ParameterIndex
 	{
 		Option_NoiseMode = 0,
+		Sld_NoiseWidth = 1,
 
-		Env_Amp = 1,
-		Env_Pan = 2,
-		Env_Pitch = 3,
-		Env_NoiseAmount = 4,
-		Env_NoiseColor = 5,
+		Env_Amp = 2,
+		Env_Pan = 3,
+		Env_Pitch = 4,
+		Env_NoiseAmount = 5,
+		Env_NoiseColor = 6,
 
-		Sld_Amp = 6,
-		Sld_Pan = 7,
-		Sld_Pitch = 8,
-		Sld_SampleOffset = 9,
+		Sld_Amp = 7,
+		Sld_Pan = 8,
+		Sld_Pitch = 9,
+		Sld_SampleOffset = 10,
 
-		Tog_Loop = 10,
-		Tog_Reverse = 11,
+		Tog_Loop = 11,
+		Tog_Reverse = 12,
 	};
 
 	Classic();
@@ -39,8 +40,6 @@ public:
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 	const blink::EnvelopeParameter& env_noise_amount() const { return *env_noise_amount_; }
 	const blink::EnvelopeParameter& env_noise_color() const { return *env_noise_color_; }
-
-	const blink::SliderParameter<float>& slider_pitch() const { return *sld_pitch_; }
 
 private:
 
@@ -56,6 +55,7 @@ private:
 	std::shared_ptr<blink::SliderParameter<float>> sld_pan_;
 	std::shared_ptr<blink::SliderParameter<float>> sld_pitch_;
 	std::shared_ptr<blink::SliderParameter<int>> sld_sample_offset_;
+	std::shared_ptr<blink::SliderParameter<float>> sld_noise_width_;
 	std::shared_ptr<blink::ToggleParameter> tog_loop_;
 	std::shared_ptr<blink::ToggleParameter> tog_revers_;
 };
