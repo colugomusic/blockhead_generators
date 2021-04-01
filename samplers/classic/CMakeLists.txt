@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(generator_classic)
+project(sampler_classic)
 
 set(BLINK_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../blink CACHE PATH "blink root directory")
 set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
@@ -43,7 +43,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	OUTPUT_NAME classic.${PLATFORM_DIR}
+	OUTPUT_NAME sampler.classic.${PLATFORM_DIR}
 	SUFFIX ".blink"
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_DIR}
