@@ -61,6 +61,8 @@ static void calculate_positions(
 			count,
 			out_derivatives ? derivatives_vec.getBuffer() : nullptr);
 
+	positions /= (float(song_rate) / sample_info.SR);
+
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
 		for (int i = 0; i < count; i++)
@@ -76,8 +78,6 @@ static void calculate_positions(
 	{
 		positions = float(sample_info.num_frames - 1) - positions;
 	}
-
-	positions /= (float(song_rate) / sample_info.SR);
 
 	std::copy(positions.getConstBuffer(), positions.getConstBuffer() + count, out_positions);
 

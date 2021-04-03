@@ -3,8 +3,11 @@
 #include <blink/sampler.hpp>
 #include <blink/standard_traversers/classic.hpp>
 #include <blink/sample_data.hpp>
+
+#pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
+#pragma warning(pop)
 
 class Classic;
 
