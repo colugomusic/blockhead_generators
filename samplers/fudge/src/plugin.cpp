@@ -9,7 +9,7 @@
 
 using namespace blink;
 
-Classic::Classic()
+Fudge::Fudge()
 {
 	auto spec_sld_noise_width = std_params::sliders::parameters::noise_width();
 
@@ -21,14 +21,17 @@ Classic::Classic()
 	auto spec_env_amp = std_params::envelopes::amp();
 	auto spec_env_pan = std_params::envelopes::pan();
 	auto spec_env_pitch = std_params::envelopes::pitch();
+	auto spec_env_speed = std_params::envelopes::speed();
 
 	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_pan.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
+	spec_env_speed.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	env_amp_ = add_parameter(spec_env_amp);
 	env_pan_ = add_parameter(spec_env_pan);
 	env_pitch_ = add_parameter(spec_env_pitch);
+	env_speed_ = add_parameter(spec_env_speed);
 
 	auto group_noise = add_group("Noise");
 	auto spec_env_noise_amount = std_params::envelopes::noise_amount();
@@ -36,6 +39,7 @@ Classic::Classic()
 
 	spec_env_noise_amount.group_index = group_noise;
 	spec_env_noise_color.group_index = group_noise;
+
 	spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 	spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 	spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
@@ -47,6 +51,7 @@ Classic::Classic()
 	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
 	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());
 	sld_pitch_ = add_parameter(std_params::sliders::parameters::pitch());
+	sld_speed_ = add_parameter(std_params::sliders::parameters::speed());
 	sld_sample_offset_ = add_parameter(std_params::sliders::parameters::sample_offset());
 
 	tog_loop_ = add_parameter(std_params::toggles::loop());
@@ -54,9 +59,23 @@ Classic::Classic()
 
 }
 
-GUI& Classic::gui()
+GUI& Fudge::gui()
 {
 	return gui_;
+}
+
+void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
+{
+	auto pos = sample_analysis_.find(sample_info->id);
+
+	if (pos != sample_analysis_.end()) return;
+ 
+	SampleAnalysis analysis;
+
+	if (analyze(host, callbacks, *sample_info, &analysis))
+	{
+		sample_analysis_[sample_info->id] = std::move(analysis);
+	}
 }
 
 enum class Error
@@ -65,23 +84,23 @@ enum class Error
 	NotInitialized,
 };
 
-Classic* g_plugin = nullptr;
+Fudge* g_plugin = nullptr;
 
 blink_UUID blink_get_plugin_uuid()
 {
-	return Classic::UUID;
+	return Fudge::UUID;
 }
 
 blink_UUID blink_get_plugin_name()
 {
-	return Classic::NAME;
+	return Fudge::NAME;
 }
 
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
 
-	g_plugin = new Classic();
+	g_plugin = new Fudge();
 
 	return BLINK_OK;
 }
@@ -97,7 +116,7 @@ blink_Error blink_terminate()
 
 blink_Sampler blink_make_sampler()
 {
-	if (!g_plugin) return { 0 };
+	if (!g_plugin) return blink_Sampler { 0 };
 
 	return bind::make_sampler<Audio>(g_plugin);
 }
@@ -114,8 +133,11 @@ blink_Bool blink_sampler_requires_preprocessing()
 
 blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
-	// TODO:
-	return -1;
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->preprocess_sample(host, callbacks, sample_info);
+
+	return BLINK_OK;
 }
 
 blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
