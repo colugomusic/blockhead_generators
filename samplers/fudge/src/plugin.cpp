@@ -78,6 +78,15 @@ void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, c
 	}
 }
 
+void Fudge::on_sample_deleted(blink_ID id)
+{
+	auto pos = sample_analysis_.find(id);
+
+	if (pos == sample_analysis_.end()) return;
+
+	sample_analysis_.erase(pos);
+}
+
 enum class Error
 {
 	AlreadyInitialized,
@@ -142,8 +151,11 @@ blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallback
 
 blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
 {
-	// TODO:
-	return -1;
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->on_sample_deleted(sample_id);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()

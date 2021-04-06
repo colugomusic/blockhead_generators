@@ -22,12 +22,9 @@ public:
 	Audio(const Fudge* plugin);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
-	blink_Error preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const;
 
 private:
 
-	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
-	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop);
 	ml::DSPVectorArray<2> add_noise(
 		const ml::DSPVectorArray<2>& in,
 		int mode,

@@ -3,20 +3,16 @@
 
 bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out)
 {
-	constexpr auto ANALYSIS_DEPTH = 64;
+	constexpr auto ANALYSIS_DEPTH = 128;
 
 	blink_ChannelCount channel = 0;
 	float total_progress = 0.0f;
 
 	snd::autocorrelation::AnalysisCallbacks analysis_callbacks;
 
-	analysis_callbacks.get_frame = [host, sample_info, &channel](std::uint32_t index)
+	analysis_callbacks.get_frames = [host, sample_info, &channel](std::uint32_t index, std::uint32_t n, float* out)
 	{
-		float out;
-
-		sample_info.get_data(sample_info.host, channel, index, 1, &out);
-
-		return out;
+		sample_info.get_data(sample_info.host, channel, index, n, out);
 	};
 
 	analysis_callbacks.report_progress = [host, callbacks, sample_info, &total_progress](float progress)

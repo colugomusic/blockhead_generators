@@ -55,7 +55,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	traverser_resetter_.check(data.env_pitch, &block_traverser_);
 
-	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
+	auto sample_pos = position_traverser_.get_positions(data.slider_speed->value, data.env_speed, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
 
 	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
 
@@ -68,14 +68,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		sample_pos = float(buffer->sample_info->num_frames - 1) - sample_pos;
 	}
 
-	if (buffer->sample_info->num_channels > 1)
-	{
-		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggle_loop->value);
-	}
-	else
-	{
-		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
-	}
+	// TODO: fudge implementation here!
 
 	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
@@ -85,35 +78,6 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
 
 	return BLINK_OK;
-}
-
-ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
-{
-	ml::DSPVectorArray<2> out;
-
-	switch (sample_data.get_channel_mode())
-	{
-		default:
-		case blink_ChannelMode_Stereo:
-		{
-			return sample_data.read_frames_interp<2>(sample_pos, loop);
-		}
-
-		case blink_ChannelMode_Left:
-		{
-			return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
-		}
-
-		case blink_ChannelMode_Right:
-		{
-			return ml::repeatRows<2>(sample_data.read_frames_interp(1, sample_pos, loop));
-		}
-	}
-}
-
-ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
-{
-	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
 }
 
 ml::DSPVectorArray<2> Audio::add_noise(
@@ -171,10 +135,5 @@ ml::DSPVectorArray<2> Audio::add_noise(
 	{
 		return ml::lerp(in, noise, ml::repeatRows<2>(noise_amount));
 	}
-}
-
-blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const
-{
-	return BLINK_OK;
 }
 

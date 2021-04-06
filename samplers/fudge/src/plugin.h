@@ -45,6 +45,7 @@ public:
 	const blink::EnvelopeParameter& env_noise_color() const { return *env_noise_color_; }
 
 	void preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info);
+	void on_sample_deleted(blink_ID id);
 
 private:
 
