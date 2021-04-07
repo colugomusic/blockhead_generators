@@ -28,11 +28,16 @@ list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
     ./src/audio_data.h
+	./src/autocorrelation.h
     ./src/controller.h
     ./src/controller.cpp
+    ./src/convert.h
     ./src/grain.h
     ./src/gui.h
     ./src/gui.cpp
+    ./src/limits.h
+    ./src/parameters.h
+    ./src/parameters.cpp
     ./src/particle.h
     ./src/particle.cpp
     ./src/plugin.h

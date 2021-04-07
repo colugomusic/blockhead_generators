@@ -1,0 +1,11 @@
+#pragma once
+
+#include <blink/envelope_spec.hpp>
+
+namespace parameters {
+namespace envelopes {
+
+extern blink::EnvelopeSpec grain_size();
+
+} // envelopes
+} // paramaters
