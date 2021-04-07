@@ -6,8 +6,107 @@
 #include <blink/standard_parameters.hpp>
 
 #include "audio.h"
+#include "convert.h"
 
 using namespace blink;
+
+namespace grain_size {
+
+inline auto stepify(float v) -> float
+{
+	return v;
+}
+
+inline auto snap_value(float v, float step_size, float snap_amount)
+{
+	return stepify(std_params::snap_value(v, step_size, snap_amount));
+}
+
+inline float constrain(float v)
+{
+	return std::clamp(v, 0.0f, 1.0f);
+};
+
+inline auto increment(float v, bool precise)
+{
+	return constrain(stepify(std_params::increment<100, 1000>(v, precise)));
+};
+
+inline auto decrement(float v, bool precise)
+{
+	return constrain(stepify(std_params::decrement<100, 1000>(v, precise)));
+};
+
+inline auto drag(float v, int amount, bool precise) -> float
+{
+	return constrain(stepify(std_params::drag<100, 1000>(v, amount / 5, precise)));
+};
+
+inline auto display(float v)
+{
+	std::stringstream ss;
+
+	ss << convert::linear_to_ms(v) << " ms";
+
+	return ss.str();
+}
+
+inline auto from_string(const std::string& str) -> std::optional<float>
+{
+	auto value = std_params::find_number<float>(str);
+
+	if (!value) return std::optional<float>();
+
+	return convert::ms_to_linear(*value);
+}
+
+}
+
+namespace sliders {
+
+inline SliderSpec<float> grain_size()
+{
+	SliderSpec<float> out;
+
+	out.constrain = grain_size::constrain;
+	out.increment = grain_size::increment;
+	out.decrement = grain_size::decrement;
+	out.drag = grain_size::drag;
+	out.display_value = grain_size::display;
+	out.from_string = grain_size::from_string;
+	out.default_value = 0.5f;
+
+	return out;
+}
+
+} // sliders
+
+namespace envelopes {
+
+inline EnvelopeSpec grain_size()
+{
+	EnvelopeSpec out;
+
+	out.uuid = "2a9c7ec6-68b4-40c1-aad9-b3c010cd9717";
+	out.name = "Size";
+
+	out.default_value = 0.5f;
+	out.search_binary = std_params::envelopes::generic_search_binary;
+	out.search_forward = std_params::envelopes::generic_search_forward;
+	out.stepify = grain_size::stepify;
+
+	out.value_slider = sliders::grain_size();
+
+	out.range.min.default_value = 0.0f;
+	out.range.min.display_value = grain_size::display;
+	out.range.max.default_value = 1.0f;
+	out.range.max.display_value = grain_size::display;
+	out.display_value = grain_size::display;
+
+	return out;
+}
+
+} // envelopes
 
 Fudge::Fudge()
 {
@@ -32,6 +131,13 @@ Fudge::Fudge()
 	env_pan_ = add_parameter(spec_env_pan);
 	env_pitch_ = add_parameter(spec_env_pitch);
 	env_speed_ = add_parameter(spec_env_speed);
+
+	auto group_geometry = add_group("Geometry");
+	auto spec_env_grain_size = envelopes::grain_size();
+
+	spec_env_grain_size.group_index = group_geometry;
+
+	env_grain_size_ = add_parameter(spec_env_grain_size);
 
 	auto group_noise = add_group("Noise");
 	auto spec_env_noise_amount = std_params::envelopes::noise_amount();
@@ -64,23 +170,32 @@ GUI& Fudge::gui()
 	return gui_;
 }
 
+const SampleAnalysis* Fudge::get_analysis_data(blink_ID sample_id) const
+{
+	const auto pos = sample_analysis_.find(sample_id);
+
+	if (pos == sample_analysis_.end()) return nullptr;
+
+	return pos->second.get();
+}
+
 void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
 	auto pos = sample_analysis_.find(sample_info->id);
 
 	if (pos != sample_analysis_.end()) return;
  
-	SampleAnalysis analysis;
+	auto analysis = std::make_shared<SampleAnalysis>();
 
-	if (analyze(host, callbacks, *sample_info, &analysis))
+	if (analyze(host, callbacks, *sample_info, analysis.get()))
 	{
-		sample_analysis_[sample_info->id] = std::move(analysis);
+		sample_analysis_[sample_info->id] = analysis;
 	}
 }
 
 void Fudge::on_sample_deleted(blink_ID id)
 {
-	auto pos = sample_analysis_.find(id);
+	const auto pos = sample_analysis_.find(id);
 
 	if (pos == sample_analysis_.end()) return;
 

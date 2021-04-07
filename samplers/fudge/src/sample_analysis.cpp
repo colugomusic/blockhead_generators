@@ -1,5 +1,5 @@
 #include "sample_analysis.h"
-#include <snd/autocorrelation.hpp>
+#include "autocorrelation.h"
 
 bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out)
 {
@@ -8,7 +8,7 @@ bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_Sample
 	blink_ChannelCount channel = 0;
 	float total_progress = 0.0f;
 
-	snd::autocorrelation::AnalysisCallbacks analysis_callbacks;
+	autocorrelation::AnalysisCallbacks analysis_callbacks;
 
 	analysis_callbacks.get_frames = [host, sample_info, &channel](std::uint32_t index, std::uint32_t n, float* out)
 	{
@@ -25,19 +25,21 @@ bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_Sample
 		return callbacks.should_abort(host);
 	};
 
-	out->resize(2);
+	out->data.resize(2);
 	
 	for (; channel < sample_info.num_channels; channel++)
 	{
-		(*out)[channel].resize(sample_info.num_frames);
+		out->data[channel].resize(sample_info.num_frames);
 
-		if (!snd::autocorrelation::analyze(analysis_callbacks, sample_info.num_frames, ANALYSIS_DEPTH, (*out)[channel].data()))
+		if (!autocorrelation::analyze(analysis_callbacks, sample_info.num_frames, ANALYSIS_DEPTH, out->data[channel].data()))
 		{
 			return false;
 		}
 
 		total_progress += 1.0f / sample_info.num_channels;
 	}
+
+	out->done = true;
 
 	return true;
 }

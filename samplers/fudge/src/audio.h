@@ -9,7 +9,8 @@
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-#include <snd/autocorrelation.hpp>
+#include "controller.h"
+#include "particle.h"
 
 class Fudge;
 
@@ -37,7 +38,8 @@ private:
 	const Fudge* plugin_;
 	blink::Traverser block_traverser_;
 	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
-	blink::std_traversers::Fudge position_traverser_;
 	ml::NoiseGen noise_gen_;
 	ml::OnePole noise_filter_;
+	Controller controller_;
+	std::array<Particle, 4> particles_;
 };

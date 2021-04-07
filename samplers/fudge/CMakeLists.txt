@@ -4,7 +4,6 @@ project(sampler_fudge)
 set(BLINK_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../blink CACHE PATH "blink root directory")
 set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
 set(MADRONALIB_DIR "" CACHE PATH "madronalib directory")
-set(SND_DIR "" CACHE PATH "snd directory")
 
 set(on_windows $<STREQUAL:${CMAKE_SYSTEM_NAME},Windows>)
 set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
@@ -25,22 +24,17 @@ if (MADRONALIB_DIR STREQUAL "")
 	set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
 endif()
 
-if (SND_DIR STREQUAL "")
-	FetchContent_Declare(
-		snd
-		GIT_REPOSITORY https://github.com/colugomusic/snd.git
-	)
-
-	FetchContent_Populate(snd)
-	
-	set(SND_DIR ${snd_SOURCE_DIR})
-endif()
-
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/audio_data.h
+    ./src/controller.h
+    ./src/controller.cpp
+    ./src/grain.h
     ./src/gui.h
     ./src/gui.cpp
+    ./src/particle.h
+    ./src/particle.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 	./src/sample_analysis.h
@@ -53,7 +47,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${BLINK_ROOT}/include
     ${BLINK_ROOT}/plugin
 	${MADRONALIB_DIR}/source
-	${SND_DIR}/include
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

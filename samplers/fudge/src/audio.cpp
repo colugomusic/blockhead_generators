@@ -1,10 +1,13 @@
 #include "audio.h"
 #include "plugin.h"
+#include "audio_data.h"
 
 using namespace blink;
 
 Audio::Audio(const Fudge* plugin)
 	: plugin_(plugin)
+	, controller_(plugin)
+	, particles_{ controller_, controller_, controller_, controller_ }
 {
 }
 
@@ -18,30 +21,14 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	const auto& block_positions = block_traverser_.get_read_position();
 
-	struct Data
-	{
-		const blink_OptionData* option_noise_mode;
-		const blink_EnvelopeData* env_amp;
-		const blink_EnvelopeData* env_pan;
-		const blink_EnvelopeData* env_pitch;
-		const blink_EnvelopeData* env_speed;
-		const blink_EnvelopeData* env_noise_amount;
-		const blink_EnvelopeData* env_noise_color;
-		const blink_SliderData* slider_amp;
-		const blink_SliderData* slider_pan;
-		const blink_SliderData* slider_pitch;
-		const blink_SliderData* slider_speed;
-		const blink_IntSliderData* slider_sample_offset;
-		const blink_SliderData* slider_noise_width;
-		const blink_ToggleData* toggle_loop;
-		const blink_ToggleData* toggle_reverse;
-	} data;
+	AudioData data;
 
 	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Fudge::ParameterIndex::Option_NoiseMode));
 	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Amp));
 	data.env_pan              = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pan));
 	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pitch));
 	data.env_speed            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
+	data.env_grain_size       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainSize));
 	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseAmount));
 	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseColor));
 	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
@@ -53,26 +40,22 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
 	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
 
-	traverser_resetter_.check(data.env_pitch, &block_traverser_);
+	traverser_resetter_.check(data.env_speed, &block_traverser_);
 
-	auto sample_pos = position_traverser_.get_positions(data.slider_speed->value, data.env_speed, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
+	const auto analysis_data = plugin_->get_analysis_data(buffer->sample_info->id);
 
-	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
+	controller_.process(data, *buffer, analysis_data, block_traverser_, prev_pos);
 
-	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
+	//for (auto& particle : particles_)
+	//{
+	//	out_vec += particle.process();
+	//}
 
-	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions, prev_pos) * data.slider_amp->value;
-
-	if (data.toggle_reverse->value)
-	{
-		sample_pos = float(buffer->sample_info->num_frames - 1) - sample_pos;
-	}
-
-	// TODO: fudge implementation here!
+	out_vec += particles_[0].process();
 
 	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
-	out_vec *= ml::repeatRows<2>(amp);
+	//out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
