@@ -36,10 +36,13 @@ Fudge::Fudge()
 
 	auto group_geometry = add_group("Geometry");
 	auto spec_env_grain_size = parameters::envelopes::grain_size();
+	auto spec_env_uniformity = parameters::envelopes::uniformity();
 
 	spec_env_grain_size.group_index = group_geometry;
+	spec_env_uniformity.group_index = group_geometry;
 
 	env_grain_size_ = add_parameter(spec_env_grain_size);
+	env_uniformity_ = add_parameter(spec_env_uniformity);
 
 	auto group_noise = add_group("Noise");
 	auto spec_env_noise_amount = std_params::envelopes::noise_amount();

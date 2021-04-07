@@ -29,6 +29,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pitch));
 	data.env_speed            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
 	data.env_grain_size       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainSize));
+	data.env_uniformity       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Uniformity));
 	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseAmount));
 	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseColor));
 	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
@@ -42,7 +43,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	traverser_resetter_.check(data.env_speed, &block_traverser_);
 
-	const auto analysis_data = plugin_->get_analysis_data(buffer->sample_info->id);
+	const auto analysis_data = buffer->sample_info->analysis_ready ? plugin_->get_analysis_data(buffer->sample_info->id) : nullptr;
 
 	controller_.process(data, *buffer, analysis_data, block_traverser_, prev_pos);
 
@@ -53,8 +54,8 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	out_vec += particles_[0].process();
 
-	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
-	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
+	//out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
+	//out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
 	//out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);

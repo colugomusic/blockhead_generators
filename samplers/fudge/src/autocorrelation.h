@@ -30,12 +30,15 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 	{
 		bool init = false;
 		bool up = false;
+		float best_peak = 0.0f;
+		std::int32_t best_peak_pos = 0;
 		std::uint32_t latest = 0;
 	} zx;
 
 	struct Crossing
 	{
 		std::uint32_t index;
+		std::int32_t peak_distance;
 		std::int32_t distance;
 		bool up;
 	};
@@ -64,6 +67,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				assert(a->up == b->up);
 
 				total_diff += std::abs(a->distance - b->distance);
+				total_diff += std::abs(a->peak_distance - b->peak_distance);
 
 				if (total_diff >= best_diff)
 				{
@@ -131,6 +135,19 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				zx.up = false;
 				crossed = true;
 			}
+			else
+			{
+				if (zx.up && value > zx.best_peak)
+				{
+					zx.best_peak = value;
+					zx.best_peak_pos = (index + i);
+				}
+				else if (!zx.up && value < zx.best_peak)
+				{
+					zx.best_peak = value;
+					zx.best_peak_pos = (index + i);
+				}
+			}
 
 			if (crossed)
 			{
@@ -138,6 +155,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 				crossing.index = (index + i);
 				crossing.distance = (index + i) - zx.latest;
+				crossing.peak_distance = zx.best_peak_pos - zx.latest;
 				crossing.up = zx.up;
 
 				crossings.push_front(crossing);
@@ -182,6 +200,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 				prev_size = size;
 				zx.latest = (index + i);
+				zx.best_peak = 0.0f;
 			}
 		}
 

@@ -40,6 +40,7 @@ public:
 	const blink_SampleInfo& sample_info() const { return *(buffer_->sample_info); }
 	const blink::SampleData& sample_data() const { return sample_data_; }
 	bool sample_loop() const { return sample_loop_; }
+	const blink_SamplerBuffer& buffer() const { return *buffer_; }
 
 private:
 

@@ -99,6 +99,31 @@ EnvelopeSpec grain_size()
 	out.range.max.display_value = grain_size::display;
 	out.display_value = grain_size::display;
 
+	out.flags = blink_EnvelopeFlags_NoGridLabels;
+
+	return out;
+}
+
+EnvelopeSpec uniformity()
+{
+	EnvelopeSpec out;
+
+	out.uuid = "83c352fb-35b5-4cb0-a6f7-05d082b56a16";
+	out.name = "Uniformity";
+
+	out.default_value = 0.0f;
+	out.search_binary = std_params::envelopes::generic_search_binary;
+	out.search_forward = std_params::envelopes::generic_search_forward;
+	out.stepify = std_params::percentage::stepify;
+
+	out.value_slider = std_params::sliders::percentage();
+
+	out.range.min.default_value = 0.0f;
+	out.range.min.display_value = std_params::percentage::display;
+	out.range.max.default_value = 1.0f;
+	out.range.max.display_value = std_params::percentage::display;
+	out.display_value = std_params::percentage::display;
+
 	return out;
 }
 

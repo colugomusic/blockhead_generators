@@ -14,14 +14,15 @@ public:
 
 	enum class ParameterIndex
 	{
-		Option_NoiseMode = 0,
-		Sld_NoiseWidth = 1,
+		Option_NoiseMode,
+		Sld_NoiseWidth,
 
 		Env_Amp,
 		Env_Pan,
 		Env_Pitch,
 		Env_Speed,
 		Env_GrainSize,
+		Env_Uniformity,
 		Env_NoiseAmount,
 		Env_NoiseColor,
 
@@ -43,6 +44,7 @@ public:
 	const blink::EnvelopeParameter& env_pan() const { return *env_pan_; }
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 	const blink::EnvelopeParameter& env_grain_size() const { return *env_grain_size_; }
+	const blink::EnvelopeParameter& env_uniformity() const { return *env_uniformity_; }
 	const blink::EnvelopeParameter& env_noise_amount() const { return *env_noise_amount_; }
 	const blink::EnvelopeParameter& env_noise_color() const { return *env_noise_color_; }
 
@@ -62,6 +64,7 @@ private:
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_speed_;
 	std::shared_ptr<blink::EnvelopeParameter> env_grain_size_;
+	std::shared_ptr<blink::EnvelopeParameter> env_uniformity_;
 	std::shared_ptr<blink::EnvelopeParameter> env_noise_amount_;
 	std::shared_ptr<blink::EnvelopeParameter> env_noise_color_;
 	std::shared_ptr<blink::SliderParameter<float>> sld_amp_;

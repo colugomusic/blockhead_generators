@@ -41,7 +41,8 @@ void Controller::process(
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();
 
-	amp_ = plugin_->env_amp().search_vec(data.env_amp, block_traverser.get_read_position(), prev_pos) * data.slider_amp->value;
-	pitch_ = plugin_->env_pitch().search_vec(data.env_pitch, block_traverser.get_read_position(), prev_pos) + data.slider_pitch->value;
-	size_ = convert::ms_to_samples(convert::linear_to_ms(plugin_->env_grain_size().search_vec(data.env_grain_size, block_traverser.get_read_position(), prev_pos)), buffer_->sample_info->SR);
+	amp_ = plugin_->env_amp().search_vec(data.env_amp, *block_positions_, prev_pos) * data.slider_amp->value;
+	pitch_ = plugin_->env_pitch().search_vec(data.env_pitch, *block_positions_, prev_pos) + data.slider_pitch->value;
+	size_ = convert::ms_to_samples(convert::linear_to_ms(plugin_->env_grain_size().search_vec(data.env_grain_size, *block_positions_, prev_pos)), buffer_->sample_info->SR);
+	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_, prev_pos);
 }

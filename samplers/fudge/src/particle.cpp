@@ -11,10 +11,8 @@ Particle::Particle(const Controller& controller)
 
 ml::DSPVectorArray<2> Particle::process()
 {
-	ml::DSPVectorArray<2> out;
-
-	auto& out_L = out.row(0);
-	auto& out_R = out.row(1);
+	ml::DSPVector vec_L;
+	ml::DSPVector vec_R;
 
 	for (int j = 0; j < kFloatsPerDSPVector; j++)
 	{
@@ -40,7 +38,7 @@ ml::DSPVectorArray<2> Particle::process()
 			else if(trigger_timer_ >= std::floor(grains_[flip_flop_].size / 2))
 			{
 				trigger_timer_ = 0.f;
-				trigger_next_grain(j, false);
+				trigger_next_grain(j, true);
 			}
 		}
 
@@ -105,14 +103,14 @@ ml::DSPVectorArray<2> Particle::process()
 				grain.on = false;
 			}
 
-			out_L[j] += L;
-			out_R[j] += R;
+			vec_L[j] += L;
+			vec_R[j] += R;
 		}
 
 		trigger_timer_ += grains_[flip_flop_].ff;
 	}
 
-	return out;
+	return ml::concatRows(vec_L, vec_R);
 }
 
 void Particle::reset(int index)
@@ -127,8 +125,6 @@ void Particle::reset(int index)
 
 float Particle::adjust_channel_pos(int index, int channel, float pos)
 {
-	float dummy;
-
 	const auto adjust_amount = 1.0f - controller_->uniformity()[index];
 
 	if (adjust_amount < 0.000001f) return pos;
@@ -150,7 +146,6 @@ float Particle::adjust_channel_pos(int index, int channel, float pos)
 	if (controller_->sample_loop()) pos = blink::math::wrap(pos, float(num_frames));
 
 	const auto other_pos_floor = int(std::floor(other_pos + other.frame));
-	const auto other_pos_fract = std::modf(other_pos, &dummy);
 	const auto diff = pos - (other_pos + other.frame);
 	const auto abs_diff = std::abs(diff);
 	const auto channel_analysis_data = analysis_data->data[channel];
@@ -162,11 +157,16 @@ float Particle::adjust_channel_pos(int index, int channel, float pos)
 
 	if (diff > 0.0f)
 	{
-		adjusted_pos = (other_pos_floor + a * other_wavecycle) + other_pos_fract;
+		adjusted_pos = (other_pos + other.frame) + (a * other_wavecycle);
 	}
 	else
 	{
-		adjusted_pos = (other_pos_floor - a * other_wavecycle) + other_pos_fract;
+		adjusted_pos = (other_pos + other.frame) - (a * other_wavecycle);
+	}
+
+	if (adjusted_pos > num_frames)
+	{
+		adjusted_pos = pos;
 	}
 
 	return blink::math::lerp(pos, adjusted_pos, adjust_amount);
@@ -191,6 +191,11 @@ void Particle::trigger_next_grain(int index, bool adjust)
 		if (controller_->sample_info().num_channels > 1)
 		{
 			pos_R = adjust_channel_pos(index, 1, pos_R);
+
+			if (std::abs(pos_R - pos_L) < 10.0f * controller_->buffer().sample_rate)
+			{
+				pos_R = pos_L;
+			}
 		}
 	}
 
