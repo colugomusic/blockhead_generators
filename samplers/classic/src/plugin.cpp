@@ -23,7 +23,6 @@ Classic::Classic()
 	auto spec_env_pitch = std_params::envelopes::pitch();
 
 	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_pan.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	env_amp_ = add_parameter(spec_env_amp);

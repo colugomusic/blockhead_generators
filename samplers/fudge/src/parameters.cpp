@@ -104,6 +104,16 @@ EnvelopeSpec grain_size()
 	return out;
 }
 
+EnvelopeSpec grain_transpose()
+{
+	EnvelopeSpec out = std_params::envelopes::pitch();
+
+	out.uuid = "fe64baa2-9d35-4eef-bc8b-1799916e8bda";
+	out.name = "Transpose";
+
+	return out;
+}
+
 EnvelopeSpec uniformity()
 {
 	EnvelopeSpec out;

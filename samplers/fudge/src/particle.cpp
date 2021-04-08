@@ -75,25 +75,21 @@ ml::DSPVectorArray<2> Particle::process()
 
 			if (overall_amp > 0.f)
 			{
-				const auto& data = controller_->sample_data();
-
-				if (controller_->sample_info().num_channels > 0)
-				{
-					const auto pos = grain.pos[0] + grain.frame;
-
-					L = pos < 0.f ? 0.f : data.read_frame_interp(0, pos) * overall_amp;
-				}
-
 				if (controller_->sample_info().num_channels > 1)
 				{
-					const auto pos = grain.pos[1] + grain.frame;
+					const auto LR = read_stereo_frame(grain);
 
-					R = pos < 0.f ? 0.f : data.read_frame_interp(1, pos) * overall_amp;
+					L = LR[0];
+					R = LR[1];
 				}
 				else
 				{
+					L = read_mono_frame(grain);
 					R = L;
 				}
+
+				L *= overall_amp;
+				R *= overall_amp;
 			}
 
 			grain.frame += grain.ff;
@@ -113,6 +109,58 @@ ml::DSPVectorArray<2> Particle::process()
 	return ml::concatRows(vec_L, vec_R);
 }
 
+float Particle::read_mono_frame(const Grain& grain) const
+{
+	const auto pos = grain.pos[0] + grain.frame;
+
+	return pos < 0.f ? 0.f : controller_->sample_data().read_frame_interp(0, pos);
+}
+
+std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
+{
+	float L;
+	float R;
+
+	const auto& data = controller_->sample_data();
+
+	switch (controller_->sample_data().get_channel_mode())
+	{
+		default:
+		case blink_ChannelMode_Stereo:
+		{
+			const auto pos_L = grain.pos[0] + grain.frame;
+			const auto pos_R = grain.pos[1] + grain.frame;
+
+			L = pos_L < 0.f ? 0.f : data.read_frame_interp(0, pos_L);
+			R = pos_R < 0.f ? 0.f : data.read_frame_interp(1, pos_R);
+
+			break;
+		}
+
+		case blink_ChannelMode_Left:
+		{
+			const auto pos = grain.pos[0] + grain.frame;
+
+			L = pos < 0.f ? 0.f : data.read_frame_interp(0, pos);
+			R = L;
+
+			break;
+		}
+
+		case blink_ChannelMode_Right:
+		{
+			const auto pos = grain.pos[1] + grain.frame;
+
+			R = pos < 0.f ? 0.f : data.read_frame_interp(0, pos);
+			L = R;
+
+			break;
+		}
+	}
+
+	return { L, R };
+}
+
 void Particle::reset(int index)
 {
 	grains_[0].on = false;
@@ -123,7 +171,7 @@ void Particle::reset(int index)
 	trigger_next_grain(index, false);
 }
 
-float Particle::adjust_channel_pos(int index, int channel, float pos)
+float Particle::adjust_channel_pos(int index, int channel, float pos) const
 {
 	const auto adjust_amount = 1.0f - controller_->uniformity()[index];
 
@@ -143,12 +191,10 @@ float Particle::adjust_channel_pos(int index, int channel, float pos)
 
 	if (other_pos + other.frame < 0.0f) return pos;
 
-	if (controller_->sample_loop()) pos = blink::math::wrap(pos, float(num_frames));
-
 	const auto other_pos_floor = int(std::floor(other_pos + other.frame));
 	const auto diff = pos - (other_pos + other.frame);
 	const auto abs_diff = std::abs(diff);
-	const auto channel_analysis_data = analysis_data->data[channel];
+	const auto& channel_analysis_data = analysis_data->data[channel];
 	const auto other_wavecycle = other_pos_floor >= channel_analysis_data.size() ? channel_analysis_data[channel_analysis_data.size() - 1] : channel_analysis_data[other_pos_floor];
 
 	const auto a = int(std::floor(float(abs_diff) / other_wavecycle));
@@ -172,6 +218,55 @@ float Particle::adjust_channel_pos(int index, int channel, float pos)
 	return blink::math::lerp(pos, adjusted_pos, adjust_amount);
 }
 
+float Particle::get_mono_position(int index, float pos, bool adjust) const
+{
+	if (!adjust) return pos;
+	if (pos <= 0.0f) return pos;
+
+	return adjust_channel_pos(index, 0, pos);
+}
+
+std::array<float, 2> Particle::get_stereo_positions(int index, float pos, bool adjust) const
+{
+	if (!adjust) return { pos, pos };
+	if (pos <= 0.0f) return { pos, pos };
+	
+	float pos_L;
+	float pos_R;
+
+	switch (controller_->sample_data().get_channel_mode())
+	{
+		default:
+		case blink_ChannelMode_Stereo:
+		{
+			pos_L = adjust_channel_pos(index, 0, pos);
+			pos_R = adjust_channel_pos(index, 1, pos);
+			break;
+		}
+
+		case blink_ChannelMode_Left:
+		{
+			pos_L = adjust_channel_pos(index, 0, pos);
+			pos_R = adjust_channel_pos(index, 0, pos);
+			break;
+		}
+
+		case blink_ChannelMode_Right:
+		{
+			pos_L = adjust_channel_pos(index, 1, pos);
+			pos_R = adjust_channel_pos(index, 1, pos);
+			break;
+		}
+	}
+
+	if (std::abs(pos_R - pos_L) < 0.01f * controller_->buffer().sample_rate)
+	{
+		pos_R = pos_L;
+	}
+
+	return { pos_L, pos_R };
+}
+
 void Particle::trigger_next_grain(int index, bool adjust)
 {
 	constexpr auto MAX_WINDOW_SIZE = 4096.0f;
@@ -181,27 +276,24 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	const auto pos = controller_->position()[index];
 	const auto fade_in = pos > 0.0f;
 
-	float pos_L = pos;
-	float pos_R = pos;
+	float pos_L;
+	float pos_R;
 
-	if (adjust && pos >= 0.0f)
+	if (controller_->sample_info().num_channels > 1)
 	{
-		pos_L = adjust_channel_pos(index, 0, pos_L);
+		const auto positions = get_stereo_positions(index, pos, adjust);
 
-		if (controller_->sample_info().num_channels > 1)
-		{
-			pos_R = adjust_channel_pos(index, 1, pos_R);
-
-			if (std::abs(pos_R - pos_L) < 10.0f * controller_->buffer().sample_rate)
-			{
-				pos_R = pos_L;
-			}
-		}
+		pos_L = positions[0];
+		pos_R = positions[1];
+	}
+	else
+	{
+		pos_L = get_mono_position(index, pos, adjust);
+		pos_R = pos_L;
 	}
 
 	auto ratio = 1.0f;// is_harmonic_ ? context_->snap_ratio_to_scale(size_ratio_) : 1.0f;
-	auto pitch = controller_->pitch()[index];
-	auto ff = blink::math::convert::p_to_ff(pitch);
+	auto ff = controller_->ff()[index];
 	auto size = controller_->size()[index] * ff;
 	auto amp = controller_->amp()[index];
 

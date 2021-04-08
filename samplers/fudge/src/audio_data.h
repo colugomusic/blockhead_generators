@@ -10,6 +10,7 @@ struct AudioData
 	const blink_EnvelopeData* env_pitch;
 	const blink_EnvelopeData* env_speed;
 	const blink_EnvelopeData* env_grain_size;
+	const blink_EnvelopeData* env_grain_transpose;
 	const blink_EnvelopeData* env_uniformity;
 	const blink_EnvelopeData* env_noise_amount;
 	const blink_EnvelopeData* env_noise_color;

@@ -25,7 +25,6 @@ Fudge::Fudge()
 	auto spec_env_speed = std_params::envelopes::speed();
 
 	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_pan.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_speed.flags |= blink_EnvelopeFlags_DefaultActive;
 
@@ -36,12 +35,17 @@ Fudge::Fudge()
 
 	auto group_geometry = add_group("Geometry");
 	auto spec_env_grain_size = parameters::envelopes::grain_size();
+	auto spec_env_grain_transpose = parameters::envelopes::grain_transpose();
 	auto spec_env_uniformity = parameters::envelopes::uniformity();
 
+	spec_env_grain_size.flags |= blink_EnvelopeFlags_DefaultActive;
+
 	spec_env_grain_size.group_index = group_geometry;
+	spec_env_grain_transpose.group_index = group_geometry;
 	spec_env_uniformity.group_index = group_geometry;
 
 	env_grain_size_ = add_parameter(spec_env_grain_size);
+	env_grain_transpose_ = add_parameter(spec_env_grain_transpose);
 	env_uniformity_ = add_parameter(spec_env_uniformity);
 
 	auto group_noise = add_group("Noise");
