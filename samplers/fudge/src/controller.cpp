@@ -47,9 +47,6 @@ void Controller::process(
 	resets_ = &block_traverser.get_resets();
 
 	const auto transpose = plugin_->env_grain_transpose().search_vec(data.env_grain_transpose, *block_positions_, prev_pos);
-
-	amp_ = plugin_->env_amp().search_vec(data.env_amp, *block_positions_, prev_pos) * data.slider_amp->value;
-	
 	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, *block_positions_, prev_pos) + data.slider_pitch->value;
 
 	ff_ = blink::math::convert::p_to_ff(pitch);

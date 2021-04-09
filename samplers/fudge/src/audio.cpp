@@ -58,6 +58,10 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
 
+	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_traverser_.get_read_position(), prev_pos) * data.slider_amp->value;
+
+	out_vec *= ml::repeatRows<2>(amp);
+
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
 

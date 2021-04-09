@@ -30,7 +30,6 @@ public:
 	const ml::DSPVector& position() const { return sample_positions_; }
 	const ml::DSPVectorInt& reset() const { return *resets_; }
 
-	const ml::DSPVector& amp() const { return amp_; }
 	const ml::DSPVector& ff() const { return ff_; }
 	const ml::DSPVector& size() const { return size_; }
 	const ml::DSPVector& uniformity() const { return uniformity_; }
@@ -52,7 +51,6 @@ private:
 	ml::DSPVector sample_positions_;
 	const ml::DSPVectorInt* resets_;
 
-	ml::DSPVector amp_;
 	ml::DSPVector ff_;
 	ml::DSPVector size_;
 	ml::DSPVector uniformity_;

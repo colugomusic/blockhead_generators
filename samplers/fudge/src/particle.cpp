@@ -49,7 +49,7 @@ ml::DSPVectorArray<2> Particle::process()
 
 			auto& grain = grains_[g];
 
-			if (!grain.on || grain.amp <= 0.f) continue;
+			if (!grain.on) continue;
 
 			if (grain.frame < grain.window)
 			{
@@ -71,7 +71,7 @@ ml::DSPVectorArray<2> Particle::process()
 			}
 
 			auto final_duck = std::min(grain.duck, self_duck);
-			auto overall_amp = grain.frame_amp * final_duck * grain.amp;
+			auto overall_amp = grain.frame_amp * final_duck;
 
 			if (overall_amp > 0.f)
 			{
@@ -295,7 +295,6 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	auto ratio = 1.0f;// is_harmonic_ ? context_->snap_ratio_to_scale(size_ratio_) : 1.0f;
 	auto ff = controller_->ff()[index];
 	auto size = controller_->size()[index] * ff;
-	auto amp = controller_->amp()[index];
 
 	grains_[flip_flop_].on = true;
 	grains_[flip_flop_].fade_in = fade_in;
@@ -306,6 +305,5 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	grains_[flip_flop_].window = std::min(MAX_WINDOW_SIZE, std::floor(size / 3));
 	grains_[flip_flop_].frame = 0.f;
 	grains_[flip_flop_].frame_amp = fade_in ? 0.f : 1.f;
-	grains_[flip_flop_].amp = amp;
 	grains_[flip_flop_].duck = 1.f;
 }
