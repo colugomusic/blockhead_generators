@@ -41,6 +41,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		std::int32_t distance;
 		std::int32_t peak_index;
 		std::int32_t peak_distance;
+		float peak_value;
 		bool up;
 	};
 
@@ -80,8 +81,14 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				const auto a_peak_distance = (float(a->peak_index) - a_beg) / a_length;
 				const auto b_peak_distance = (float(b->peak_index) - b_beg) / b_length;
 
-				total_diff += std::abs(a_distance - b_distance);
-				total_diff += std::abs(a_peak_distance - b_peak_distance);
+				float part_diff = 0.0f;
+
+				part_diff += std::abs(a_distance - b_distance);
+				part_diff += std::abs(a_peak_distance - b_peak_distance);
+				part_diff += std::abs(a->peak_value - b->peak_value);
+				part_diff /= (depth / 2);
+
+				total_diff += part_diff;
 
 				if (total_diff >= best_diff)
 				{
@@ -114,8 +121,8 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 	ml::OnePole filter;
 	ml::DCBlocker dc_blocker;
 
-	filter.mCoeffs = ml::OnePole::coeffs(0.0045f);
-	dc_blocker.mCoeffs = ml::DCBlocker::coeffs(0.045f);
+	filter.mCoeffs = ml::OnePole::coeffs(0.0011f);
+	dc_blocker.mCoeffs = ml::DCBlocker::coeffs(0.011f);
 
 	auto index = 0;
 	auto frames_remaining = n;
@@ -130,6 +137,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		callbacks.get_frames(index, num_chunk_frames, chunk_frames.getBuffer());
 
 		const auto filtered_frames = filter(dc_blocker(chunk_frames));
+		//const auto filtered_frames = filter(chunk_frames);
 
 		for (std::uint32_t i = 0; i < num_chunk_frames; i++)
 		{
@@ -171,6 +179,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				crossing.distance = (index + i) - zx.latest;
 				crossing.peak_index = zx.best_peak_pos;
 				crossing.peak_distance = zx.best_peak_pos - zx.latest;
+				crossing.peak_value = zx.best_peak;
 				crossing.up = zx.up;
 
 				crossings.push_front(crossing);
