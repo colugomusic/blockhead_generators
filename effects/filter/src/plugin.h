@@ -17,8 +17,8 @@ public:
 
 	Filter();
 
-	const blink::EnvelopeParameter& env_freq() const { return *env_res_; }
-	const blink::EnvelopeParameter& env_res() const { return *env_freq_; }
+	const blink::EnvelopeParameter& env_freq() const { return *env_freq_; }
+	const blink::EnvelopeParameter& env_res() const { return *env_res_; }
 
 private:
 

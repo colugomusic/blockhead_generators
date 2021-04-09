@@ -34,7 +34,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	plugin_->env_res().search_vec(data.env_res, block_positions.getConstBuffer(), 1, prev_pos_, &res);
 
 	const auto omega = math::convert::linear_to_filter_hz(freq) / buffer->sample_rate;
-	const auto coeffs = ml::Lopass::coeffs(omega, res);
+	const auto coeffs = ml::Lopass::coeffs(omega, 0.5f);
 
 	lopass_[0].mCoeffs = coeffs;
 	lopass_[1].mCoeffs = coeffs;
