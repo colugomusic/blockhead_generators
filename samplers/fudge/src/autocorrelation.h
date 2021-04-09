@@ -38,8 +38,9 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 	struct Crossing
 	{
 		std::uint32_t index;
-		std::int32_t peak_distance;
 		std::int32_t distance;
+		std::int32_t peak_index;
+		std::int32_t peak_distance;
 		bool up;
 	};
 
@@ -47,8 +48,8 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 	const auto find_best_crossing = [](const std::deque<Crossing>& crossings)
 	{
-		constexpr auto AUTO_WIN = 3;
-		constexpr auto MAX_DIFF = 100;
+		constexpr auto AUTO_WIN = 0.05f;
+		constexpr auto MAX_DIFF = 100.0f;
 
 		auto best = crossings.front().index;
 		auto best_diff = MAX_DIFF;
@@ -59,15 +60,28 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 			auto a = crossings.begin();
 			auto b = crossings.begin() + depth;
 
-			auto total_diff = 0;
+			const auto last = b + (depth - 1);
+
+			const auto a_beg = b->index;
+			const auto b_beg = (last->index - last->distance);
+
+			const auto a_length = a->index - a_beg;
+			const auto b_length = b->index - b_beg;
+
+			auto total_diff = 0.0f;
 			auto terrible = false;
 
 			for (int i = 0; i < depth; i++, a++, b++)
 			{
 				assert(a->up == b->up);
 
-				total_diff += std::abs(a->distance - b->distance);
-				total_diff += std::abs(a->peak_distance - b->peak_distance);
+				const auto a_distance = (float(a->index) - a_beg) / a_length;
+				const auto b_distance = (float(b->index) - b_beg) / b_length;
+				const auto a_peak_distance = (float(a->peak_index) - a_beg) / a_length;
+				const auto b_peak_distance = (float(b->peak_index) - b_beg) / b_length;
+
+				total_diff += std::abs(a_distance - b_distance);
+				total_diff += std::abs(a_peak_distance - b_peak_distance);
 
 				if (total_diff >= best_diff)
 				{
@@ -155,6 +169,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 				crossing.index = (index + i);
 				crossing.distance = (index + i) - zx.latest;
+				crossing.peak_index = zx.best_peak_pos;
 				crossing.peak_distance = zx.best_peak_pos - zx.latest;
 				crossing.up = zx.up;
 
