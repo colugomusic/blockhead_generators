@@ -47,7 +47,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 	const auto find_best_crossing = [](const std::deque<Crossing>& crossings)
 	{
-		constexpr auto AUTO_WIN = 1;
+		constexpr auto AUTO_WIN = 3;
 		constexpr auto MAX_DIFF = 100;
 
 		auto best = crossings.front().index;
