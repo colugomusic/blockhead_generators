@@ -151,7 +151,7 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 		{
 			const auto pos = grain.pos[1] + grain.frame;
 
-			R = pos < 0.f ? 0.f : data.read_frame_interp(0, pos);
+			R = pos < 0.f ? 0.f : data.read_frame_interp(1, pos);
 			L = R;
 
 			break;
