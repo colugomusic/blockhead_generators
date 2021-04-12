@@ -3,3 +3,4 @@ project(blockhead_generators)
 
 add_subdirectory(effects)
 add_subdirectory(samplers)
+add_subdirectory(synths)

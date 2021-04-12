@@ -12,8 +12,6 @@ class Audio : public blink::Effect
 {
 public:
 
-	static constexpr auto REQUIRES_PREPROCESS = false;
-
 	Audio(const SpringReverb* plugin);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
