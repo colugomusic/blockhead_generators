@@ -84,13 +84,13 @@ static void calculate_positions(
 	if (out_derivatives) std::copy(derivatives_vec.getConstBuffer(), derivatives_vec.getConstBuffer() + count, out_derivatives);
 }
 
-static void calculate_amp(const Classic* plugin, const Data& data, const float* positions, int count, float prev_pos, float* out)
+static void calculate_amp(const Classic* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
 	ml::DSPVector amp(1.0f);
 
 	if (data.envelopes.amp)
 	{
-		plugin->env_amp().search_vec(data.envelopes.amp, positions, count, prev_pos, amp.getBuffer());
+		plugin->env_amp().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
 	}
 
 	if (data.sliders.amp)
@@ -98,7 +98,7 @@ static void calculate_amp(const Classic* plugin, const Data& data, const float* 
 		amp *= data.sliders.amp->value;
 	}
 
-	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + count, out);
+	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
 blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp)
@@ -109,13 +109,16 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 
 	auto frames_remaining = n;
 	int index = 0;
-	auto prev_pos = std::numeric_limits<float>::max();
+
+	BlockPositions block_positions;
 
 	while (frames_remaining > 0 && frames_remaining <= buffer->sample_info->num_frames)
 	{
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
 
-		block_traverser_.generate(buffer->positions + index, count, buffer->data_offset);
+		block_positions(buffer->positions + index, buffer->data_offset, count);
+
+		block_traverser_.generate(block_positions, count);
 
 		traverser_resetter_.check(data.envelopes.pitch, &block_traverser_);
 
@@ -129,11 +132,8 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 			out + index,
 			derivatives ? derivatives + index : nullptr);
 
-		const auto positions = block_traverser_.get_read_position().getConstBuffer();
+		calculate_amp(plugin, data, block_positions, amp + index);
 
-		calculate_amp(plugin, data, positions, count, prev_pos, amp + index);
-
-		prev_pos = positions[count - 1];
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;
 	}

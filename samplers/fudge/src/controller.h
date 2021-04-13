@@ -4,6 +4,7 @@
 #include <blink/traverser.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/standard_traversers/fudge.hpp>
+#include <blink/block_positions.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPOps.h>
@@ -24,9 +25,9 @@ public:
 		const blink_SamplerBuffer& buffer,
 		const SampleAnalysis* analysis_data,
 		const blink::Traverser& block_traverser,
-		float prev_pos);
+		const blink::BlockPositions& block_positions);
 
-	const ml::DSPVector& block_position() const { return *block_positions_; }
+	const blink::BlockPositions& block_positions() const { return *block_positions_; }
 	const ml::DSPVector& position() const { return sample_positions_; }
 	const ml::DSPVectorInt& reset() const { return *resets_; }
 
@@ -47,7 +48,7 @@ private:
 	blink::std_traversers::Fudge position_traverser_;
 
 	const blink_SamplerBuffer* buffer_;
-	const ml::DSPVector* block_positions_;
+	const blink::BlockPositions* block_positions_;
 	ml::DSPVector sample_positions_;
 	const ml::DSPVectorInt* resets_;
 

@@ -11,6 +11,8 @@ Audio::Audio(const Filter* plugin)
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
+	begin_process(buffer);
+
 	ml::DSPVector block_positions;
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)

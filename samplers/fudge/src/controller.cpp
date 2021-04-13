@@ -14,9 +14,9 @@ void Controller::process(
 	const blink_SamplerBuffer& buffer,
 	const SampleAnalysis* analysis_data,
 	const blink::Traverser& block_traverser,
-	float prev_pos)
+	const blink::BlockPositions& block_positions)
 {
-	block_positions_ = &block_traverser.get_read_position();
+	block_positions_ = &block_positions;
 
 	sample_positions_ =
 		position_traverser_.get_positions(
@@ -46,14 +46,14 @@ void Controller::process(
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();
 
-	const auto transpose = plugin_->env_grain_transpose().search_vec(data.env_grain_transpose, *block_positions_, prev_pos);
-	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, *block_positions_, prev_pos) + data.slider_pitch->value;
+	const auto transpose = plugin_->env_grain_transpose().search_vec(data.env_grain_transpose, *block_positions_);
+	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, *block_positions_) + data.slider_pitch->value;
 
 	ff_ = blink::math::convert::p_to_ff(pitch);
 
-	const auto size_in_ms = convert::linear_to_ms(plugin_->env_grain_size().search_vec(data.env_grain_size, *block_positions_, prev_pos));
+	const auto size_in_ms = convert::linear_to_ms(plugin_->env_grain_size().search_vec(data.env_grain_size, *block_positions_));
 	const auto size_in_samples = convert::ms_to_samples(size_in_ms, buffer_->sample_info->SR);
 
 	size_ = blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose);
-	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_, prev_pos);
+	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_);
 }

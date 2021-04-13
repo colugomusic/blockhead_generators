@@ -36,15 +36,10 @@ ml::Projection unityToDecay(ml::projections::intervalMap({ 0, 1 }, { kDecayLo, k
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
+	begin_process(buffer);
+
 	glide_size_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
 	glide_decay_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
-
-	ml::DSPVector block_positions;
-
-	for (int i = 0; i < kFloatsPerDSPVector; i++)
-	{
-		block_positions[i] = float(buffer->positions[i] - buffer->data_offset);
-	}
 
 	struct Data
 	{
@@ -60,10 +55,10 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	float size;
 	float decay;
 
-	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions, prev_pos_);
+	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
 
-	plugin_->env_size().search_vec(data.env_size, block_positions.getConstBuffer(), 1, prev_pos_, &size);
-	plugin_->env_decay().search_vec(data.env_decay, block_positions.getConstBuffer(), 1, prev_pos_, &decay);
+	plugin_->env_size().search_vec(data.env_size, block_positions().positions.getConstBuffer(), 1, block_positions().prev_pos, &size);
+	plugin_->env_decay().search_vec(data.env_decay, block_positions().positions.getConstBuffer(), 1, block_positions().prev_pos, &decay);
 
 	const float sr = float(buffer->sample_rate);
 	const float RT60const = 0.001f;
@@ -125,8 +120,6 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
-
-	prev_pos_ = block_positions[kFloatsPerDSPVector - 1];
 
 	return BLINK_OK;
 }

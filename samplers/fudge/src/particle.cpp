@@ -16,7 +16,7 @@ ml::DSPVectorArray<2> Particle::process()
 
 	for (int j = 0; j < kFloatsPerDSPVector; j++)
 	{
-		auto block_pos = controller_->block_position()[j];
+		auto block_pos = controller_->block_positions().positions[j];
 
 		if (trig_primed_ && block_pos >= 0.0f)
 		{

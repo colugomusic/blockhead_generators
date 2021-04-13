@@ -3,6 +3,7 @@
 #include <blink/sampler.hpp>
 #include <blink/standard_traversers/classic.hpp>
 #include <blink/sample_data.hpp>
+#include <blink/block_positions.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
@@ -32,8 +33,7 @@ private:
 		const blink_EnvelopeData* env_noise_amount,
 		const blink_EnvelopeData* env_noise_color,
 		const blink_SliderData* sld_noise_width,
-		const ml::DSPVector& block_positions,
-		float prev_pos);
+		const blink::BlockPositions& block_positions);
 	
 	const Classic* plugin_;
 	blink::Traverser block_traverser_;

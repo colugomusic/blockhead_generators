@@ -5,18 +5,12 @@ using namespace blink;
 
 Audio::Audio(const Test* plugin)
 	: plugin_(plugin)
-	, prev_pos_(std::numeric_limits<float>::max())
 {
 }
 
 blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 {
-	ml::DSPVector block_positions;
-
-	for (int i = 0; i < kFloatsPerDSPVector; i++)
-	{
-		block_positions[i] = float(buffer->positions[i] - buffer->data_offset);
-	}
+	Synth::begin_process(buffer);
 
 	struct Data
 	{
@@ -33,11 +27,11 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 	data.env_fm0 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_FM0));
 	data.env_fm1 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_FM1));
 
-	const auto wave = plugin_->env_wave().search_vec(data.env_wave, block_positions, prev_pos_);
-	const auto p0 = plugin_->env_p0().search_vec(data.env_p0, block_positions, prev_pos_) + 60.0f;
-	const auto p1 = plugin_->env_p1().search_vec(data.env_p1, block_positions, prev_pos_) + 60.0f;
-	const auto fm0 = plugin_->env_fm0().search_vec(data.env_fm0, block_positions, prev_pos_);
-	const auto fm1 = plugin_->env_fm1().search_vec(data.env_fm1, block_positions, prev_pos_);
+ 	const auto wave = plugin_->env_wave().search_vec(data.env_wave, block_positions());
+	const auto p0 = plugin_->env_p0().search_vec(data.env_p0, block_positions()) + 60.0f;
+	const auto p1 = plugin_->env_p1().search_vec(data.env_p1, block_positions()) + 60.0f;
+	const auto fm0 = plugin_->env_fm0().search_vec(data.env_fm0, block_positions());
+	const auto fm1 = plugin_->env_fm1().search_vec(data.env_fm1, block_positions());
 	
 	const auto freq0 = blink::math::convert::pitch_to_frequency(p0);
 	const auto freq1 = blink::math::convert::pitch_to_frequency(p1);
@@ -58,8 +52,6 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
-
-	prev_pos_ = block_positions[kFloatsPerDSPVector - 1];
 
 	return BLINK_OK;
 }

@@ -10,13 +10,11 @@ Audio::Audio(const Classic* plugin)
 
 blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
+	begin_process(buffer);
+
 	ml::DSPVectorArray<2> out_vec;
 
-	const auto prev_pos = block_traverser_.get_last_pos();
-
-	block_traverser_.generate(buffer->positions, kFloatsPerDSPVector, buffer->data_offset);
-
-	const auto& block_positions = block_traverser_.get_read_position();
+	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
 
 	struct Data
 	{
@@ -57,7 +55,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
-	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions, prev_pos) * data.slider_amp->value;
+	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions()) * data.slider_amp->value;
 
 	if (data.toggle_reverse->value)
 	{
@@ -73,8 +71,8 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
-	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions, prev_pos);
-	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions, prev_pos);
+	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions());
+	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);
@@ -118,8 +116,7 @@ ml::DSPVectorArray<2> Audio::add_noise(
 	const blink_EnvelopeData* env_noise_amount,
 	const blink_EnvelopeData* env_noise_color,
 	const blink_SliderData* sld_noise_width,
-	const ml::DSPVector& block_positions,
-	float prev_pos)
+	const BlockPositions& block_positions)
 {
 	ml::DSPVectorArray<2> out;
 
@@ -128,7 +125,7 @@ ml::DSPVectorArray<2> Audio::add_noise(
 		return in;
 	}
 
-	const auto noise_amount = plugin_->env_noise_amount().search_vec(env_noise_amount, block_positions, prev_pos);
+	const auto noise_amount = plugin_->env_noise_amount().search_vec(env_noise_amount, block_positions);
 
 	if (ml::sum(noise_amount) < 0.0001f)
 	{
@@ -137,7 +134,7 @@ ml::DSPVectorArray<2> Audio::add_noise(
 
 	float noise_color;
 
-	plugin_->env_noise_color().search_vec(env_noise_color, block_positions.getConstBuffer(), 1, prev_pos, &noise_color);
+	plugin_->env_noise_color().search_vec(env_noise_color, block_positions.positions.getConstBuffer(), 1, block_positions.prev_pos, &noise_color);
 
 	noise_filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(noise_color, 2.0f) * 0.6f));
 
