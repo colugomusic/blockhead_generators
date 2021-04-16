@@ -66,7 +66,7 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Effect blink_make_effect()
+blink_Effect blink_make_effect(int instance_group)
 {
 	if (!g_plugin) return blink_Effect { 0 };
 

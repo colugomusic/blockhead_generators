@@ -147,7 +147,7 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Sampler blink_make_sampler()
+blink_Sampler blink_make_sampler(int instance_group)
 {
 	if (!g_plugin) return blink_Sampler { 0 };
 

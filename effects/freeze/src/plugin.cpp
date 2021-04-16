@@ -8,16 +8,18 @@
 
 using namespace blink;
 
-Filter::Filter()
+Freeze::Freeze()
 {
-	auto spec_env_freq = std_params::envelopes::filter_frequency();
-	auto spec_env_res = std_params::envelopes::resonance();
+	auto spec_env_pitch = std_params::envelopes::pitch();
+	auto spec_env_formant = std_params::envelopes::formant();
+	auto spec_sld_pitch = std_params::sliders::parameters::pitch();
 
-	spec_env_freq.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_res.flags |= blink_EnvelopeFlags_DefaultActive;
+	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
+	spec_env_formant.flags |= blink_EnvelopeFlags_DefaultActive;
 
-	env_freq_ = add_parameter(spec_env_freq);
-	env_res_ = add_parameter(spec_env_res);
+	env_pitch_ = add_parameter(spec_env_pitch);
+	env_formant_ = add_parameter(spec_env_formant);
+	add_parameter(spec_sld_pitch);
 }
 
 enum class Error
@@ -26,23 +28,23 @@ enum class Error
 	NotInitialized,
 };
 
-Filter* g_plugin = nullptr;
+Freeze* g_plugin = nullptr;
 
 blink_UUID blink_get_plugin_uuid()
 {
-	return Filter::UUID;
+	return Freeze::UUID;
 }
 
 blink_UUID blink_get_plugin_name()
 {
-	return Filter::NAME;
+	return Freeze::NAME;
 }
 
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
 
-	g_plugin = new Filter();
+	g_plugin = new Freeze();
 
 	return BLINK_OK;
 }
@@ -58,7 +60,7 @@ blink_Error blink_terminate()
 
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0 };
+	if (!g_plugin) return blink_Effect { 0, 0, 0 };
 
 	return bind::make_effect<Audio>(g_plugin);
 }

@@ -77,9 +77,9 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Synth blink_make_synth()
+blink_Synth blink_make_synth(int instance_group)
 {
-	if (!g_plugin) return blink_Synth { 0 };
+	if (!g_plugin) return blink_Synth { 0, 0, 0 };
 
 	return bind::make_synth<Audio>(g_plugin);
 }
