@@ -9,7 +9,7 @@ struct Grain
 	float window = 256.0f;
 	float frame = 0.0f;
 	float frame_amp = 0.0f;
-	float edge = 0.0f;
+	int edge = 0;
 	float duck = 1.0f;
 	float ff = 1.0f;
 };

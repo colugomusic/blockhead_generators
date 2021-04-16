@@ -24,7 +24,7 @@ public:
 
 	const blink::BlockPositions& block_positions() const { return traverser_->block_positions(); }
 
-	const ml::DSPVectorInt reset() const { return traverser_->get_resets(); }
+	const ml::DSPVectorInt& reset() const { return traverser_->get_resets(); }
 	const ml::DSPVector& ff() const { return ff_; }
 	const ml::DSPVector& size() const { return size_; }
 

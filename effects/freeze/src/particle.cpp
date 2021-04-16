@@ -13,17 +13,19 @@ LR Particle::process(int vector_index)
 {
 	LR out;
 
-	auto block_pos = controller_->block_positions().positions[vector_index];
-
-	if (controller_->reset()[vector_index])
+	if (controller_->reset()[vector_index] > 0)
 	{
 		reset(vector_index);
 	}
-	else if (trigger_timer_ >= grains_[flip_flop_].period / 2)
+	else
 	{
-		float dummy;
-		trigger_timer_ = std::modf(trigger_timer_, &dummy);
-		trigger_next_grain(vector_index);
+		const auto half_period = grains_[flip_flop_].period / 2;
+
+		if (trigger_timer_ >= half_period)
+		{
+			trigger_timer_ -= half_period;
+			trigger_next_grain(vector_index);
+		}
 	}
 
 	for (int g = 0; g < 2; g++)
@@ -85,7 +87,10 @@ LR Particle::read_stereo_frame(int vector_index, const Grain& grain) const
 {
 	const auto pos = grain.frame * grain.ff;
 
-	if (pos < 0) return { 0.0f, 0.0f };
+	if (pos < 0)
+	{
+		return { 0.0f, 0.0f };
+	}
 
 	if (pos >= grain.edge)
 	{
@@ -96,7 +101,7 @@ LR Particle::read_stereo_frame(int vector_index, const Grain& grain) const
 
 	if (pos >= grain.edge - 512)
 	{
-		amp = 1.0f - blink::math::inverse_lerp(grain.edge - 512, grain.edge, pos);
+		amp = 1.0f - blink::math::inverse_lerp(float(grain.edge - 512), float(grain.edge), pos);
 	}
 
 	const auto L = read_(vector_index, 0, pos) * amp;
@@ -126,18 +131,16 @@ void Particle::trigger_next_grain(int index)
 
 	flip_flop_ = flip_flop_ == 0 ? 1 : 0;
 
-
 	auto ff = controller_->ff()[index];
 	auto size = controller_->size()[index];
 	auto period = size;
-
-	const auto fade_in = !first_grain_ || ff > 1.0f;
+	const auto fade_in = true;// !first_grain_ || ff != 1.0f;
 
 	first_grain_ = false;
 
 	const auto& buffer = controller_->buffer();
 	const auto frames_available = buffer.frames_available();
-	const auto edge = float(frames_available);
+	const auto edge = frames_available;
 
 	grains_[flip_flop_].on = true;
 	grains_[flip_flop_].fade_in = fade_in;

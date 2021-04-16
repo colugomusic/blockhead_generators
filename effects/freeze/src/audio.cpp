@@ -30,7 +30,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
-		freeze_buffer_.process(i, block_traverser_.get_resets()[i] > 0, in_vec.constRow(0)[i], in_vec.constRow(1)[i]);
+		freeze_buffer_.process(block_traverser_.get_resets()[i] > 0, in_vec.constRow(0)[i], in_vec.constRow(1)[i]);
 		
 		auto LR = particle_.process(i);
 

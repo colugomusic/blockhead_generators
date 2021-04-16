@@ -5,95 +5,71 @@
 
 #include <blink/math.hpp>
 
-#pragma warning(push, 0)
-#include <DSP/MLDSPOps.h>
-#pragma warning(pop)
-
-template <std::int32_t COLUMNS>
+template <std::size_t SIZE>
 class Buffer
 {
 public:
 
-	void process(int vector_index, bool reset, float L, float R)
+	static bool not_zero(float L, float R, float threshold = 0.0001f)
+	{
+		return L > threshold || L < -threshold || R > threshold || R < -threshold;
+	}
+
+	void process(bool reset, float L, float R)
 	{
 		if (reset)
 		{
 			init_ = false;
 			size_ = 0;
-			zero_index_ = 0;
-			frames_available_ = 0;
 		}
 
-		if (!init_)
+		if (!init_ && not_zero(L, R))
 		{
-			if (L > 0.0001f || L < -0.0001f || R > 0.0001f || R < -0.0001f)
-			{
-				init_ = true;
-				zero_index_ = vector_index + size_;
-			}
+			init_ = true;
 		}
 
-		if (init_ && write(L, R))
+		if (init_)
 		{
-			frames_available_ = size_ - zero_index_;
+			write(L, R);
 		}
 	}
 
 	float at(std::size_t row, int index) const
 	{
-		if (index > frames_available_ - 1)
+		if (index > size_ - 1)
 		{
  			return 0.0f;
 		}
 
-		index += zero_index_;
-
-		const auto column_index = int(index / kFloatsPerDSPVector);
-
-		if (column_index > size_ - 1)
-		{
-			return 0.0f;
-		}
-
-		const auto sub_index = int(index % kFloatsPerDSPVector);
-
-		return data_.constRow(int(row * COLUMNS) + column_index)[sub_index];
+		return data_[row][index];
 	}
 
 	void clear()
 	{
 		init_ = false;
 		size_ = 0;
-		zero_index_ = 0;
-		frames_available_ = 0;
 	}
 
-	int frames_available() const { return frames_available_; }
+	int frames_available() const { return size_; }
 
 private:
 
 	bool write(float L, float R)
 	{
-		if (size_ >= COLUMNS * kFloatsPerDSPVector) return false;
+		if (size_ >= SIZE) return false;
 
-		const auto index = size_;
-		const auto column_index = int(index / kFloatsPerDSPVector);
-		const auto sub_index = int(index % kFloatsPerDSPVector);
-
-		data_.row(int(0 * COLUMNS) + column_index)[sub_index] = L;
-		data_.row(int(1 * COLUMNS) + column_index)[sub_index] = R;
+		data_[0][size_] = L;
+		data_[1][size_] = R;
 
 		size_++;
 
 		return true;
 	}
 
-	ml::DSPVectorArray<2 * COLUMNS> data_;
+	std::array<std::array<float, SIZE>, 2> data_;
 
 	bool init_ = false;
 	int size_ = 0;
-	int zero_index_ = 0;
-	int frames_available_ = 0;
 };
 
-using FreezeBuffer = Buffer<128>;
+using FreezeBuffer = Buffer<8192*2>;
