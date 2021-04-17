@@ -138,4 +138,14 @@ EnvelopeSpec uniformity()
 }
 
 } // envelopes
+
+extern blink::ChordSpec grain_harmonics_scale()
+{
+	auto out = std_params::chords::scale();
+
+	out.name = "Harmonics";
+
+	return out;
+}
+
 } // parameters

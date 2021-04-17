@@ -34,34 +34,49 @@ Fudge::Fudge()
 	env_speed_ = add_parameter(spec_env_speed);
 
 	auto group_geometry = add_group("Geometry");
-	auto spec_env_grain_size = parameters::envelopes::grain_size();
-	auto spec_env_grain_transpose = parameters::envelopes::grain_transpose();
-	auto spec_env_uniformity = parameters::envelopes::uniformity();
+	{
+		auto spec_env_grain_size = parameters::envelopes::grain_size();
+		auto spec_env_grain_transpose = parameters::envelopes::grain_transpose();
+		auto spec_env_uniformity = parameters::envelopes::uniformity();
 
-	spec_env_grain_size.flags |= blink_EnvelopeFlags_DefaultActive;
+		spec_env_grain_size.flags |= blink_EnvelopeFlags_DefaultActive;
 
-	spec_env_grain_size.group_index = group_geometry;
-	spec_env_grain_transpose.group_index = group_geometry;
-	spec_env_uniformity.group_index = group_geometry;
+		spec_env_grain_size.group_index = group_geometry;
+		spec_env_grain_transpose.group_index = group_geometry;
+		spec_env_uniformity.group_index = group_geometry;
 
-	env_grain_size_ = add_parameter(spec_env_grain_size);
-	env_grain_transpose_ = add_parameter(spec_env_grain_transpose);
-	env_uniformity_ = add_parameter(spec_env_uniformity);
+		env_grain_size_ = add_parameter(spec_env_grain_size);
+		env_grain_transpose_ = add_parameter(spec_env_grain_transpose);
+		env_uniformity_ = add_parameter(spec_env_uniformity);
+	}
+
+
+	auto group_harmonics = add_group("Harmonics");
+	{
+		auto spec_scale = parameters::grain_harmonics_scale();
+
+		spec_scale.flags |= blink_ChordFlags_AlwaysShowButtonWhenGroupIsVisible;
+		spec_scale.group_index = group_harmonics;
+
+		chord_harmonics_scale_ = add_parameter(spec_scale);
+	}
 
 	auto group_noise = add_group("Noise");
-	auto spec_env_noise_amount = std_params::envelopes::noise_amount();
-	auto spec_env_noise_color = std_params::envelopes::noise_color();
+	{
+		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
+		auto spec_env_noise_color = std_params::envelopes::noise_color();
 
-	spec_env_noise_amount.group_index = group_noise;
-	spec_env_noise_color.group_index = group_noise;
+		spec_env_noise_amount.group_index = group_noise;
+		spec_env_noise_color.group_index = group_noise;
 
-	spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-	spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-	spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-	spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 
-	env_noise_amount_ = add_parameter(spec_env_noise_amount);
-	env_noise_color_ = add_parameter(spec_env_noise_color);
+		env_noise_amount_ = add_parameter(spec_env_noise_amount);
+		env_noise_color_ = add_parameter(spec_env_noise_color);
+	}
 
 	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
 	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());

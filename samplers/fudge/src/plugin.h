@@ -24,6 +24,7 @@ public:
 		Env_GrainSize,
 		Env_GrainTranspose,
 		Env_Uniformity,
+		Chord_Harmonics_Scale,
 		Env_NoiseAmount,
 		Env_NoiseColor,
 
@@ -41,6 +42,7 @@ public:
 
 	GUI& gui();
 
+	const blink::ChordParameter& chord_harmonics_scale() const { return *chord_harmonics_scale_; }
 	const blink::EnvelopeParameter& env_amp() const { return *env_amp_; }
 	const blink::EnvelopeParameter& env_pan() const { return *env_pan_; }
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
@@ -60,6 +62,7 @@ private:
 	std::map<blink_ID, std::shared_ptr<SampleAnalysis>> sample_analysis_;
 	GUI gui_;
 
+	std::shared_ptr<blink::ChordParameter> chord_harmonics_scale_;
 	std::shared_ptr<blink::OptionParameter> option_noise_mode_;
 	std::shared_ptr<blink::EnvelopeParameter> env_amp_;
 	std::shared_ptr<blink::EnvelopeParameter> env_pan_;
