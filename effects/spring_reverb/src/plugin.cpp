@@ -10,16 +10,15 @@ using namespace blink;
 
 SpringReverb::SpringReverb()
 {
+	// TODO: do this properly
 	auto spec_env_size = std_params::envelopes::resonance();
 	auto spec_env_decay = std_params::envelopes::resonance();
-	auto spec_env_mix = std_params::envelopes::resonance();
+	auto spec_env_mix = std_params::envelopes::mix();
 
 	spec_env_size.name = "Size";
 	spec_env_size.uuid = "65e00902-5318-4d76-9b86-2479dcce7f52";
 	spec_env_decay.name = "Decay";
 	spec_env_decay.uuid = "aa47aa82-0e26-4d3b-8f60-ddb5d57353e7";
-	spec_env_mix.name = "Mix";
-	spec_env_mix.uuid = "f1a0b134-1fd1-487d-9371-727c33ce0009";
 
 	spec_env_size.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_decay.flags |= blink_EnvelopeFlags_DefaultActive;

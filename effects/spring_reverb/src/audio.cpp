@@ -5,7 +5,6 @@ using namespace blink;
 
 Audio::Audio(const SpringReverb* plugin)
 	: plugin_(plugin)
-	, prev_pos_(std::numeric_limits<float>::max())
 {
 	// set allpass filter coefficients
 	mAp1.mGain = 0.75f;
@@ -57,8 +56,8 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
 
-	plugin_->env_size().search_vec(data.env_size, block_positions().positions.getConstBuffer(), 1, block_positions().prev_pos, &size);
-	plugin_->env_decay().search_vec(data.env_decay, block_positions().positions.getConstBuffer(), 1, block_positions().prev_pos, &decay);
+	plugin_->env_size().search_vec(data.env_size, block_positions(), 1, &size);
+	plugin_->env_decay().search_vec(data.env_decay, block_positions(), 1, &decay);
 
 	const float sr = float(buffer->sample_rate);
 	const float RT60const = 0.001f;

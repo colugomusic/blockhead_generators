@@ -20,7 +20,6 @@ public:
 private:
 	
 	const SpringReverb* plugin_;
-	float prev_pos_;
 
 	ml::LinearGlide glide_size_;
 	ml::LinearGlide glide_decay_;
