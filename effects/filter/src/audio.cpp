@@ -5,7 +5,6 @@ using namespace blink;
 
 Audio::Audio(const Filter* plugin)
 	: plugin_(plugin)
-	, prev_pos_(std::numeric_limits<float>::max())
 {
 }
 
@@ -13,27 +12,22 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 {
 	begin_process(buffer);
 
-	ml::DSPVector block_positions;
-
-	for (int i = 0; i < kFloatsPerDSPVector; i++)
-	{
-		block_positions[i] = float(buffer->positions[i] - buffer->data_offset);
-	}
-
 	struct Data
 	{
 		const blink_EnvelopeData* env_freq;
 		const blink_EnvelopeData* env_res;
+		const blink_EnvelopeData* env_mix;
 	} data;
 
 	data.env_freq = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Freq));
 	data.env_res  = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Res));
+	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Mix));
 
 	float freq;
 	float res;
 
-	plugin_->env_freq().search_vec(data.env_freq, block_positions.getConstBuffer(), 1, prev_pos_, &freq);
-	plugin_->env_res().search_vec(data.env_res, block_positions.getConstBuffer(), 1, prev_pos_, &res);
+	plugin_->env_freq().search_vec(data.env_freq, block_positions(), 1, &freq);
+	plugin_->env_res().search_vec(data.env_res, block_positions(), 1, &res);
 
 	res = ml::lerp(1.0f, 0.1f, res);
 
@@ -48,12 +42,14 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	const auto L = lopass_[0](in_vec.constRow(0));
 	const auto R = lopass_[1](in_vec.constRow(1));
 
-	const auto out_vec = ml::concatRows(L, R);
+	auto out_vec = ml::concatRows(L, R);
+
+	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
+
+	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix));
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
-
-	prev_pos_ = block_positions[kFloatsPerDSPVector - 1];
 
 	return BLINK_OK;
 }

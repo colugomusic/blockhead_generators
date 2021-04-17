@@ -12,12 +12,14 @@ Filter::Filter()
 {
 	auto spec_env_freq = std_params::envelopes::filter_frequency();
 	auto spec_env_res = std_params::envelopes::resonance();
+	auto spec_env_mix = std_params::envelopes::mix();
 
 	spec_env_freq.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_res.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	env_freq_ = add_parameter(spec_env_freq);
 	env_res_ = add_parameter(spec_env_res);
+	env_mix_ = add_parameter(spec_env_mix);
 }
 
 enum class Error

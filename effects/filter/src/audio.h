@@ -20,6 +20,5 @@ public:
 private:
 	
 	const Filter* plugin_;
-	float prev_pos_;
 	std::array<ml::Lopass, 2> lopass_;
 };
