@@ -12,6 +12,7 @@ Freeze::Freeze()
 {
 	auto spec_env_pitch = std_params::envelopes::pitch();
 	auto spec_env_formant = std_params::envelopes::formant();
+	auto spec_env_mix = std_params::envelopes::mix();
 	auto spec_sld_pitch = std_params::sliders::parameters::pitch();
 
 	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
@@ -19,6 +20,8 @@ Freeze::Freeze()
 
 	env_pitch_ = add_parameter(spec_env_pitch);
 	env_formant_ = add_parameter(spec_env_formant);
+	env_mix_ = add_parameter(spec_env_mix);
+
 	add_parameter(spec_sld_pitch);
 }
 

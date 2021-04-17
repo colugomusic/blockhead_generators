@@ -13,6 +13,7 @@ public:
 	{
 		Env_Pitch,
 		Env_Formant,
+		Env_Mix,
 		Sld_Pitch,
 	};
 
@@ -20,9 +21,11 @@ public:
 
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 	const blink::EnvelopeParameter& env_formant() const { return *env_formant_; }
+	const blink::EnvelopeParameter& env_mix() const { return *env_mix_; }
 
 private:
 
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_formant_;
+	std::shared_ptr<blink::EnvelopeParameter> env_mix_;
 };

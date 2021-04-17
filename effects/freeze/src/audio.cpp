@@ -21,6 +21,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(Freeze::ParameterIndex::Env_Pitch));
 	data.env_formant = plugin_->get_envelope_data(buffer->parameter_data, int(Freeze::ParameterIndex::Env_Formant));
+	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Freeze::ParameterIndex::Env_Mix));
 	data.slider_pitch = plugin_->get_slider_data(buffer->parameter_data, int(Freeze::ParameterIndex::Sld_Pitch));
 
 	ml::DSPVectorArray<2> in_vec(in);
@@ -37,6 +38,10 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		out_vec.row(0)[i] = LR.L;
 		out_vec.row(1)[i] = LR.R;
 	}
+
+	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
+
+	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix));
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
