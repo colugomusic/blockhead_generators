@@ -53,12 +53,17 @@ Fudge::Fudge()
 
 	auto group_harmonics = add_group("Harmonics");
 	{
-		auto spec_scale = parameters::grain_harmonics_scale();
+		auto spec_scale = parameters::harmonics_scale();
+		auto spec_env_amount = parameters::envelopes::harmonics_amount();
+		auto spec_env_spread = parameters::envelopes::harmonics_spread();
 
-		spec_scale.flags |= blink_ChordFlags_AlwaysShowButtonWhenGroupIsVisible;
 		spec_scale.group_index = group_harmonics;
+		spec_env_amount.group_index = group_harmonics;
+		spec_env_spread.group_index = group_harmonics;
 
 		chord_harmonics_scale_ = add_parameter(spec_scale);
+		env_harmonics_amount_ = add_parameter(spec_env_amount);
+		env_harmonics_spread_ = add_parameter(spec_env_spread);
 	}
 
 	auto group_noise = add_group("Noise");

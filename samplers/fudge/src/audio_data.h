@@ -5,6 +5,8 @@
 struct AudioData
 {
 	const blink_OptionData* option_noise_mode;
+	const blink_EnvelopeData* env_harmonics_amount;
+	const blink_EnvelopeData* env_harmonics_spread;
 	const blink_EnvelopeData* env_amp;
 	const blink_EnvelopeData* env_pan;
 	const blink_EnvelopeData* env_pitch;

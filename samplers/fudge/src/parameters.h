@@ -9,9 +9,11 @@ namespace envelopes {
 extern blink::EnvelopeSpec grain_size();
 extern blink::EnvelopeSpec grain_transpose();
 extern blink::EnvelopeSpec uniformity();
+extern blink::EnvelopeSpec harmonics_amount();
+extern blink::EnvelopeSpec harmonics_spread();
 
 } // envelopes
 
-extern blink::ChordSpec grain_harmonics_scale();
+extern blink::ChordSpec harmonics_scale();
 
 } // paramaters
