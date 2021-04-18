@@ -56,4 +56,5 @@ void Controller::process(
 
 	size_ = blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose);
 	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_);
+	scale_ = plugin_->chord_harmonics_scale().search_vec(data.chord_harmonics_scale, *block_positions_);
 }

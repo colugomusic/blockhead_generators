@@ -55,6 +55,7 @@ private:
 	ml::DSPVector ff_;
 	ml::DSPVector size_;
 	ml::DSPVector uniformity_;
+	ml::DSPVectorInt scale_;
 
 	blink::SampleData sample_data_;
 	const SampleAnalysis* analysis_data_;
