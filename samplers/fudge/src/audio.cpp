@@ -21,24 +21,25 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	AudioData data;
 
-	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Fudge::ParameterIndex::Option_NoiseMode));
-	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Amp));
-	data.env_pan              = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pan));
-	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pitch));
-	data.env_speed            = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
-	data.env_grain_size       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainSize));
-	data.env_grain_transpose  = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainTranspose));
-	data.env_uniformity       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Uniformity));
-	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseColor));
-	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
-	data.slider_pan           = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pan));
-	data.slider_pitch         = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pitch));
-	data.slider_speed         = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Speed));
-	data.slider_sample_offset = plugin_->get_int_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_SampleOffset));
-	data.slider_noise_width   = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_NoiseWidth));
-	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
-	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
+	data.option_noise_mode     = plugin_->get_option_data(buffer->parameter_data, int(Fudge::ParameterIndex::Option_NoiseMode));
+	data.chord_harmonics_scale = plugin_->get_chord_data(buffer->parameter_data, int(Fudge::ParameterIndex::Chord_Harmonics_Scale));
+	data.env_amp               = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Amp));
+	data.env_pan               = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pan));
+	data.env_pitch             = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pitch));
+	data.env_speed             = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
+	data.env_grain_size        = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainSize));
+	data.env_grain_transpose   = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainTranspose));
+	data.env_uniformity        = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Uniformity));
+	data.env_noise_amount      = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseAmount));
+	data.env_noise_color       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseColor));
+	data.slider_amp            = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
+	data.slider_pan            = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pan));
+	data.slider_pitch          = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pitch));
+	data.slider_speed          = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Speed));
+	data.slider_sample_offset  = plugin_->get_int_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_SampleOffset));
+	data.slider_noise_width    = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_NoiseWidth));
+	data.toggle_loop           = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
+	data.toggle_reverse        = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
 
 	traverser_resetter_.check(data.env_speed, &block_traverser_);
 
