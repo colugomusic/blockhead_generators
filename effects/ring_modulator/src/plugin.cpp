@@ -8,24 +8,14 @@
 
 using namespace blink;
 
-SpringReverb::SpringReverb()
+RingModulator::RingModulator()
 {
-	// TODO: do this properly
-	auto spec_env_size = std_params::envelopes::resonance();
-	auto spec_env_decay = std_params::envelopes::resonance();
+	auto spec_env_pitch = std_params::envelopes::pitch();
 	auto spec_env_mix = std_params::envelopes::mix();
 
-	spec_env_size.name = "Size";
-	spec_env_size.uuid = "65e00902-5318-4d76-9b86-2479dcce7f52";
-	spec_env_decay.name = "Decay";
-	spec_env_decay.uuid = "aa47aa82-0e26-4d3b-8f60-ddb5d57353e7";
+	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
 
-	spec_env_size.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_decay.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_mix.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_size_ = add_parameter(spec_env_size);
-	env_decay_ = add_parameter(spec_env_decay);
+	env_pitch_ = add_parameter(spec_env_pitch);
 	env_mix_ = add_parameter(spec_env_mix);
 }
 
@@ -35,23 +25,23 @@ enum class Error
 	NotInitialized,
 };
 
-SpringReverb* g_plugin = nullptr;
+RingModulator* g_plugin = nullptr;
 
 blink_UUID blink_get_plugin_uuid()
 {
-	return SpringReverb::UUID;
+	return RingModulator::UUID;
 }
 
 blink_UUID blink_get_plugin_name()
 {
-	return SpringReverb::NAME;
+	return RingModulator::NAME;
 }
 
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
 
-	g_plugin = new SpringReverb();
+	g_plugin = new RingModulator();
 
 	return BLINK_OK;
 }
@@ -67,7 +57,7 @@ blink_Error blink_terminate()
 
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0 };
+	if (!g_plugin) return blink_Effect { 0, 0, 0 };
 
 	return bind::make_effect<Audio>(g_plugin);
 }
