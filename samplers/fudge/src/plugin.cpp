@@ -154,7 +154,7 @@ blink_Error blink_destroy_sampler(blink_Sampler sampler)
 	return bind::destroy_sampler(sampler);
 }
 
-blink_Bool blink_sampler_enable_warp_markers()
+blink_Bool blink_enable_warp_markers()
 {
 	return BLINK_TRUE;
 }

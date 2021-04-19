@@ -27,7 +27,14 @@ endif()
 
 list(APPEND SRC
     ./src/audio.h
+    ./src/audio_data.h
     ./src/audio.cpp
+    ./src/buffer.h
+    ./src/controller.h
+    ./src/controller.cpp
+    ./src/grain.h
+    ./src/particle.h
+    ./src/particle.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
