@@ -45,6 +45,9 @@ public:
 
 private:
 
+	float snap_ratio_to_scale(int index, float ff) const;
+	float snap_pitch_to_scale(float pitch, std::int32_t scale) const;
+
 	const Fudge* plugin_;
 	blink::std_traversers::Fudge position_traverser_;
 

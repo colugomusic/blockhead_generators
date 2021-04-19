@@ -2,6 +2,7 @@
 #include "audio_data.h"
 #include "plugin.h"
 #include "convert.h"
+#include <blink/bits.hpp>
 
 Controller::Controller(const Fudge* plugin)
 	: plugin_(plugin)
@@ -62,5 +63,43 @@ void Controller::process(
 
 float Controller::get_harmonic_ratio(int index, int harmonic) const
 {
-	return 1.0f + (float(harmonic + 1) * spread_[index]);
+	return snap_ratio_to_scale(index, 1.0f + (float(harmonic + 1) * spread_[index]));
+}
+
+float Controller::snap_ratio_to_scale(int index, float ff) const
+{
+	const auto scale = scale_[index];
+
+	if (scale == 0) return ff;
+
+	const auto pitch = blink::math::convert::ff_to_p(ff);
+
+	return blink::math::convert::p_to_ff(snap_pitch_to_scale(pitch, scale));
+}
+
+float Controller::snap_pitch_to_scale(float pitch, std::int32_t scale) const
+{
+	auto octaves = int(std::floor(pitch / 12));
+	auto octave_offset = (octaves * 12);
+
+	auto note = int(blink::math::wrap(pitch, 12.0f));
+
+	if (blink::bits::check(scale, note)) return float(note + octave_offset);
+
+	int offset = 1;
+
+	for (int i = 0; i < 6; i++)
+	{
+		int check = blink::math::wrap(note + offset, 12);
+
+		if (blink::bits::check(scale, check)) return float(check + octave_offset);
+
+		check = blink::math::wrap(note - offset, 12);
+
+		if (blink::bits::check(scale, check)) return float(check + octave_offset);
+
+		offset++;
+	}
+
+	return pitch;
 }
