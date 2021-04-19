@@ -57,4 +57,10 @@ void Controller::process(
 	size_ = blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose);
 	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_);
 	scale_ = plugin_->chord_harmonics_scale().search_vec(data.chord_harmonics_scale, *block_positions_);
+	spread_ = plugin_->env_harmonics_spread().search_vec(data.env_harmonics_spread, *block_positions_);
+}
+
+float Controller::get_harmonic_ratio(int index, int harmonic) const
+{
+	return 1.0f + (float(harmonic + 1) * spread_[index]);
 }

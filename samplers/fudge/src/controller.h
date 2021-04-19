@@ -41,6 +41,7 @@ public:
 	const blink::SampleData& sample_data() const { return sample_data_; }
 	bool sample_loop() const { return sample_loop_; }
 	const blink_SamplerBuffer& buffer() const { return *buffer_; }
+	float get_harmonic_ratio(int index, int harmonic) const;
 
 private:
 
@@ -55,6 +56,7 @@ private:
 	ml::DSPVector ff_;
 	ml::DSPVector size_;
 	ml::DSPVector uniformity_;
+	ml::DSPVector spread_;
 	ml::DSPVectorInt scale_;
 
 	blink::SampleData sample_data_;

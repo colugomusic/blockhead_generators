@@ -12,7 +12,7 @@ class Particle
 {
 public:
 
-	Particle(const Controller& controller);
+	Particle(const Controller& controller, int harmonic = 0);
 
 	ml::DSPVectorArray<2> process();
 
@@ -30,6 +30,7 @@ private:
 	const Grain& other_grain(int idx) const { return grains_[idx == 0 ? 1 : 0]; }
 
 	const Controller* controller_;
+	int harmonic_ = 0;
 	bool trig_primed_ = false;
 	char flip_flop_ = 0;
 	float trigger_timer_ = 0.0f;

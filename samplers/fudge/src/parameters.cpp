@@ -56,7 +56,41 @@ auto from_string(const std::string& str) -> std::optional<float>
 	return convert::ms_to_linear(*value);
 }
 
+} // grain_size
+
+namespace harmonics_spread {
+
+auto stepify(float v) -> float
+{
+	return std_params::percentage::stepify(v);
 }
+
+auto snap_value(float v, float step_size, float snap_amount)
+{
+	return stepify(std_params::snap_value(v, step_size, snap_amount));
+}
+
+float constrain(float v)
+{
+	return std::clamp(v, 0.0f, 4.0f);
+};
+
+auto increment(float v, bool precise)
+{
+	return constrain(stepify(std_params::increment<100, 1000>(v, precise)));
+};
+
+auto decrement(float v, bool precise)
+{
+	return constrain(stepify(std_params::decrement<100, 1000>(v, precise)));
+};
+
+auto drag(float v, int amount, bool precise) -> float
+{
+	return constrain(stepify(std_params::drag<100, 1000>(v, amount / 5, precise)));
+}
+
+} // harmonics_spread
 
 namespace sliders {
 
@@ -161,7 +195,7 @@ blink::EnvelopeSpec harmonics_amount()
 
 	out.range.min.default_value = 0.0f;
 	out.range.min.display_value = std_params::display_number<float>;
-	out.range.max.default_value = 4.0f;
+	out.range.max.default_value = 3.0f;
 	out.range.max.display_value = std_params::display_number<float>;
 	out.display_value = std_params::display_number<float>;
 
@@ -174,6 +208,21 @@ blink::EnvelopeSpec harmonics_spread()
 
 	out.uuid = "f04c18fd-0341-4398-a02b-f3e253f658c1";
 	out.name = "Spread";
+
+	out.default_value = 1.0f;
+	out.get_gridline = [](int index) { return float(index) / 4.0f; };
+	out.stepify = std_params::stepify_0_01;
+
+	out.value_slider.constrain = harmonics_spread::constrain;
+	out.value_slider.stepify = harmonics_spread::stepify;
+	out.value_slider.decrement = harmonics_spread::decrement;
+	out.value_slider.increment = harmonics_spread::increment;
+	out.value_slider.drag = harmonics_spread::drag;
+	out.value_slider.from_string = std_params::percentage::from_string;
+	out.value_slider.display_value = std_params::percentage::display;
+
+	out.range.max = out.value_slider;
+	out.range.max.default_value = 2.0f;
 
 	return out;
 }

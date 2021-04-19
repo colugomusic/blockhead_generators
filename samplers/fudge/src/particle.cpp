@@ -4,8 +4,9 @@
 #include <blink/math.hpp>
 #include <cassert>
 
-Particle::Particle(const Controller& controller)
+Particle::Particle(const Controller& controller, int harmonic)
 	: controller_(&controller)
+	, harmonic_(harmonic)
 {
 }
 
@@ -292,7 +293,7 @@ void Particle::trigger_next_grain(int index, bool adjust)
 		pos_R = pos_L;
 	}
 
-	auto ratio = 1.0f;// is_harmonic_ ? context_->snap_ratio_to_scale(size_ratio_) : 1.0f;
+	auto ratio = harmonic_ > 0 ? controller_->get_harmonic_ratio(index, harmonic_) : 1.0f;
 	auto ff = controller_->ff()[index];
 	auto size = controller_->size()[index] * ff;
 

@@ -16,6 +16,7 @@ class Audio : public blink::Sampler
 {
 public:
 
+	static constexpr auto ENABLE_WARP_MARKERS = false;
 	static constexpr auto REQUIRES_PREPROCESS = false;
 
 	Audio(const Classic* plugin);
