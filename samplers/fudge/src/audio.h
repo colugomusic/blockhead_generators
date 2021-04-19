@@ -19,9 +19,6 @@ class Audio : public blink::Sampler
 {
 public:
 
-	static constexpr auto ENABLE_WARP_MARKERS = true;
-	static constexpr auto REQUIRES_PREPROCESS = true;
-
 	Audio(const Fudge* plugin);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;

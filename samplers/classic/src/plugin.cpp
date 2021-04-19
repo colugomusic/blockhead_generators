@@ -30,18 +30,21 @@ Classic::Classic()
 	env_pitch_ = add_parameter(spec_env_pitch);
 
 	auto group_noise = add_group("Noise");
-	auto spec_env_noise_amount = std_params::envelopes::noise_amount();
-	auto spec_env_noise_color = std_params::envelopes::noise_color();
+	{
+		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
+		auto spec_env_noise_color = std_params::envelopes::noise_color();
 
-	spec_env_noise_amount.group_index = group_noise;
-	spec_env_noise_color.group_index = group_noise;
-	spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-	spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-	spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-	spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 
-	env_noise_amount_ = add_parameter(spec_env_noise_amount);
-	env_noise_color_ = add_parameter(spec_env_noise_color);
+		env_noise_amount_ = add_parameter(spec_env_noise_amount);
+		env_noise_color_ = add_parameter(spec_env_noise_color);
+
+		env_noise_amount_->set_group_index(group_noise);
+		env_noise_color_->set_group_index(group_noise);
+	}
 
 	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
 	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());
@@ -62,6 +65,7 @@ enum class Error
 {
 	AlreadyInitialized,
 	NotInitialized,
+	NotImplemented,
 };
 
 Classic* g_plugin = nullptr;
@@ -96,7 +100,7 @@ blink_Error blink_terminate()
 
 blink_Sampler blink_make_sampler(int instance_group)
 {
-	if (!g_plugin) return { 0 };
+	if (!g_plugin) return { 0, 0 };
 
 	return bind::make_sampler<Audio>(g_plugin);
 }
@@ -106,21 +110,24 @@ blink_Error blink_destroy_sampler(blink_Sampler sampler)
 	return bind::destroy_sampler(sampler);
 }
 
+blink_Bool blink_sampler_enable_warp_markers()
+{
+	return BLINK_FALSE;
+}
+
 blink_Bool blink_sampler_requires_preprocessing()
 {
-	return Audio::REQUIRES_PREPROCESS ? BLINK_TRUE : BLINK_FALSE;
+	return BLINK_FALSE;
 }
 
 blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
-	// TODO:
-	return -1;
+	return blink_Error(Error::NotImplemented);
 }
 
 blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
 {
-	// TODO:
-	return -1;
+	return blink_Error(Error::NotImplemented);
 }
 
 int blink_get_num_groups()
@@ -158,6 +165,7 @@ const char* blink_get_error_string(blink_Error error)
 	{
 		case Error::AlreadyInitialized: return "already initialized";
 		case Error::NotInitialized: return "not initialized";
+		case Error::NotImplemented: return "not implemented";
 		default: return "unknown error";
 	}
 }

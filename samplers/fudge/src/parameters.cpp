@@ -129,6 +129,38 @@ SliderSpec<float> harmonic_amount()
 
 namespace envelopes {
 
+EnvelopeSpec amp()
+{
+	auto out = std_params::envelopes::amp();
+
+	out.flags |= blink_EnvelopeFlags_DefaultActive;
+
+	return out;
+}
+
+EnvelopeSpec pan()
+{
+	return std_params::envelopes::pan();
+}
+
+EnvelopeSpec pitch()
+{
+	auto out = std_params::envelopes::pitch();
+
+	out.flags |= blink_EnvelopeFlags_DefaultActive;
+
+	return out;
+}
+
+EnvelopeSpec speed()
+{
+	auto out = std_params::envelopes::speed();
+
+	out.flags |= blink_EnvelopeFlags_DefaultActive;
+
+	return out;
+}
+
 EnvelopeSpec grain_size()
 {
 	EnvelopeSpec out;
@@ -149,7 +181,7 @@ EnvelopeSpec grain_size()
 	out.range.max.display_value = grain_size::display;
 	out.display_value = grain_size::display;
 
-	out.flags = blink_EnvelopeFlags_NoGridLabels;
+	out.flags = blink_EnvelopeFlags_DefaultActive | blink_EnvelopeFlags_NoGridLabels;
 
 	return out;
 }
@@ -228,6 +260,19 @@ blink::EnvelopeSpec harmonics_spread()
 }
 
 } // envelopes
+
+namespace sliders {
+
+blink::SliderParameterSpec<float> noise_width()
+{
+	auto out = std_params::sliders::parameters::noise_width();
+
+	out.flags = blink_SliderFlags_NonGlobal;
+
+	return out;
+}
+
+} // sliders
 
 extern blink::ChordSpec harmonics_scale()
 {

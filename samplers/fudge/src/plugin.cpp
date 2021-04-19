@@ -12,67 +12,40 @@ using namespace blink;
 
 Fudge::Fudge()
 {
-	auto spec_sld_noise_width = std_params::sliders::parameters::noise_width();
-
-	spec_sld_noise_width.flags = blink_SliderFlags_NonGlobal;
-
 	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
-	sld_noise_width_ = add_parameter(spec_sld_noise_width);
+	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
 
-	auto spec_env_amp = std_params::envelopes::amp();
-	auto spec_env_pan = std_params::envelopes::pan();
-	auto spec_env_pitch = std_params::envelopes::pitch();
-	auto spec_env_speed = std_params::envelopes::speed();
-
-	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_speed.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_amp_ = add_parameter(spec_env_amp);
-	env_pan_ = add_parameter(spec_env_pan);
-	env_pitch_ = add_parameter(spec_env_pitch);
-	env_speed_ = add_parameter(spec_env_speed);
+	env_amp_ = add_parameter(parameters::envelopes::amp());
+	env_pan_ = add_parameter(parameters::envelopes::pan());
+	env_pitch_ = add_parameter(parameters::envelopes::pitch());
+	env_speed_ = add_parameter(parameters::envelopes::speed());
 
 	auto group_geometry = add_group("Geometry");
 	{
-		auto spec_env_grain_size = parameters::envelopes::grain_size();
-		auto spec_env_grain_transpose = parameters::envelopes::grain_transpose();
-		auto spec_env_uniformity = parameters::envelopes::uniformity();
+		env_grain_size_ = add_parameter(parameters::envelopes::grain_size());
+		env_grain_transpose_ = add_parameter(parameters::envelopes::grain_transpose());
+		env_uniformity_ = add_parameter(parameters::envelopes::uniformity());
 
-		spec_env_grain_size.flags |= blink_EnvelopeFlags_DefaultActive;
-
-		spec_env_grain_size.group_index = group_geometry;
-		spec_env_grain_transpose.group_index = group_geometry;
-		spec_env_uniformity.group_index = group_geometry;
-
-		env_grain_size_ = add_parameter(spec_env_grain_size);
-		env_grain_transpose_ = add_parameter(spec_env_grain_transpose);
-		env_uniformity_ = add_parameter(spec_env_uniformity);
+		env_grain_size_->set_group_index(group_geometry);
+		env_grain_transpose_->set_group_index(group_geometry);
+		env_uniformity_->set_group_index(group_geometry);
 	}
-
 
 	auto group_harmonics = add_group("Harmonics");
 	{
-		auto spec_scale = parameters::harmonics_scale();
-		auto spec_env_amount = parameters::envelopes::harmonics_amount();
-		auto spec_env_spread = parameters::envelopes::harmonics_spread();
+		chord_harmonics_scale_ = add_parameter(parameters::harmonics_scale());
+		env_harmonics_amount_ = add_parameter(parameters::envelopes::harmonics_amount());
+		env_harmonics_spread_ = add_parameter(parameters::envelopes::harmonics_spread());
 
-		spec_scale.group_index = group_harmonics;
-		spec_env_amount.group_index = group_harmonics;
-		spec_env_spread.group_index = group_harmonics;
-
-		chord_harmonics_scale_ = add_parameter(spec_scale);
-		env_harmonics_amount_ = add_parameter(spec_env_amount);
-		env_harmonics_spread_ = add_parameter(spec_env_spread);
+		chord_harmonics_scale_->set_group_index(group_harmonics);
+		env_harmonics_amount_->set_group_index(group_harmonics);
+		env_harmonics_spread_->set_group_index(group_harmonics);
 	}
 
 	auto group_noise = add_group("Noise");
 	{
 		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
 		auto spec_env_noise_color = std_params::envelopes::noise_color();
-
-		spec_env_noise_amount.group_index = group_noise;
-		spec_env_noise_color.group_index = group_noise;
 
 		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
@@ -81,6 +54,9 @@ Fudge::Fudge()
 
 		env_noise_amount_ = add_parameter(spec_env_noise_amount);
 		env_noise_color_ = add_parameter(spec_env_noise_color);
+
+		env_noise_amount_->set_group_index(group_noise);
+		env_noise_color_->set_group_index(group_noise);
 	}
 
 	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
@@ -88,7 +64,6 @@ Fudge::Fudge()
 	sld_pitch_ = add_parameter(std_params::sliders::parameters::pitch());
 	sld_speed_ = add_parameter(std_params::sliders::parameters::speed());
 	sld_sample_offset_ = add_parameter(std_params::sliders::parameters::sample_offset());
-
 	tog_loop_ = add_parameter(std_params::toggles::loop());
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
 
@@ -169,7 +144,7 @@ blink_Error blink_terminate()
 
 blink_Sampler blink_make_sampler(int instance_group)
 {
-	if (!g_plugin) return blink_Sampler { 0 };
+	if (!g_plugin) return blink_Sampler { 0, 0 };
 
 	return bind::make_sampler<Audio>(g_plugin);
 }
@@ -179,9 +154,14 @@ blink_Error blink_destroy_sampler(blink_Sampler sampler)
 	return bind::destroy_sampler(sampler);
 }
 
+blink_Bool blink_sampler_enable_warp_markers()
+{
+	return BLINK_TRUE;
+}
+
 blink_Bool blink_sampler_requires_preprocessing()
 {
-	return Audio::REQUIRES_PREPROCESS ? BLINK_TRUE : BLINK_FALSE;
+	return BLINK_TRUE;
 }
 
 blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
