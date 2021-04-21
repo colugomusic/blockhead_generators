@@ -110,7 +110,7 @@ blink_Error blink_destroy_sampler(blink_Sampler sampler)
 	return bind::destroy_sampler(sampler);
 }
 
-blink_Bool blink_enable_warp_markers()
+blink_Bool blink_sampler_enable_warp_markers()
 {
 	return BLINK_FALSE;
 }
@@ -170,11 +170,11 @@ const char* blink_get_error_string(blink_Error error)
 	}
 }
 
-blink_Error blink_sampler_get_waveform_positions(const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp)
+blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	if (!g_plugin) return blink_Error(Error::NotInitialized);
 
-	g_plugin->gui().get_waveform_positions(g_plugin, buffer, n, out, derivatives, amp);
+	g_plugin->gui().draw(g_plugin, buffer, n, out);
 
 	return BLINK_OK;
 }

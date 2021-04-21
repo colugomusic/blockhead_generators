@@ -3,13 +3,13 @@
 #include <blink/standard_traversers/fudge.hpp>
 #include <blink_sampler.h>
 
-class Fudge;
+class Wavetable;
 
 class GUI
 {
 public:
 
-	blink_Error draw(const Fudge* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
+	blink_Error draw(const Wavetable* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
 
 private:
 

@@ -5,16 +5,10 @@
 struct AudioData
 {
 	const blink_OptionData* option_noise_mode;
-	const blink_ChordData* chord_harmonics_scale;
-	const blink_EnvelopeData* env_harmonics_amount;
-	const blink_EnvelopeData* env_harmonics_spread;
 	const blink_EnvelopeData* env_amp;
 	const blink_EnvelopeData* env_pan;
 	const blink_EnvelopeData* env_pitch;
 	const blink_EnvelopeData* env_speed;
-	const blink_EnvelopeData* env_grain_size;
-	const blink_EnvelopeData* env_grain_transpose;
-	const blink_EnvelopeData* env_uniformity;
 	const blink_EnvelopeData* env_noise_amount;
 	const blink_EnvelopeData* env_noise_color;
 	const blink_SliderData* slider_amp;

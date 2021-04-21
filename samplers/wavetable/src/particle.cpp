@@ -196,7 +196,7 @@ float Particle::adjust_channel_pos(int index, int channel, float pos) const
 	const auto diff = pos - (other_pos + other.frame);
 	const auto abs_diff = std::abs(diff);
 	const auto& channel_analysis_data = analysis_data->data[channel];
-	const auto other_wavecycle = other_pos_floor >= channel_analysis_data.size() ? channel_analysis_data[channel_analysis_data.size() - 1].estimated_size : channel_analysis_data[other_pos_floor].estimated_size;
+	const auto other_wavecycle = other_pos_floor >= channel_analysis_data.size() ? channel_analysis_data[channel_analysis_data.size() - 1] : channel_analysis_data[other_pos_floor];
 
 	const auto a = int(std::floor(float(abs_diff) / other_wavecycle));
 

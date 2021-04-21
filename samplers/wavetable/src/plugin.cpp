@@ -10,7 +10,7 @@
 
 using namespace blink;
 
-Fudge::Fudge()
+Wavetable::Wavetable()
 {
 	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
 	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
@@ -19,28 +19,6 @@ Fudge::Fudge()
 	env_pan_ = add_parameter(parameters::envelopes::pan());
 	env_pitch_ = add_parameter(parameters::envelopes::pitch());
 	env_speed_ = add_parameter(parameters::envelopes::speed());
-
-	auto group_geometry = add_group("Geometry");
-	{
-		env_grain_size_ = add_parameter(parameters::envelopes::grain_size());
-		env_grain_transpose_ = add_parameter(parameters::envelopes::grain_transpose());
-		env_uniformity_ = add_parameter(parameters::envelopes::uniformity());
-
-		env_grain_size_->set_group_index(group_geometry);
-		env_grain_transpose_->set_group_index(group_geometry);
-		env_uniformity_->set_group_index(group_geometry);
-	}
-
-	auto group_harmonics = add_group("Harmonics");
-	{
-		chord_harmonics_scale_ = add_parameter(parameters::harmonics_scale());
-		env_harmonics_amount_ = add_parameter(parameters::envelopes::harmonics_amount());
-		env_harmonics_spread_ = add_parameter(parameters::envelopes::harmonics_spread());
-
-		chord_harmonics_scale_->set_group_index(group_harmonics);
-		env_harmonics_amount_->set_group_index(group_harmonics);
-		env_harmonics_spread_->set_group_index(group_harmonics);
-	}
 
 	auto group_noise = add_group("Noise");
 	{
@@ -69,12 +47,12 @@ Fudge::Fudge()
 
 }
 
-GUI& Fudge::gui()
+GUI& Wavetable::gui()
 {
 	return gui_;
 }
 
-const SampleAnalysis* Fudge::get_analysis_data(blink_ID sample_id) const
+const SampleAnalysis* Wavetable::get_analysis_data(blink_ID sample_id) const
 {
 	const auto pos = sample_analysis_.find(sample_id);
 
@@ -83,7 +61,7 @@ const SampleAnalysis* Fudge::get_analysis_data(blink_ID sample_id) const
 	return pos->second.get();
 }
 
-void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
+void Wavetable::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
 	auto pos = sample_analysis_.find(sample_info->id);
 
@@ -97,7 +75,7 @@ void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, c
 	}
 }
 
-void Fudge::on_sample_deleted(blink_ID id)
+void Wavetable::on_sample_deleted(blink_ID id)
 {
 	const auto pos = sample_analysis_.find(id);
 
@@ -112,23 +90,23 @@ enum class Error
 	NotInitialized,
 };
 
-Fudge* g_plugin = nullptr;
+Wavetable* g_plugin = nullptr;
 
 blink_UUID blink_get_plugin_uuid()
 {
-	return Fudge::UUID;
+	return Wavetable::UUID;
 }
 
 blink_UUID blink_get_plugin_name()
 {
-	return Fudge::NAME;
+	return Wavetable::NAME;
 }
 
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
 
-	g_plugin = new Fudge();
+	g_plugin = new Wavetable();
 
 	return BLINK_OK;
 }

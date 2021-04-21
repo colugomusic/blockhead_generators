@@ -19,13 +19,14 @@ void Controller::process(
 {
 	block_positions_ = &block_positions;
 
-	sample_positions_ =
-		position_traverser_.get_positions(
-			data.slider_speed->value,
-			data.env_speed,
-			block_traverser,
-			data.slider_sample_offset->value,
-			kFloatsPerDSPVector);
+	position_traverser_.get_positions(
+		data.slider_speed->value,
+		data.env_speed,
+		data.warp_points,
+		block_traverser,
+		data.slider_sample_offset->value,
+		kFloatsPerDSPVector,
+		&sample_positions_);
 
 	sample_positions_ /= float(buffer.song_rate) / buffer.sample_info->SR;
 

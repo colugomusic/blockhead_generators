@@ -18,11 +18,17 @@ struct AnalysisCallbacks
 	std::function<void(float)> report_progress;
 };
 
+struct FrameAnalysis
+{
+	float estimated_size = 0.0f;
+	std::uint32_t prev_crossing = 0;
+	std::uint32_t next_crossing = 0;
+};
+
 // specialized autocorrelation which only considers the distances between zero crossings in the analysis.
-// output is an array of estimated wavecycle sizes for each frame
 // returns false if aborted before the analysis could complete
 // allocates memory
-inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t depth, float* out)
+inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t depth, FrameAnalysis* out)
 {
 	if (depth < 4) depth = 4;
 
@@ -176,7 +182,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				Crossing crossing;
 
 				crossing.index = (index + i);
-				crossing.distance = (index + i) - zx.latest;
+				crossing.distance = crossing.index - zx.latest;
 				crossing.peak_index = zx.best_peak_pos;
 				crossing.peak_distance = zx.best_peak_pos - zx.latest;
 				crossing.peak_value = zx.best_peak;
@@ -192,38 +198,40 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 				best_crossing = find_best_crossing(crossings);
 
 				const auto found = best_crossing != (index + i);
-				const auto size = !found ? prev_size : float((index + i) - best_crossing);
+				const auto size = !found ? prev_size : float(crossing.index - best_crossing);
 
 				if (found && !filled_start_frames)
 				{
 					for (std::uint32_t j = 0; j < (index + i); j++)
 					{
-						out[j] = size;
+						out[j].prev_crossing = 0;
+						out[j].next_crossing = crossing.index;
+						out[j].estimated_size = size;
 					}
 
 					filled_start_frames = true;
 				}
 				else
 				{
-					const auto distance = (index + i) - zx.latest;
+					const auto distance = crossing.index - zx.latest;
 
-					if (distance > 1)
+					for (std::uint32_t j = 0; j <= distance; j++)
 					{
-						for (std::uint32_t j = 1; j < distance; j++)
-						{
-							const auto x = float(j) / (distance - 1);
+						const auto x = float(j) / (distance - 1);
 
-							out[j + zx.latest] = blink::math::lerp(prev_size, size, x);
-						}
+						out[j + zx.latest].prev_crossing = zx.latest;
+						out[j + zx.latest].next_crossing = crossing.index;
+						out[j + zx.latest].estimated_size = blink::math::lerp(prev_size, size, x);
 					}
 				}
 
-				out[(index + i)] = size;
+				out[crossing.index].prev_crossing = crossing.index;
+				out[crossing.index].estimated_size = size;
 
 				callbacks.report_progress(float((index + i)) / (n - 1));
 
 				prev_size = size;
-				zx.latest = (index + i);
+				zx.latest = crossing.index;
 				zx.best_peak = 0.0f;
 			}
 		}
@@ -234,7 +242,9 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 	for (std::uint32_t i = zx.latest; i < n; i++)
 	{
-		out[i] = prev_size;
+		out[i].prev_crossing = zx.latest;
+		out[i].next_crossing = n;
+		out[i].estimated_size = prev_size;
 	}
 
 	return true;

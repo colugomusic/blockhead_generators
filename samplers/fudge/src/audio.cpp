@@ -42,6 +42,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.slider_noise_width    = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_NoiseWidth));
 	data.toggle_loop           = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
 	data.toggle_reverse        = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
+	data.warp_points           = buffer->warp_points;
 
 	traverser_resetter_.check(data.env_speed, &block_traverser_);
 

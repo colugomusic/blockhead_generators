@@ -9,7 +9,7 @@ class GUI
 {
 public:
 
-	blink_Error get_waveform_positions(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp);
+	blink_Error draw(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
 
 private:
 

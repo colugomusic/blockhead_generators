@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(sampler_fudge)
+project(sampler_wavetable)
 
 set(BLINK_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../blink CACHE PATH "blink root directory")
 set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
@@ -28,17 +28,10 @@ list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
     ./src/audio_data.h
-    ./src/controller.h
-    ./src/controller.cpp
-    ./src/convert.h
-    ./src/grain.h
     ./src/gui.h
     ./src/gui.cpp
-    ./src/limits.h
     ./src/parameters.h
     ./src/parameters.cpp
-    ./src/particle.h
-    ./src/particle.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 	./src/sample_analysis.h
@@ -56,7 +49,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	OUTPUT_NAME sampler.fudge.${PLATFORM_DIR}
+	OUTPUT_NAME sampler.wavetable.${PLATFORM_DIR}
 	SUFFIX ".blink"
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_DIR}

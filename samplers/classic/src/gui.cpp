@@ -101,7 +101,7 @@ static void calculate_amp(const Classic* plugin, const Data& data, const blink::
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, float* out, float* derivatives, float* amp)
+blink_Error GUI::draw(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 
@@ -129,10 +129,10 @@ blink_Error GUI::get_waveform_positions(const Classic* plugin, const blink_Sampl
 			block_traverser_,
 			&position_traverser_,
 			count,
-			out + index,
-			derivatives ? derivatives + index : nullptr);
+			out->waveform_positions + index,
+			out->waveform_derivatives ? out->waveform_derivatives + index : nullptr);
 
-		calculate_amp(plugin, data, block_positions, amp + index);
+		calculate_amp(plugin, data, block_positions, out->amp + index);
 
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;
