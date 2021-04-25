@@ -53,8 +53,9 @@ static void calculate_positions(
 	int count,
 	blink_SamplerDrawInfo* out)
 {
-	ml::DSPVector positions_vec;
-	ml::DSPVector derivatives_vec;
+	ml::DSPVector sculpted_block_positions;
+	ml::DSPVector warped_block_positions;
+	ml::DSPVector derivatives;
 
 	fudge_traverser->get_positions(
 		data.sliders.speed ? data.sliders.speed->value : 1,
@@ -63,29 +64,59 @@ static void calculate_positions(
 		block_traverser,
 		data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
 		count,
-		&positions_vec,
-		&derivatives_vec);
+		&sculpted_block_positions,
+		&warped_block_positions,
+		&derivatives);
 
-	positions_vec /= (float(song_rate) / sample_info.SR);
+	auto sculpted_sample_positions = sculpted_block_positions / (float(song_rate) / sample_info.SR);
+	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_info.SR);
+	auto final_sample_positions = warped_sample_positions;
 
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			if (positions_vec[i] > sample_info.num_frames - 1)
+			if (final_sample_positions[i] > sample_info.num_frames - 1)
 			{
-				positions_vec[i] = float(std::fmod(positions_vec[i], sample_info.num_frames));
+				final_sample_positions[i] = float(std::fmod(final_sample_positions[i], sample_info.num_frames));
 			}
 		}
 	}
 
 	if (data.toggles.reverse && data.toggles.reverse->value)
 	{
-		positions_vec = float(sample_info.num_frames - 1) - positions_vec;
+		final_sample_positions = float(sample_info.num_frames - 1) - final_sample_positions;
 	}
 
-	std::copy(positions_vec.getConstBuffer(), positions_vec.getConstBuffer() + count, out->waveform_positions + index);
-	std::copy(derivatives_vec.getConstBuffer(), derivatives_vec.getConstBuffer() + count, out->waveform_derivatives + index);
+	if (out->sculpted_block_positions)
+	{
+		std::copy(sculpted_block_positions.getConstBuffer(), sculpted_block_positions.getConstBuffer() + count, out->sculpted_block_positions + index);
+	}
+
+	if (out->sculpted_sample_positions)
+	{
+		std::copy(sculpted_sample_positions.getConstBuffer(), sculpted_sample_positions.getConstBuffer() + count, out->sculpted_sample_positions + index);
+	}
+
+	if (out->warped_block_positions)
+	{
+		std::copy(warped_block_positions.getConstBuffer(), warped_block_positions.getConstBuffer() + count, out->warped_block_positions + index);
+	}
+
+	if (out->warped_sample_positions)
+	{
+		std::copy(warped_sample_positions.getConstBuffer(), warped_sample_positions.getConstBuffer() + count, out->warped_sample_positions + index);
+	}
+
+	if (out->final_sample_positions)
+	{
+		std::copy(final_sample_positions.getConstBuffer(), final_sample_positions.getConstBuffer() + count, out->final_sample_positions + index);
+	}
+
+	if (out->waveform_derivatives)
+	{
+		std::copy(derivatives.getConstBuffer(), derivatives.getConstBuffer() + count, out->waveform_derivatives + index);
+	}
 }
 
 static void calculate_amp(const Fudge* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
@@ -136,7 +167,10 @@ blink_Error GUI::draw(const Fudge* plugin, const blink_SamplerBuffer* buffer, bl
 			count,
 			out);
 
-		calculate_amp(plugin, data, block_positions, out->amp + index);
+		if (out->amp)
+		{
+			calculate_amp(plugin, data, block_positions, out->amp + index);
+		}
 
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;

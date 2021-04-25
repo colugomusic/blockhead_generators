@@ -46,42 +46,59 @@ static void calculate_positions(
 	const blink_SR song_rate,
 	const blink::Traverser& block_traverser,
 	blink::std_traversers::Classic* classic_traverser,
+	int index,
 	int count,
-	float* out_positions,
-	float* out_derivatives)
+	blink_SamplerDrawInfo* out)
 {
-	ml::DSPVector derivatives_vec;
+	ml::DSPVector derivatives;
 
-	auto positions =
+	auto sculpted_block_positions =
 		classic_traverser->get_positions(
 			data.sliders.pitch ? data.sliders.pitch->value : 0,
 			data.envelopes.pitch,
 			block_traverser,
 			data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
 			count,
-			out_derivatives ? derivatives_vec.getBuffer() : nullptr);
+			&derivatives);
 
-	positions /= (float(song_rate) / sample_info.SR);
+	auto sculpted_sample_positions = sculpted_block_positions / (float(song_rate) / sample_info.SR);
+	auto final_sample_positions = sculpted_sample_positions;
 
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			if (positions[i] > sample_info.num_frames - 1)
+			if (final_sample_positions[i] > sample_info.num_frames - 1)
 			{
-				positions[i] = float(std::fmod(positions[i], sample_info.num_frames));
+				final_sample_positions[i] = float(std::fmod(final_sample_positions[i], sample_info.num_frames));
 			}
 		}
 	}
 
 	if (data.toggles.reverse && data.toggles.reverse->value)
 	{
-		positions = float(sample_info.num_frames - 1) - positions;
+		final_sample_positions = float(sample_info.num_frames - 1) - final_sample_positions;
 	}
 
-	std::copy(positions.getConstBuffer(), positions.getConstBuffer() + count, out_positions);
+	if (out->sculpted_block_positions)
+	{
+		std::copy(sculpted_block_positions.getConstBuffer(), sculpted_block_positions.getConstBuffer() + count, out->sculpted_block_positions + index);
+	}
 
-	if (out_derivatives) std::copy(derivatives_vec.getConstBuffer(), derivatives_vec.getConstBuffer() + count, out_derivatives);
+	if (out->sculpted_sample_positions)
+	{
+		std::copy(sculpted_sample_positions.getConstBuffer(), sculpted_sample_positions.getConstBuffer() + count, out->sculpted_sample_positions + index);
+	}
+
+	if (out->final_sample_positions)
+	{
+		std::copy(final_sample_positions.getConstBuffer(), final_sample_positions.getConstBuffer() + count, out->final_sample_positions + index);
+	}
+
+	if (out->waveform_derivatives)
+	{
+		std::copy(derivatives.getConstBuffer(), derivatives.getConstBuffer() + count, out->waveform_derivatives + index);
+	}
 }
 
 static void calculate_amp(const Classic* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
@@ -128,11 +145,14 @@ blink_Error GUI::draw(const Classic* plugin, const blink_SamplerBuffer* buffer, 
 			buffer->song_rate,
 			block_traverser_,
 			&position_traverser_,
+			index,
 			count,
-			out->waveform_positions + index,
-			out->waveform_derivatives ? out->waveform_derivatives + index : nullptr);
+			out);
 
-		calculate_amp(plugin, data, block_positions, out->amp + index);
+		if (out->amp)
+		{
+			calculate_amp(plugin, data, block_positions, out->amp + index);
+		}
 
 		frames_remaining -= kFloatsPerDSPVector;
 		index += kFloatsPerDSPVector;

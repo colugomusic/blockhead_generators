@@ -53,7 +53,9 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 			block_traverser_,
 			data.slider_sample_offset->value,
 			kFloatsPerDSPVector,
-			&sample_positions);
+			nullptr,
+			&sample_positions,
+			nullptr);
 
 		struct Wavecycle
 		{

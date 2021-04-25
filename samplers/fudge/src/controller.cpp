@@ -26,7 +26,9 @@ void Controller::process(
 		block_traverser,
 		data.slider_sample_offset->value,
 		kFloatsPerDSPVector,
-		&sample_positions_);
+		nullptr,
+		&sample_positions_,
+		nullptr);
 
 	sample_positions_ /= float(buffer.song_rate) / buffer.sample_info->SR;
 
