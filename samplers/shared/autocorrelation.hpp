@@ -143,7 +143,6 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		callbacks.get_frames(index, num_chunk_frames, chunk_frames.getBuffer());
 
 		const auto filtered_frames = filter(dc_blocker(chunk_frames));
-		//const auto filtered_frames = filter(chunk_frames);
 
 		for (std::uint32_t i = 0; i < num_chunk_frames; i++)
 		{
@@ -217,7 +216,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 
 					for (std::uint32_t j = 0; j <= distance; j++)
 					{
-						const auto x = float(j) / (distance - 1);
+						const auto x = float(j) / distance;
 
 						out[j + zx.latest].prev_crossing = zx.latest;
 						out[j + zx.latest].next_crossing = crossing.index;
