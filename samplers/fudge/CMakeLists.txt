@@ -44,6 +44,8 @@ list(APPEND SRC
 	./src/sample_analysis.h
 	./src/sample_analysis.cpp
 	../shared/autocorrelation.hpp
+	../../shared/noise_generator.h
+	../../shared/noise_generator.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC})
@@ -52,7 +54,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${BLINK_ROOT}/include
     ${BLINK_ROOT}/plugin
 	${MADRONALIB_DIR}/source
-	../shared
+	..
+	../..
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

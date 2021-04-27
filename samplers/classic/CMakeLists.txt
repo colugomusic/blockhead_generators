@@ -32,6 +32,8 @@ list(APPEND SRC
     ./src/gui.cpp
     ./src/plugin.h
     ./src/plugin.cpp
+	../../shared/noise_generator.h
+	../../shared/noise_generator.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC})
@@ -40,6 +42,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${BLINK_ROOT}/include
     ${BLINK_ROOT}/plugin
 	${MADRONALIB_DIR}/source
+	../..
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

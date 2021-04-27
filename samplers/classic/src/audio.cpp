@@ -71,7 +71,17 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		out_vec = process_mono_sample(sample_data, sample_pos, data.toggle_loop->value);
 	}
 
-	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions());
+	out_vec =
+		noise_gen_(
+			out_vec,
+			data.option_noise_mode->index,
+			plugin_->env_noise_amount(),
+			plugin_->env_noise_color(),
+			*data.env_noise_amount,
+			*data.env_noise_color,
+			*data.slider_noise_width,
+			block_positions());
+	
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
@@ -108,62 +118,6 @@ ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data
 ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
 {
 	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
-}
-
-ml::DSPVectorArray<2> Audio::add_noise(
-	const ml::DSPVectorArray<2>& in,
-	int mode,
-	const blink_EnvelopeData* env_noise_amount,
-	const blink_EnvelopeData* env_noise_color,
-	const blink_SliderData* sld_noise_width,
-	const BlockPositions& block_positions)
-{
-	ml::DSPVectorArray<2> out;
-
-	if (env_noise_amount->points.count < 1)
-	{
-		return in;
-	}
-
-	const auto noise_amount = plugin_->env_noise_amount().search_vec(env_noise_amount, block_positions);
-
-	if (ml::sum(noise_amount) < 0.0001f)
-	{
-		return in;
-	}
-
-	float noise_color;
-
-	plugin_->env_noise_color().search_vec(env_noise_color, block_positions.positions.getConstBuffer(), 1, block_positions.prev_pos, &noise_color);
-
-	noise_filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(noise_color, 2.0f) * 0.6f));
-
-	constexpr auto MULTIPLY = 0;
-	constexpr auto MIX = 1;
-
-	const auto noise_L = noise_filter_(noise_gen_());
-
-	ml::DSPVectorArray<2> noise;
-
-	if (sld_noise_width->value > 0.0f)
-	{
-		const auto noise_R = noise_filter_(noise_gen_());
-
-		noise = ml::concatRows(noise_L, ml::lerp(noise_L, noise_R, sld_noise_width->value));
-	}
-	else
-	{
-		noise = ml::repeatRows<2>(noise_L);
-	}
-
-	if (mode == MULTIPLY)
-	{
-		return in * ml::lerp(ml::DSPVectorArray<2>(1.0f), noise, ml::repeatRows<2>(noise_amount));
-	}
-	else
-	{
-		return ml::lerp(in, noise, ml::repeatRows<2>(noise_amount));
-	}
 }
 
 blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const

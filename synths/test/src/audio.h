@@ -6,6 +6,8 @@
 #include <blink/synth.hpp>
 #include <bleat/oscillators/scalar/multi_wave.hpp>
 
+#include "shared/noise_generator.h"
+
 class Test;
 
 class Audio : public blink::Synth
@@ -21,4 +23,5 @@ private:
 	
 	const Test* plugin_;
 	std::array<bleat::oscillators::scalar::MultiWaveOsc, 2> oscs_;
+	NoiseGenerator noise_gen_;
 };

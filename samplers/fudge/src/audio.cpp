@@ -75,7 +75,17 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	out_vec /= ml::repeatRows<2>(total_amp);
 
-	out_vec = add_noise(out_vec, data.option_noise_mode->index, data.env_noise_amount, data.env_noise_color, data.slider_noise_width, block_positions());
+	out_vec =
+		noise_gen_(
+			out_vec,
+			data.option_noise_mode->index,
+			plugin_->env_noise_amount(),
+			plugin_->env_noise_color(),
+			*data.env_noise_amount,
+			*data.env_noise_color,
+			*data.slider_noise_width,
+			block_positions());
+
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions());
 
 	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions()) * data.slider_amp->value;
@@ -87,60 +97,3 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	return BLINK_OK;
 }
-
-ml::DSPVectorArray<2> Audio::add_noise(
-	const ml::DSPVectorArray<2>& in,
-	int mode,
-	const blink_EnvelopeData* env_noise_amount,
-	const blink_EnvelopeData* env_noise_color,
-	const blink_SliderData* sld_noise_width,
-	const blink::BlockPositions& block_positions)
-{
-	ml::DSPVectorArray<2> out;
-
-	if (env_noise_amount->points.count < 1)
-	{
-		return in;
-	}
-
-	const auto noise_amount = plugin_->env_noise_amount().search_vec(env_noise_amount, block_positions);
-
-	if (ml::sum(noise_amount) < 0.0001f)
-	{
-		return in;
-	}
-
-	float noise_color;
-
-	plugin_->env_noise_color().search_vec(env_noise_color, block_positions.positions.getConstBuffer(), 1, block_positions.prev_pos, &noise_color);
-
-	noise_filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(noise_color, 2.0f) * 0.6f));
-
-	constexpr auto MULTIPLY = 0;
-	constexpr auto MIX = 1;
-
-	const auto noise_L = noise_filter_(noise_gen_());
-
-	ml::DSPVectorArray<2> noise;
-
-	if (sld_noise_width->value > 0.0f)
-	{
-		const auto noise_R = noise_filter_(noise_gen_());
-
-		noise = ml::concatRows(noise_L, ml::lerp(noise_L, noise_R, sld_noise_width->value));
-	}
-	else
-	{
-		noise = ml::repeatRows<2>(noise_L);
-	}
-
-	if (mode == MULTIPLY)
-	{
-		return in * ml::lerp(ml::DSPVectorArray<2>(1.0f), noise, ml::repeatRows<2>(noise_amount));
-	}
-	else
-	{
-		return ml::lerp(in, noise, ml::repeatRows<2>(noise_amount));
-	}
-}
-

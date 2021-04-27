@@ -11,12 +11,14 @@ using namespace blink;
 
 Test::Test()
 {
+	auto spec_env_amp = std_params::envelopes::amp();
 	auto spec_env_wave = std_params::envelopes::resonance();
 	auto spec_env_p0 = std_params::envelopes::pitch();
 	auto spec_env_p1 = std_params::envelopes::pitch();
 	auto spec_env_fm0 = std_params::envelopes::resonance();
 	auto spec_env_fm1 = std_params::envelopes::resonance();
-
+	
+	spec_env_amp.default_value = 0.5f;
 	spec_env_wave.name = "wave";
 	spec_env_p0.name = "p0";
 	spec_env_p1.name = "p1";
@@ -28,17 +30,42 @@ Test::Test()
 	spec_env_fm0.uuid = "05ffbc42-d2aa-4746-905e-44d4373b4345";
 	spec_env_fm1.uuid = "343689ff-d1bf-48f0-96bf-7a6689568ef5";
 
+	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_wave.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_p0.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_p1.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_fm0.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_fm1.flags |= blink_EnvelopeFlags_DefaultActive;
 
+	env_amp_ = add_parameter(spec_env_amp);
 	env_wave_ = add_parameter(spec_env_wave);
 	env_p0_ = add_parameter(spec_env_p0);
 	env_p1_ = add_parameter(spec_env_p1);
 	env_fm0_ = add_parameter(spec_env_fm0);
 	env_fm1_ = add_parameter(spec_env_fm1);
+
+	auto group_noise = add_group("Noise");
+	{
+		auto spec_sld_noise_width = std_params::sliders::parameters::noise_width();
+
+		spec_sld_noise_width.flags = blink_SliderFlags_NonGlobal;
+
+		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
+		auto spec_env_noise_color = std_params::envelopes::noise_color();
+
+		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
+		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
+
+		option_noise_mode_ = add_parameter(std_params::options::noise_mode());
+		env_noise_amount_ = add_parameter(spec_env_noise_amount);
+		env_noise_color_ = add_parameter(spec_env_noise_color);
+		sld_noise_width_ = add_parameter(spec_sld_noise_width);
+
+		env_noise_amount_->set_group_index(group_noise);
+		env_noise_color_->set_group_index(group_noise);
+	}
 }
 
 enum class Error

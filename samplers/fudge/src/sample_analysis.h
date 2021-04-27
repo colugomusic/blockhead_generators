@@ -3,7 +3,7 @@
 #include <atomic>
 #include <vector>
 #include <blink_sampler.h>
-#include <autocorrelation.hpp>
+#include "shared/autocorrelation.hpp"
 
 struct SampleAnalysis
 {

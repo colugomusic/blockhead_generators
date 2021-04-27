@@ -4,6 +4,7 @@
 #include <blink/standard_traversers/fudge.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
+#include "shared/noise_generator.h"
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
@@ -36,8 +37,7 @@ private:
 	const Fudge* plugin_;
 	blink::Traverser block_traverser_;
 	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
-	ml::NoiseGen noise_gen_;
-	ml::OnePole noise_filter_;
+	NoiseGenerator noise_gen_;
 	Controller controller_;
 	std::array<Particle, 4> particles_;
 };
