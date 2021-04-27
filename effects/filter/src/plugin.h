@@ -7,7 +7,7 @@ class Filter : public blink::Plugin
 public:
 
 	static constexpr auto UUID = "3bb94b4c-ec38-4557-8666-8fe2e446b83c";
-	static constexpr auto NAME = "Filter (ALPHA)";
+	static constexpr auto NAME = "Lowpass (ALPHA)";
 
 	enum class ParameterIndex
 	{

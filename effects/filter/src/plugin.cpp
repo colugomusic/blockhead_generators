@@ -40,6 +40,11 @@ blink_UUID blink_get_plugin_name()
 	return Filter::NAME;
 }
 
+const char* blink_get_plugin_category()
+{
+	return BLINK_STD_CATEGORY_FILTERS;
+}
+
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
@@ -60,7 +65,7 @@ blink_Error blink_terminate()
 
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0 };
+	if (!g_plugin) return blink_Effect { 0, 0, 0 };
 
 	return bind::make_effect<Audio>(g_plugin);
 }
