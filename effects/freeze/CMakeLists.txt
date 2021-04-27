@@ -13,17 +13,22 @@ set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,x11>>)
 if (MADRONALIB_DIR STREQUAL "")
 	include(FetchContent)
 
-	set(FETCHCONTENT_QUIET off)
+    FetchContent_GetProperties(madronalib)
 
-	FetchContent_Declare(
-		madronalib
-		GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
-	)
+    if (NOT madronalib_POPULATED)
+        set(FETCHCONTENT_QUIET off)
 
-	FetchContent_Populate(madronalib)
-	
-	set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
+        FetchContent_Declare(
+            madronalib
+            GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
+        )
+
+        FetchContent_Populate(madronalib)
+    endif()
+        
+    set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
 endif()
+
 
 list(APPEND SRC
     ./src/audio.h

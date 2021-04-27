@@ -10,19 +10,19 @@ set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
 set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
 set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,x11>>)
 
+include(FetchContent)
+set(FETCHCONTENT_QUIET off)
+
 if (MADRONALIB_DIR STREQUAL "")
-	include(FetchContent)
-
-	set(FETCHCONTENT_QUIET off)
-
-	FetchContent_Declare(
-		madronalib
-		GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
-	)
-
-	FetchContent_Populate(madronalib)
-	
-	set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
+    FetchContent_GetProperties(madronalib)
+    if (NOT madronalib_POPULATED)
+        FetchContent_Declare(
+            madronalib
+            GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
+        )
+        FetchContent_Populate(madronalib)
+    endif()
+    set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
 endif()
 
 list(APPEND SRC

@@ -15,20 +15,26 @@ include(FetchContent)
 set(FETCHCONTENT_QUIET off)
 
 if (MADRONALIB_DIR STREQUAL "")
-	FetchContent_Declare(
-		madronalib
-		GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
-	)
-	FetchContent_Populate(madronalib)
-	set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
+    FetchContent_GetProperties(madronalib)
+    if (NOT madronalib_POPULATED)
+        FetchContent_Declare(
+            madronalib
+            GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
+        )
+        FetchContent_Populate(madronalib)
+    endif()
+    set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
 endif()
 
 if (BLEAT_DIR STREQUAL "")
-	FetchContent_Declare(
-		bleat
-		GIT_REPOSITORY https://github.com/colugomusic/bleat.git
-	)
-	FetchContent_Populate(bleat)
+	FetchContent_GetProperties(bleat)
+    if (NOT bleat_POPULATED)
+		FetchContent_Declare(
+			bleat
+			GIT_REPOSITORY https://github.com/colugomusic/bleat.git
+		)
+		FetchContent_Populate(bleat)
+	endif()
 	set(BLEAT_DIR ${bleat_SOURCE_DIR})
 endif()
 
