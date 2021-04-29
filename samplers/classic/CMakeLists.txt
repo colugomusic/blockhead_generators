@@ -1,29 +1,21 @@
 cmake_minimum_required(VERSION 3.0)
 project(sampler_classic)
 
-set(BLINK_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../blink CACHE PATH "blink root directory")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
+
+include(CPM)
+
 set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
-set(MADRONALIB_DIR "" CACHE PATH "madronalib directory")
 
 set(on_windows $<STREQUAL:${CMAKE_SYSTEM_NAME},Windows>)
 set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
 set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
 set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,x11>>)
 
-include(FetchContent)
-set(FETCHCONTENT_QUIET off)
+CPMAddPackage("gh:colugomusic/blink#master")
+CPMAddPackage("gh:madronalabs/madronalib#master")
 
-if (MADRONALIB_DIR STREQUAL "")
-    FetchContent_GetProperties(madronalib)
-    if (NOT madronalib_POPULATED)
-        FetchContent_Declare(
-            madronalib
-            GIT_REPOSITORY https://github.com/madronalabs/madronalib.git
-        )
-        FetchContent_Populate(madronalib)
-    endif()
-    set(MADRONALIB_DIR ${madronalib_SOURCE_DIR})
-endif()
+cpm_export_variables(blink)
 
 list(APPEND SRC
     ./src/audio.h
@@ -39,10 +31,10 @@ list(APPEND SRC
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${BLINK_ROOT}/include
-    ${BLINK_ROOT}/plugin
-	${MADRONALIB_DIR}/source
-	../..
+    ${blink_SOURCE_DIR}/include
+    ${blink_SOURCE_DIR}/plugin
+	${madronalib_SOURCE_DIR}/source
+    ../..
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
