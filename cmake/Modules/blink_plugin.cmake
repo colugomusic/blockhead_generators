@@ -6,7 +6,13 @@ set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
 set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,x11>>)
 
 CPMAddPackage("gh:colugomusic/blink#master")
-CPMAddPackage("gh:madronalabs/madronalib#master")
+
+CPMAddPackage(
+    NAME madronalib
+    GITHUB_REPOSITORY madronalabs/madronalib
+    GIT_TAG master
+    DOWNLOAD_ONLY YES
+)
 
 cpm_export_variables(blink)
 
