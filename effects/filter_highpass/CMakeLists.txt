@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(effect_filter)
+project(effect_filter_highpass)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
@@ -21,4 +21,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${madronalib_SOURCE_DIR}/source
 )
 
-blink_plugin_set_effect_target_properties("filter")
+blink_plugin_set_effect_target_properties("filter.highpass")
