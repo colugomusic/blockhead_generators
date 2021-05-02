@@ -3,7 +3,7 @@ set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
 set(on_windows $<STREQUAL:${CMAKE_SYSTEM_NAME},Windows>)
 set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
 set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
-set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,x11>>)
+set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,linux>>)
 
 CPMAddPackage("gh:colugomusic/blink#master")
 
