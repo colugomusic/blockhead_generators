@@ -70,7 +70,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		}
 
 		total_amp += amp;
-		out_vec += particles_[i].process() * ml::repeatRows<2>(amp);
+		out_vec += particles_[i].process(amp);
 	}
 
 	out_vec /= ml::repeatRows<2>(total_amp);

@@ -10,7 +10,7 @@ Particle::Particle(const Controller& controller, int harmonic)
 {
 }
 
-ml::DSPVectorArray<2> Particle::process()
+ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 {
 	ml::DSPVector vec_L;
 	ml::DSPVector vec_R;
@@ -72,7 +72,7 @@ ml::DSPVectorArray<2> Particle::process()
 			}
 
 			auto final_duck = std::min(grain.duck, self_duck);
-			auto overall_amp = grain.frame_amp * final_duck;
+			auto overall_amp = grain.frame_amp * final_duck * amp[j];
 
 			if (overall_amp > 0.f)
 			{

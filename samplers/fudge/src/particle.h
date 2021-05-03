@@ -14,7 +14,7 @@ public:
 
 	Particle(const Controller& controller, int harmonic = 0);
 
-	ml::DSPVectorArray<2> process();
+	ml::DSPVectorArray<2> process(const ml::DSPVector& amp);
 
 private:
 
