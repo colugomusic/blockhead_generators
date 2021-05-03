@@ -7,7 +7,7 @@ class RingModulator : public blink::Plugin
 public:
 
 	static constexpr auto UUID = "881569c5-108b-4923-b30e-1e1ac6c1a04f";
-	static constexpr auto NAME = "Ring Modulator (ALPHA)";
+	static constexpr auto NAME = "Ring Modulator";
 
 	enum class ParameterIndex
 	{

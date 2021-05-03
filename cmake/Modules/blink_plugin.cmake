@@ -29,6 +29,9 @@ function(blink_plugin_set_target_properties name type)
 		LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_OUTPUT_DIR}
 		CXX_STANDARD 17
 	)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE
+		PLUGIN_VERSION="${PROJECT_VERSION}"
+	)
 endfunction()
 
 function(blink_plugin_set_effect_target_properties name)

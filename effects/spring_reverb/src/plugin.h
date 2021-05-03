@@ -7,7 +7,7 @@ class SpringReverb : public blink::Plugin
 public:
 
 	static constexpr auto UUID = "0af95a47-f5f5-426c-8384-00f6ed30449d";
-	static constexpr auto NAME = "Spring Reverb (ALPHA)";
+	static constexpr auto NAME = "Spring Reverb";
 
 	enum class ParameterIndex
 	{

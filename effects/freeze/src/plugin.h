@@ -7,7 +7,7 @@ class Freeze : public blink::Plugin
 public:
 
 	static constexpr auto UUID = "cde37ae4-a943-4b2c-b792-3eeba8107a6b";
-	static constexpr auto NAME = "Freeze (ALPHA)";
+	static constexpr auto NAME = "Freeze";
 
 	enum class ParameterIndex
 	{

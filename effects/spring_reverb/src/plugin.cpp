@@ -37,15 +37,9 @@ enum class Error
 
 SpringReverb* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid()
-{
-	return SpringReverb::UUID;
-}
-
-blink_UUID blink_get_plugin_name()
-{
-	return SpringReverb::NAME;
-}
+blink_UUID blink_get_plugin_uuid() { return SpringReverb::UUID; }
+blink_UUID blink_get_plugin_name() { return SpringReverb::NAME; }
+const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {

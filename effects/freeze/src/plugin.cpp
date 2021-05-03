@@ -33,15 +33,9 @@ enum class Error
 
 Freeze* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid()
-{
-	return Freeze::UUID;
-}
-
-blink_UUID blink_get_plugin_name()
-{
-	return Freeze::NAME;
-}
+blink_UUID blink_get_plugin_uuid() { return Freeze::UUID; }
+blink_UUID blink_get_plugin_name() { return Freeze::NAME; }
+const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {

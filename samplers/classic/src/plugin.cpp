@@ -70,15 +70,9 @@ enum class Error
 
 Classic* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid()
-{
-	return Classic::UUID;
-}
-
-blink_UUID blink_get_plugin_name()
-{
-	return Classic::NAME;
-}
+blink_UUID blink_get_plugin_uuid() { return Classic::UUID; }
+blink_UUID blink_get_plugin_name() { return Classic::NAME; }
+const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {

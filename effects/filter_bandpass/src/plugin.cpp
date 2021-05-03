@@ -30,20 +30,10 @@ enum class Error
 
 Filter* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid()
-{
-	return Filter::UUID;
-}
-
-blink_UUID blink_get_plugin_name()
-{
-	return Filter::NAME;
-}
-
-const char* blink_get_plugin_category()
-{
-	return BLINK_STD_CATEGORY_FILTERS;
-}
+blink_UUID blink_get_plugin_uuid() { return Filter::UUID; }
+blink_UUID blink_get_plugin_name() { return Filter::NAME; }
+const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS; }
+const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
