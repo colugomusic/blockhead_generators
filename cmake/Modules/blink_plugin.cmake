@@ -18,7 +18,7 @@ cpm_export_variables(blink)
 
 function(blink_plugin_set_target_properties name type)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
-		OUTPUT_NAME ${type}.${name}.${PLATFORM_DIR}
+		OUTPUT_NAME ${type}.${name}.v${PROJECT_VERSION}.${PLATFORM_DIR}
 		FOLDER "plugins/${type}s"
 		SUFFIX ".blink"
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_DIR}
