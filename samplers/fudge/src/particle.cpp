@@ -270,6 +270,7 @@ std::array<float, 2> Particle::get_stereo_positions(int index, float pos, bool a
 
 void Particle::trigger_next_grain(int index, bool adjust)
 {
+	constexpr auto MIN_GRAIN_SIZE = 3.0f;
 	constexpr auto MAX_WINDOW_SIZE = 4096.0f;
 
 	flip_flop_ = flip_flop_ == 0 ? 1 : 0;
@@ -295,7 +296,7 @@ void Particle::trigger_next_grain(int index, bool adjust)
 
 	auto ratio = harmonic_ > 0 ? controller_->get_harmonic_ratio(index, harmonic_) : 1.0f;
 	auto ff = controller_->ff()[index];
-	auto size = controller_->size()[index] * ff;
+	auto size = std::max(MIN_GRAIN_SIZE, controller_->size()[index] * ff);
 
 	grains_[flip_flop_].on = true;
 	grains_[flip_flop_].fade_in = fade_in;
