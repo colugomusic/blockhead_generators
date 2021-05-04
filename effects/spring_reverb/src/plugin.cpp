@@ -19,6 +19,9 @@ SpringReverb::SpringReverb()
 	spec_env_size.uuid = "65e00902-5318-4d76-9b86-2479dcce7f52";
 	spec_env_decay.name = "Decay";
 	spec_env_decay.uuid = "aa47aa82-0e26-4d3b-8f60-ddb5d57353e7";
+	spec_env_size.default_value = 0.5f;
+	spec_env_decay.default_value = 0.5f;
+	spec_env_mix.default_value = 0.25f;
 
 	spec_env_size.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_decay.flags |= blink_EnvelopeFlags_DefaultActive;
