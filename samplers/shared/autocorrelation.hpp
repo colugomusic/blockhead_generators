@@ -13,7 +13,7 @@ namespace autocorrelation {
 
 struct AnalysisCallbacks
 {
-	std::function<void(std::uint32_t index, std::uint32_t n, float* out)> get_frames;
+	std::function<void(std::uint64_t index, std::uint32_t n, float* out)> get_frames;
 	std::function<bool()> should_abort;
 	std::function<void(float)> report_progress;
 };
@@ -21,14 +21,14 @@ struct AnalysisCallbacks
 struct FrameAnalysis
 {
 	float estimated_size = 0.0f;
-	std::uint32_t prev_crossing = 0;
-	std::uint32_t next_crossing = 0;
+	std::uint64_t prev_crossing = 0;
+	std::uint64_t next_crossing = 0;
 };
 
 // specialized autocorrelation which only considers the distances between zero crossings in the analysis.
 // returns false if aborted before the analysis could complete
 // allocates memory
-inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t depth, FrameAnalysis* out)
+inline bool analyze(AnalysisCallbacks callbacks, std::uint64_t n, std::uint32_t depth, FrameAnalysis* out)
 {
 	if (depth < 4) depth = 4;
 
@@ -37,16 +37,16 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		bool init = false;
 		bool up = false;
 		float best_peak = 0.0f;
-		std::int32_t best_peak_pos = 0;
-		std::uint32_t latest = 0;
+		std::uint64_t best_peak_pos = 0;
+		std::uint64_t latest = 0;
 	} zx;
 
 	struct Crossing
 	{
-		std::uint32_t index;
-		std::int32_t distance;
-		std::int32_t peak_index;
-		std::int32_t peak_distance;
+		std::uint64_t index;
+		std::uint64_t distance;
+		std::uint64_t peak_index;
+		std::uint64_t peak_distance;
 		float peak_value;
 		bool up;
 	};
@@ -120,7 +120,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		return best;
 	};
 
-	auto best_crossing = 0;
+	std::uint64_t best_crossing = 0;
 	auto prev_size = 0.0f;
 
 	ml::DSPVector chunk_frames;
@@ -130,7 +130,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 	filter.mCoeffs = ml::OnePole::coeffs(0.0011f);
 	dc_blocker.mCoeffs = ml::DCBlocker::coeffs(0.011f);
 
-	auto index = 0;
+	std::uint64_t index = 0;
 	auto frames_remaining = n;
 	auto filled_start_frames = false;
 
@@ -138,7 +138,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 	{
 		if (callbacks.should_abort()) return false;
 
-		auto num_chunk_frames = std::min(std::uint32_t(kFloatsPerDSPVector), frames_remaining);
+		auto num_chunk_frames = std::uint32_t(std::min(std::uint64_t(kFloatsPerDSPVector), frames_remaining));
 
 		callbacks.get_frames(index, num_chunk_frames, chunk_frames.getBuffer());
 
@@ -239,7 +239,7 @@ inline bool analyze(AnalysisCallbacks callbacks, std::uint32_t n, std::uint32_t 
 		frames_remaining -= num_chunk_frames;
 	}
 
-	for (std::uint32_t i = zx.latest; i < n; i++)
+	for (std::uint64_t i = zx.latest; i < n; i++)
 	{
 		out[i].prev_crossing = zx.latest;
 		out[i].next_crossing = n;
