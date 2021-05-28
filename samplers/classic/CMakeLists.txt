@@ -17,13 +17,8 @@ list(APPEND SRC
 	../../shared/noise_generator.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SRC})
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${blink_SOURCE_DIR}/include
-    ${blink_SOURCE_DIR}/plugin
-	${madronalib_SOURCE_DIR}/source
-    ../..
-)
-
+blink_plugin_add(${PROJECT_NAME} "${SRC}")
 blink_plugin_set_sampler_target_properties("classic")
+target_include_directories(${PROJECT_NAME} PRIVATE
+	../..
+)

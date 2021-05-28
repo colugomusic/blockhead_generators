@@ -15,7 +15,7 @@ auto stepify(float v) -> float
 
 auto snap_value(float v, float step_size, float snap_amount)
 {
-	return stepify(std_params::snap_value(v, step_size, snap_amount));
+	return stepify(tweak::snap_value(v, step_size, snap_amount));
 }
 
 float constrain(float v)
@@ -25,17 +25,17 @@ float constrain(float v)
 
 auto increment(float v, bool precise)
 {
-	return constrain(stepify(std_params::increment<100, 1000>(v, precise)));
+	return constrain(stepify(tweak::increment<100, 1000>(v, precise)));
 };
 
 auto decrement(float v, bool precise)
 {
-	return constrain(stepify(std_params::decrement<100, 1000>(v, precise)));
+	return constrain(stepify(tweak::decrement<100, 1000>(v, precise)));
 };
 
 auto drag(float v, int amount, bool precise) -> float
 {
-	return constrain(stepify(std_params::drag<100, 1000>(v, amount / 5, precise)));
+	return constrain(stepify(tweak::drag<100, 1000>(v, amount / 5, precise)));
 };
 
 auto display(float v)
@@ -49,7 +49,7 @@ auto display(float v)
 
 auto from_string(const std::string& str) -> std::optional<float>
 {
-	auto value = std_params::find_number<float>(str);
+	auto value = tweak::find_number<float>(str);
 
 	if (!value) return std::optional<float>();
 
@@ -67,7 +67,7 @@ auto stepify(float v) -> float
 
 auto snap_value(float v, float step_size, float snap_amount)
 {
-	return stepify(std_params::snap_value(v, step_size, snap_amount));
+	return stepify(tweak::snap_value(v, step_size, snap_amount));
 }
 
 float constrain(float v)
@@ -77,17 +77,17 @@ float constrain(float v)
 
 auto increment(float v, bool precise)
 {
-	return constrain(stepify(std_params::increment<100, 1000>(v, precise)));
+	return constrain(stepify(tweak::increment<100, 1000>(v, precise)));
 };
 
 auto decrement(float v, bool precise)
 {
-	return constrain(stepify(std_params::decrement<100, 1000>(v, precise)));
+	return constrain(stepify(tweak::decrement<100, 1000>(v, precise)));
 };
 
 auto drag(float v, int amount, bool precise) -> float
 {
-	return constrain(stepify(std_params::drag<100, 1000>(v, amount / 5, precise)));
+	return constrain(stepify(tweak::drag<100, 1000>(v, amount / 5, precise)));
 }
 
 } // harmonics_spread
@@ -102,7 +102,7 @@ SliderSpec<float> grain_size()
 	out.increment = grain_size::increment;
 	out.decrement = grain_size::decrement;
 	out.drag = grain_size::drag;
-	out.display_value = grain_size::display;
+	out.to_string = grain_size::display;
 	out.from_string = grain_size::from_string;
 	out.default_value = 0.5f;
 
@@ -113,13 +113,13 @@ SliderSpec<float> harmonic_amount()
 {
 	SliderSpec<float> out;
 
-	out.constrain = [](float v) { return std_params::constrain(v, 0.0f, 4.0f); };
-	out.stepify = std_params::stepify_0_01;
-	out.increment = [out](float v, bool precise) { return out.constrain(out.stepify(std_params::increment<1, 10>(v, precise))); };
-	out.decrement = [out](float v, bool precise) { return out.constrain(out.stepify(std_params::decrement<1, 10>(v, precise))); };
-	out.drag = [out](float v, int amount, bool precise) { return out.constrain(out.stepify(std_params::drag<10, 100>(v, amount / 5, precise))); };
-	out.display_value = std_params::display_number<float>;
-	out.from_string = std_params::find_positive_number<float>;
+	out.constrain = [](float v) { return tweak::constrain(v, 0.0f, 4.0f); };
+    out.stepify = tweak::math::stepify<100, float>;
+	out.increment = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::increment<1, 10>(v, precise))); };
+	out.decrement = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::decrement<1, 10>(v, precise))); };
+	out.drag = [out](float v, int amount, bool precise) { return out.constrain(out.stepify(tweak::drag<10, 100>(v, amount / 5, precise))); };
+    out.to_string = [](float v) { return std::to_string(v); };
+	out.from_string = tweak::find_positive_number<float>;
 	out.default_value = 0.0f;
 
 	return out;
@@ -176,9 +176,9 @@ EnvelopeSpec grain_size()
 	out.value_slider = sliders::grain_size();
 
 	out.range.min.default_value = 0.0f;
-	out.range.min.display_value = grain_size::display;
+	out.range.min.to_string = grain_size::display;
 	out.range.max.default_value = 1.0f;
-	out.range.max.display_value = grain_size::display;
+	out.range.max.to_string = grain_size::display;
 	out.display_value = grain_size::display;
 
 	out.flags = blink_EnvelopeFlags_DefaultActive | blink_EnvelopeFlags_NoGridLabels;
@@ -221,15 +221,15 @@ blink::EnvelopeSpec harmonics_amount()
 	out.default_value = 0.0f;
 	out.search_binary = std_params::envelopes::generic_search_binary;
 	out.search_forward = std_params::envelopes::generic_search_forward;
-	out.stepify = std_params::stepify_0_01;
+    out.stepify = tweak::math::stepify<100, float>;
 
 	out.value_slider = sliders::harmonic_amount();
 
 	out.range.min.default_value = 0.0f;
-	out.range.min.display_value = std_params::display_number<float>;
+    out.range.min.to_string = [](float v) { return std::to_string(v); };
 	out.range.max.default_value = 3.0f;
-	out.range.max.display_value = std_params::display_number<float>;
-	out.display_value = std_params::display_number<float>;
+    out.range.max.to_string = [](float v) { return std::to_string(v); };
+    out.display_value = [](float v) { return std::to_string(v); };
 
 	return out;
 }
@@ -243,7 +243,7 @@ blink::EnvelopeSpec harmonics_spread()
 
 	out.default_value = 1.0f;
 	out.get_gridline = [](int index) { return float(index) / 4.0f; };
-	out.stepify = std_params::stepify_0_01;
+    out.stepify = tweak::math::stepify<100, float>;
 
 	out.value_slider.constrain = harmonics_spread::constrain;
 	out.value_slider.stepify = harmonics_spread::stepify;
@@ -251,7 +251,7 @@ blink::EnvelopeSpec harmonics_spread()
 	out.value_slider.increment = harmonics_spread::increment;
 	out.value_slider.drag = harmonics_spread::drag;
 	out.value_slider.from_string = std_params::percentage::from_string;
-	out.value_slider.display_value = std_params::percentage::display;
+	out.value_slider.to_string = std_params::percentage::display;
 
 	out.range.max = out.value_slider;
 	out.range.max.default_value = 2.0f;

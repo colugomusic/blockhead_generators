@@ -5,16 +5,16 @@ set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
 set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
 set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,linux>>)
 
-CPMAddPackage("gh:colugomusic/blink#master")
-
 CPMAddPackage(
-    NAME madronalib
-    GITHUB_REPOSITORY madronalabs/madronalib
-    GIT_TAG master
-    DOWNLOAD_ONLY YES
+	NAME blink
+	GITHUB_REPOSITORY colugomusic/blink
+	GIT_TAG master
+	DOWNLOAD_ONLY YES
 )
 
-cpm_export_variables(blink)
+if (NOT TARGET blink_plugin)
+	add_subdirectory(${blink_SOURCE_DIR}/plugin/blink blink_plugin)
+endif()
 
 function(blink_plugin_set_target_properties name type)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -44,4 +44,9 @@ endfunction()
 
 function(blink_plugin_set_synth_target_properties name)
 	blink_plugin_set_target_properties(${name} "synth")
+endfunction()
+
+function(blink_plugin_add name src)
+	add_library(${name} SHARED ${src})
+	target_link_libraries(${name} PRIVATE blink_plugin)
 endfunction()
