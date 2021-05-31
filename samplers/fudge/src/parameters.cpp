@@ -35,7 +35,7 @@ auto decrement(float v, bool precise)
 
 auto drag(float v, int amount, bool precise) -> float
 {
-	return constrain(stepify(tweak::drag<100, 1000>(v, amount / 5, precise)));
+	return constrain(stepify(tweak::drag<float, 100, 1000>(v, amount / 5, precise)));
 };
 
 auto display(float v)
@@ -87,7 +87,7 @@ auto decrement(float v, bool precise)
 
 auto drag(float v, int amount, bool precise) -> float
 {
-	return constrain(stepify(tweak::drag<100, 1000>(v, amount / 5, precise)));
+	return constrain(stepify(tweak::drag<float, 100, 1000>(v, amount / 5, precise)));
 }
 
 } // harmonics_spread
@@ -117,7 +117,7 @@ SliderSpec<float> harmonic_amount()
     out.stepify = tweak::math::stepify<100, float>;
 	out.increment = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::increment<1, 10>(v, precise))); };
 	out.decrement = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::decrement<1, 10>(v, precise))); };
-	out.drag = [out](float v, int amount, bool precise) { return out.constrain(out.stepify(tweak::drag<10, 100>(v, amount / 5, precise))); };
+	out.drag = [out](float v, int amount, bool precise) { return out.constrain(out.stepify(tweak::drag<float, 10, 100>(v, amount / 5, precise))); };
     out.to_string = [](float v) { return std::to_string(v); };
 	out.from_string = tweak::find_positive_number<float>;
 	out.default_value = 0.0f;
