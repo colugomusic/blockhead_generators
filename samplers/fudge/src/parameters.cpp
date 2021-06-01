@@ -62,7 +62,7 @@ namespace harmonics_spread {
 
 auto stepify(float v) -> float
 {
-	return std_params::percentage::stepify(v);
+	return tweak::std::percentage::stepify(v);
 }
 
 auto snap_value(float v, float step_size, float snap_amount)
@@ -179,7 +179,7 @@ EnvelopeSpec grain_size()
 	out.range.min.to_string = grain_size::display;
 	out.range.max.default_value = 1.0f;
 	out.range.max.to_string = grain_size::display;
-	out.display_value = grain_size::display;
+	out.to_string = grain_size::display;
 
 	out.flags = blink_EnvelopeFlags_DefaultActive | blink_EnvelopeFlags_NoGridLabels;
 
@@ -229,7 +229,7 @@ blink::EnvelopeSpec harmonics_amount()
     out.range.min.to_string = [](float v) { return std::to_string(v); };
 	out.range.max.default_value = 3.0f;
     out.range.max.to_string = [](float v) { return std::to_string(v); };
-    out.display_value = [](float v) { return std::to_string(v); };
+    out.to_string = [](float v) { return std::to_string(v); };
 
 	return out;
 }
@@ -250,8 +250,8 @@ blink::EnvelopeSpec harmonics_spread()
 	out.value_slider.decrement = harmonics_spread::decrement;
 	out.value_slider.increment = harmonics_spread::increment;
 	out.value_slider.drag = harmonics_spread::drag;
-	out.value_slider.from_string = std_params::percentage::from_string;
-	out.value_slider.to_string = std_params::percentage::display;
+	out.value_slider.from_string = tweak::std::percentage::from_string;
+	out.value_slider.to_string = tweak::std::percentage::to_string;
 
 	out.range.max = out.value_slider;
 	out.range.max.default_value = 2.0f;
