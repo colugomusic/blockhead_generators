@@ -9,7 +9,7 @@ bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_Sample
 
 	autocorrelation::AnalysisCallbacks analysis_callbacks;
 
-	analysis_callbacks.get_frames = [host, sample_info, &channel](std::uint32_t index, std::uint32_t n, float* out)
+	analysis_callbacks.get_frames = [host, sample_info, &channel](std::uint64_t index, std::uint32_t n, float* out)
 	{
 		sample_info.get_data(sample_info.host, channel, index, n, out);
 	};

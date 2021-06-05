@@ -53,8 +53,8 @@ static void calculate_positions(
 	int count,
 	blink_SamplerDrawInfo* out)
 {
-	ml::DSPVector sculpted_block_positions;
-	ml::DSPVector warped_block_positions;
+	snd::transport::DSPVectorFramePosition sculpted_block_positions;
+	snd::transport::DSPVectorFramePosition warped_block_positions;
 	ml::DSPVector derivatives;
 
 	fudge_traverser->get_positions(
@@ -76,41 +76,51 @@ static void calculate_positions(
 	{
 		for (int i = 0; i < count; i++)
 		{
-			if (final_sample_positions[i] > sample_info.num_frames - 1)
+			if (final_sample_positions[i] > std::int32_t(sample_info.num_frames - 1))
 			{
-				final_sample_positions[i] = float(std::fmod(final_sample_positions[i], sample_info.num_frames));
+				final_sample_positions.set(i, std::fmod(final_sample_positions[i], double(sample_info.num_frames)));
 			}
 		}
 	}
 
 	if (data.toggles.reverse && data.toggles.reverse->value)
 	{
-		final_sample_positions = float(sample_info.num_frames - 1) - final_sample_positions;
+		final_sample_positions = std::int32_t(sample_info.num_frames - 1) - final_sample_positions;
 	}
 
 	if (out->sculpted_block_positions)
 	{
-		std::copy(sculpted_block_positions.getConstBuffer(), sculpted_block_positions.getConstBuffer() + count, out->sculpted_block_positions + index);
+		const auto doubles = sculpted_block_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->sculpted_block_positions + index);
 	}
 
 	if (out->sculpted_sample_positions)
 	{
-		std::copy(sculpted_sample_positions.getConstBuffer(), sculpted_sample_positions.getConstBuffer() + count, out->sculpted_sample_positions + index);
+		const auto doubles = sculpted_sample_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->sculpted_sample_positions + index);
 	}
 
 	if (out->warped_block_positions)
 	{
-		std::copy(warped_block_positions.getConstBuffer(), warped_block_positions.getConstBuffer() + count, out->warped_block_positions + index);
+		const auto doubles = warped_block_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->warped_block_positions + index);
 	}
 
 	if (out->warped_sample_positions)
 	{
-		std::copy(warped_sample_positions.getConstBuffer(), warped_sample_positions.getConstBuffer() + count, out->warped_sample_positions + index);
+		const auto doubles = warped_sample_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->warped_sample_positions + index);
 	}
 
 	if (out->final_sample_positions)
 	{
-		std::copy(final_sample_positions.getConstBuffer(), final_sample_positions.getConstBuffer() + count, out->final_sample_positions + index);
+		const auto doubles = final_sample_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->final_sample_positions + index);
 	}
 
 	if (out->waveform_derivatives)

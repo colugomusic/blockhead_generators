@@ -59,7 +59,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	if (data.toggle_reverse->value)
 	{
-		sample_pos = float(buffer->sample_info->num_frames - 1) - sample_pos;
+		sample_pos = std::int32_t(buffer->sample_info->num_frames - 1) - sample_pos;
 	}
 
 	if (buffer->sample_info->num_channels > 1)
@@ -91,7 +91,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	return BLINK_OK;
 }
 
-ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
+ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data, const snd::transport::DSPVectorFramePosition &sample_pos, bool loop)
 {
 	ml::DSPVectorArray<2> out;
 
@@ -115,7 +115,7 @@ ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data
 	}
 }
 
-ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const ml::DSPVector& sample_pos, bool loop)
+ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop)
 {
 	return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
 }

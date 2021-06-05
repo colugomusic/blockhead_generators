@@ -36,7 +36,7 @@ void Controller::process(
 
 	if (data.toggle_reverse->value)
 	{
-		sample_positions_ = float(buffer.sample_info->num_frames - 1) - sample_positions_;
+		sample_positions_ = std::int32_t(buffer.sample_info->num_frames - 1) - sample_positions_;
 	}
 
 	if (data.toggle_loop->value)

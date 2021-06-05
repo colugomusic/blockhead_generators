@@ -28,7 +28,7 @@ public:
 		const blink::BlockPositions& block_positions);
 
 	const blink::BlockPositions& block_positions() const { return *block_positions_; }
-	const ml::DSPVector& position() const { return sample_positions_; }
+	const snd::transport::DSPVectorFramePosition& position() const { return sample_positions_; }
 	const ml::DSPVectorInt& reset() const { return *resets_; }
 
 	const ml::DSPVector& ff() const { return ff_; }
@@ -53,7 +53,7 @@ private:
 
 	const blink_SamplerBuffer* buffer_;
 	const blink::BlockPositions* block_positions_;
-	ml::DSPVector sample_positions_;
+	snd::transport::DSPVectorFramePosition sample_positions_;
 	const ml::DSPVectorInt* resets_;
 
 	ml::DSPVector ff_;

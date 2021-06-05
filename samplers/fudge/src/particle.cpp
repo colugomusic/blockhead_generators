@@ -19,7 +19,7 @@ ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 	{
 		auto block_pos = controller_->block_positions().positions[j];
 
-		if (trig_primed_ && block_pos >= 0.0f)
+		if (trig_primed_ && block_pos >= 0)
 		{
 			reset(j);
 		}
@@ -27,7 +27,7 @@ ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 		{
 			if (controller_->reset()[j])
 			{
-				if (block_pos < 0.0f)
+				if (block_pos < 0)
 				{
 					trig_primed_ = true;
 				}
@@ -276,7 +276,7 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	flip_flop_ = flip_flop_ == 0 ? 1 : 0;
 
 	const auto pos = controller_->position()[index];
-	const auto fade_in = pos > 0.0f;
+	const auto fade_in = pos > 0;
 
 	float pos_L;
 	float pos_R;
