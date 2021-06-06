@@ -20,6 +20,7 @@ function(blink_plugin_set_target_properties name type)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 		OUTPUT_NAME ${type}.${name}.v${PROJECT_VERSION}.${PLATFORM_DIR}
 		FOLDER "plugins/${type}s"
+		PREFIX ""
 		SUFFIX ".blink"
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_DIR}
 		RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_DIR}
