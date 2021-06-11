@@ -3,6 +3,7 @@ set(PLUGIN_OUTPUT_DIR bin CACHE PATH "plugin output directory")
 set(on_windows $<STREQUAL:${CMAKE_SYSTEM_NAME},Windows>)
 set(on_macos $<STREQUAL:${CMAKE_SYSTEM_NAME},Darwin>)
 set(on_linux $<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>)
+set(debug_build $<OR:$<CONFIG:Debug>,$<STREQUAL:${CMAKE_BUILD_TYPE},Debug}>>)
 set(PLATFORM_DIR $<IF:${on_windows},win64,$<IF:${on_macos},macos,linux>>)
 
 CPMAddPackage(
@@ -18,7 +19,7 @@ endif()
 
 function(blink_plugin_set_target_properties name type)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
-		OUTPUT_NAME ${type}.${name}.v${PROJECT_VERSION}.${PLATFORM_DIR}
+		OUTPUT_NAME ${type}.${name}.v${PROJECT_VERSION}.${PLATFORM_DIR}$<${debug_build}:.dbg>
 		FOLDER "plugins/${type}s"
 		PREFIX ""
 		SUFFIX ".blink"
