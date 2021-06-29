@@ -100,9 +100,9 @@ blink_Error blink_terminate()
 
 blink_Synth blink_make_synth(int instance_group)
 {
-	if (!g_plugin) return blink_Synth { 0, 0, 0 };
+	if (!g_plugin) return blink_Synth { 0, 0 };
 
-	return bind::make_synth<Audio>(g_plugin);
+	return bind::make_synth<Audio>(g_plugin, instance_group);
 }
 
 blink_Error blink_destroy_synth(blink_Synth synth)

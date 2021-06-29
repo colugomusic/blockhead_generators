@@ -4,8 +4,9 @@
 
 using namespace blink;
 
-Audio::Audio(const Fudge* plugin)
-	: plugin_(plugin)
+Audio::Audio(Fudge* plugin, int instance_group)
+	: Sampler(plugin, instance_group)
+	, plugin_(plugin)
 	, controller_(plugin)
 	, particles_{ controller_, { controller_, 1 }, { controller_, 2 }, { controller_, 3 } }
 {
@@ -13,8 +14,6 @@ Audio::Audio(const Fudge* plugin)
 
 blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
-	begin_process(buffer);
-
 	ml::DSPVectorArray<2> out_vec;
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);

@@ -8,6 +8,13 @@
 
 using namespace blink;
 
+enum class Error
+{
+	AlreadyInitialized,
+	NotInitialized,
+	InvalidInstanceGroup,
+};
+
 Freeze::Freeze()
 {
 	auto spec_env_pitch = std_params::envelopes::pitch();
@@ -25,11 +32,38 @@ Freeze::Freeze()
 	add_parameter(spec_sld_pitch);
 }
 
-enum class Error
+blink_Effect Freeze::make_effect(int instance_group)
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	if (instance_group_data_.find(instance_group) == instance_group_data_.end())
+	{
+		instance_group_data_[instance_group] = std::make_shared<InstanceGroupData>();
+	}
+
+	initialize_instance_group(instance_group);
+
+	return bind::make_effect<Audio>(this, instance_group, instance_group_data_[instance_group]);
+}
+
+blink_Error Freeze::destroy_effect(blink_Effect effect)
+{
+	const auto audio = (Audio*)(effect.proc_data);
+	const auto instance_group = audio->get_instance_group();
+
+	if (instance_group_data_.find(instance_group) != instance_group_data_.end())
+	{
+		instance_group_data_.erase(instance_group);
+	}
+
+	return bind::destroy_effect(effect);
+}
+
+void Freeze::hard_reset(int instance_group)
+{
+	auto& instance_group_data = instance_group_data_[instance_group];
+
+	instance_group_data->buffer.clear();
+	instance_group_data->master_instance = nullptr;
+}
 
 Freeze* g_plugin = nullptr;
 
@@ -57,14 +91,14 @@ blink_Error blink_terminate()
 
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0, 0, 0 };
+	if (!g_plugin) return blink_Effect { 0, 0 };
 
-	return bind::make_effect<Audio>(g_plugin);
+	return g_plugin->make_effect(instance_group);
 }
 
 blink_Error blink_destroy_effect(blink_Effect effect)
 {
-	return bind::destroy_effect(effect);
+	return g_plugin->destroy_effect(effect);
 }
 
 int blink_get_num_groups()
@@ -102,6 +136,7 @@ const char* blink_get_error_string(blink_Error error)
 	{
 		case Error::AlreadyInitialized: return "already initialized";
 		case Error::NotInitialized: return "not initialized";
+		case Error::InvalidInstanceGroup: return "invalid instance group";
 		default: return "unknown error";
 	}
 }

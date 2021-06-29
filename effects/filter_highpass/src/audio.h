@@ -12,10 +12,10 @@ class Audio : public blink::Effect
 {
 public:
 
-	Audio(const Filter* plugin);
+	Audio(Filter* plugin, int instance_group);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
-	blink_Error reset() override;
+	void reset() override;
 
 private:
 	

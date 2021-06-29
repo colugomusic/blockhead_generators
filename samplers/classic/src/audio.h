@@ -17,12 +17,14 @@ class Audio : public blink::Sampler
 {
 public:
 
-	Audio(const Classic* plugin);
+	Audio(Classic* plugin, int instance_group);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
 	blink_Error preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const;
 
 private:
+
+	void reset() override {}
 
 	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);
 	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);

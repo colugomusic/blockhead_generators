@@ -3,15 +3,14 @@
 
 using namespace blink;
 
-Audio::Audio(const RingModulator* plugin)
-	: plugin_(plugin)
+Audio::Audio(RingModulator* plugin, int instance_group)
+	: Effect(plugin, instance_group)
+	, plugin_(plugin)
 {
 }
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
-	begin_process(buffer);
-
 	struct Data
 	{
 		const blink_EnvelopeData* env_pitch;
@@ -35,9 +34,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	return BLINK_OK;
 }
 
-blink_Error Audio::reset()
+void Audio::reset()
 {
 	sine_.clear();
-
-	return BLINK_OK;
 }

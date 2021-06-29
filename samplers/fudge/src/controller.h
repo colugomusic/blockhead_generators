@@ -28,6 +28,7 @@ public:
 		const blink::BlockPositions& block_positions);
 
 	const blink::BlockPositions& block_positions() const { return *block_positions_; }
+	const std::int32_t data_offset() const { return std::int32_t(block_positions_->data_offset); }
 	const snd::transport::DSPVectorFramePosition& position() const { return sample_positions_; }
 	const ml::DSPVectorInt& reset() const { return *resets_; }
 

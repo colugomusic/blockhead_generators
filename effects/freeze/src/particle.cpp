@@ -13,7 +13,7 @@ LR Particle::process(int vector_index)
 {
 	LR out;
 
-	if (controller_->reset()[vector_index] > 0)
+	if (queue_reset_)
 	{
 		reset(vector_index);
 	}
@@ -121,6 +121,7 @@ void Particle::clear()
 
 void Particle::reset(int index)
 {
+	queue_reset_ = false;
 	clear();
 	trigger_next_grain(index);
 }

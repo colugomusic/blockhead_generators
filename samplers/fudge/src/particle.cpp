@@ -18,8 +18,9 @@ ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 	for (int j = 0; j < kFloatsPerDSPVector; j++)
 	{
 		auto block_pos = controller_->block_positions().positions[j];
+		auto local_block_pos = block_pos + controller_->data_offset();
 
-		if (trig_primed_ && block_pos >= 0)
+		if (trig_primed_ && local_block_pos >= 0)
 		{
 			reset(j);
 		}
@@ -27,7 +28,7 @@ ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 		{
 			if (controller_->reset()[j])
 			{
-				if (block_pos < 0)
+				if (local_block_pos < 0)
 				{
 					trig_primed_ = true;
 				}

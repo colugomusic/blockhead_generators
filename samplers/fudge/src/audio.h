@@ -20,11 +20,13 @@ class Audio : public blink::Sampler
 {
 public:
 
-	Audio(const Fudge* plugin);
+	Audio(Fudge* plugin, int instance_group);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
 
 private:
+
+	void reset() override {}
 
 	ml::DSPVectorArray<2> add_noise(
 		const ml::DSPVectorArray<2>& in,

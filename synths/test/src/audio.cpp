@@ -3,15 +3,14 @@
 
 using namespace blink;
 
-Audio::Audio(const Test* plugin)
-	: plugin_(plugin)
+Audio::Audio(Test* plugin, int instance_group)
+	: Synth(plugin, instance_group)
+	, plugin_(plugin)
 {
 }
 
 blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 {
-	Synth::begin_process(buffer);
-
 	struct Data
 	{
 		const blink_EnvelopeData* env_amp;
@@ -80,10 +79,8 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 	return BLINK_OK;
 }
 
-blink_Error Audio::reset()
+void Audio::reset()
 {
 	oscs_[0].reset();
 	oscs_[1].reset();
-
-	return BLINK_OK;
 }

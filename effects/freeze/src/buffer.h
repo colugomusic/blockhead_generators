@@ -15,14 +15,8 @@ public:
 		return L > threshold || L < -threshold || R > threshold || R < -threshold;
 	}
 
-	void process(bool reset, float L, float R)
+	void process(float L, float R)
 	{
-		if (reset)
-		{
-			init_ = false;
-			size_ = 0;
-		}
-
 		if (!init_ && not_zero(L, R))
 		{
 			init_ = true;

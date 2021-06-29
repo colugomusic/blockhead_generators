@@ -18,6 +18,7 @@ public:
 
 	LR process(int vector_);
 	void clear();
+	void queue_reset() { queue_reset_ = true; }
 
 private:
 
@@ -34,5 +35,6 @@ private:
 	float trigger_timer_ = 0.0f;
 	std::array<Grain, 2> grains_;
 	std::function<float(int, std::size_t, float)> read_;
+	bool queue_reset_ = false;
 
 };

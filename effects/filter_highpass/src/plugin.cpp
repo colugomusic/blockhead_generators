@@ -57,9 +57,9 @@ blink_Error blink_terminate()
 
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0, 0, 0 };
+	if (!g_plugin) return blink_Effect { 0, 0 };
 
-	return bind::make_effect<Audio>(g_plugin);
+	return bind::make_effect<Audio>(g_plugin, instance_group);
 }
 
 blink_Error blink_destroy_effect(blink_Effect effect)

@@ -3,8 +3,9 @@
 
 using namespace blink;
 
-Audio::Audio(const SpringReverb* plugin)
-	: plugin_(plugin)
+Audio::Audio(SpringReverb* plugin, int instance_group)
+	: Effect(plugin, instance_group)
+	, plugin_(plugin)
 {
 	// set allpass filter coefficients
 	mAp1.mGain = 0.75f;
@@ -35,8 +36,6 @@ ml::Projection unityToDecay(ml::projections::intervalMap({ 0, 1 }, { kDecayLo, k
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
-	begin_process(buffer);
-
 	glide_size_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
 	glide_decay_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
 
@@ -123,7 +122,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	return BLINK_OK;
 }
 
-blink_Error Audio::reset()
+void Audio::reset()
 {
 	mAp1.clear();
 	mAp2.clear();
@@ -139,5 +138,4 @@ blink_Error Audio::reset()
 	mDelayR.clear();
 	mvFeedbackL = ml::DSPVector();
 	mvFeedbackR = ml::DSPVector();
-	return BLINK_OK;
 }

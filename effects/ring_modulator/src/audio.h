@@ -11,10 +11,10 @@ class Audio : public blink::Effect
 {
 public:
 
-	Audio(const RingModulator* plugin);
+	Audio(RingModulator* plugin, int instance_group);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
-	blink_Error reset() override;
+	void reset() override;
 
 private:
 	

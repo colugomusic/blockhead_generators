@@ -3,15 +3,14 @@
 
 using namespace blink;
 
-Audio::Audio(const Classic* plugin)
-	: plugin_(plugin)
+Audio::Audio(Classic* plugin, int instance_group)
+	: Sampler(plugin, instance_group)
+	, plugin_(plugin)
 {
 }
 
 blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 {
-	begin_process(buffer);
-
 	ml::DSPVectorArray<2> out_vec;
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);

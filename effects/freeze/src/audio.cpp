@@ -4,16 +4,27 @@
 
 using namespace blink;
 
-Audio::Audio(const Freeze* plugin)
-	: plugin_(plugin)
-	, controller_(plugin, freeze_buffer_, block_traverser_)
+Audio::Audio(Freeze* plugin, int instance_group, std::shared_ptr<Freeze::InstanceGroupData> instance_group_data)
+	: blink::Effect(plugin, instance_group)
+	, plugin_(plugin)
+	, instance_group_data_(instance_group_data)
+	, controller_(plugin, instance_group_data->buffer, block_traverser_)
 	, particle_(controller_, [this](int vector_index, std::size_t row, float pos) { return buffer_read(vector_index, row, pos); })
 {
 }
 
+void Audio::reset()
+{
+	particle_.queue_reset();
+}
+
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
-	begin_process(buffer);
+	if (!instance_group_data_->master_instance)
+	{
+		instance_group_data_->master_instance = this;
+		record_ = false;
+	}
 
 	block_traverser_.generate(block_positions());
 
@@ -31,7 +42,20 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
-		freeze_buffer_.process(block_traverser_.get_resets()[i] > 0, in_vec.constRow(0)[i], in_vec.constRow(1)[i]);
+		if (instance_group_data_->master_instance == this)
+		{
+			const auto local_block_position = block_positions().positions[i] + std::int32_t(block_positions().data_offset);
+
+			if (local_block_position >= 0)
+			{
+				record_ = true;
+			}
+
+			if (record_)
+			{
+				instance_group_data_->buffer.process(in_vec.constRow(0)[i], in_vec.constRow(1)[i]);
+			}
+		}
 		
 		auto LR = particle_.process(i);
 
@@ -49,23 +73,14 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	return BLINK_OK;
 }
 
-blink_Error Audio::reset()
-{
-	block_traverser_.set_reset(0);
-	freeze_buffer_.clear();
-	particle_.clear();
-
-	return BLINK_OK;
-}
-
 float Audio::buffer_read(int vector_index, std::size_t row, float pos) const
 {
 	int next = int(std::ceil(pos));
 	int prev = int(std::floor(pos));
 	float x = pos - float(prev);
 
-	const auto next_value = freeze_buffer_.at(row, next);
-	const auto prev_value = freeze_buffer_.at(row, prev);
+	const auto next_value = instance_group_data_->buffer.at(row, next);
+	const auto prev_value = instance_group_data_->buffer.at(row, prev);
 
 	return (x * (next_value - prev_value)) + prev_value;
 }

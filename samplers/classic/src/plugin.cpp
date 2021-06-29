@@ -96,7 +96,7 @@ blink_Sampler blink_make_sampler(int instance_group)
 {
 	if (!g_plugin) return { 0, 0 };
 
-	return bind::make_sampler<Audio>(g_plugin);
+	return bind::make_sampler<Audio>(g_plugin, instance_group);
 }
 
 blink_Error blink_destroy_sampler(blink_Sampler sampler)

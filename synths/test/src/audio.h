@@ -14,10 +14,10 @@ class Audio : public blink::Synth
 {
 public:
 
-	Audio(const Test* plugin);
+	Audio(Test* plugin, int instance_group);
 
 	blink_Error process(const blink_SynthBuffer* buffer, float* out) override;
-	blink_Error reset() override;
+	void reset() override;
 
 private:
 	

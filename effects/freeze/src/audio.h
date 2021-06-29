@@ -5,29 +5,27 @@
 #include "buffer.h"
 #include "controller.h"
 #include "particle.h"
-
-#pragma warning(push, 0)
-
-#pragma warning(pop)
-
-class Freeze;
+#include "plugin.h"
 
 class Audio : public blink::Effect
 {
 public:
 
-	Audio(const Freeze* plugin);
+	Audio(Freeze* plugin, int instance_group, std::shared_ptr<Freeze::InstanceGroupData> instance_group_data);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
-	blink_Error reset() override;
+	void reset() override;
 
 private:
 
 	float buffer_read(int vector_index, std::size_t row, float pos) const;
 	
-	const Freeze* plugin_;
+	Freeze* plugin_;
+	std::uint64_t buffer_id_ = 0;
+	bool primed_ = false;
+	bool record_ = false;
+	std::shared_ptr<Freeze::InstanceGroupData> instance_group_data_;
 	blink::Traverser block_traverser_;
-	FreezeBuffer freeze_buffer_;
 	Controller controller_;
 	Particle particle_;
 };
