@@ -44,11 +44,14 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	{
 		if (instance_group_data_->master_instance == this)
 		{
-			const auto local_block_position = block_positions().positions[i] + std::int32_t(block_positions().data_offset);
-
-			if (local_block_position >= 0)
+			if (!record_)
 			{
-				record_ = true;
+				const auto local_block_position = block_positions().positions[i] + std::int32_t(block_positions().data_offset);
+
+				if (local_block_position >= 0)
+				{
+					record_ = true;
+				}
 			}
 
 			if (record_)
