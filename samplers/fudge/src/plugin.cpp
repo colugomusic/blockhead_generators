@@ -10,6 +10,8 @@
 
 using namespace blink;
 
+namespace fudge {
+
 Fudge::Fudge()
 {
 	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
@@ -114,33 +116,35 @@ enum class Error
 
 Fudge* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid() { return Fudge::UUID; }
-blink_UUID blink_get_plugin_name() { return Fudge::NAME; }
+}
+
+blink_UUID blink_get_plugin_uuid() { return fudge::Fudge::UUID; }
+blink_UUID blink_get_plugin_name() { return fudge::Fudge::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (fudge::g_plugin) return blink_Error(fudge::Error::AlreadyInitialized);
 
-	g_plugin = new Fudge();
+    fudge::g_plugin = new fudge::Fudge();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
 
-	delete g_plugin;
+	delete fudge::g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Sampler blink_make_sampler(int instance_group)
 {
-	if (!g_plugin) return blink_Sampler { 0, 0 };
+	if (!fudge::g_plugin) return blink_Sampler { 0, 0 };
 
-	return bind::make_sampler<Audio>(g_plugin, instance_group);
+	return bind::make_sampler<fudge::Audio>(fudge::g_plugin, instance_group);
 }
 
 blink_Error blink_destroy_sampler(blink_Sampler sampler)
@@ -160,66 +164,66 @@ blink_Bool blink_sampler_requires_preprocessing()
 
 blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
 
-	g_plugin->preprocess_sample(host, callbacks, sample_info);
+    fudge::g_plugin->preprocess_sample(host, callbacks, sample_info);
 
 	return BLINK_OK;
 }
 
 blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
 
-	g_plugin->on_sample_deleted(sample_id);
+    fudge::g_plugin->on_sample_deleted(sample_id);
 
 	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!g_plugin) return 0;
+	if (!fudge::g_plugin) return 0;
 
-	return g_plugin->get_num_groups();
+	return fudge::g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!g_plugin) return 0;
+	if (!fudge::g_plugin) return 0;
 
-	return g_plugin->get_num_parameters();
+	return fudge::g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(g_plugin->get_group(index));
+	return bind::group(fudge::g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(g_plugin->get_parameter(index));
+	return bind::parameter(fudge::g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(fudge::g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
+	switch (fudge::Error(error))
 	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
+        case fudge::Error::AlreadyInitialized: return "already initialized";
+        case fudge::Error::NotInitialized: return "not initialized";
 		default: return "unknown error";
 	}
 }
 
 blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
 
-	g_plugin->gui().draw(g_plugin, buffer, n, out);
+    fudge::g_plugin->gui().draw(fudge::g_plugin, buffer, n, out);
 
 	return BLINK_OK;
 }

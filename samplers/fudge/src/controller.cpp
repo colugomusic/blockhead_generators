@@ -4,6 +4,8 @@
 #include "convert.h"
 #include <blink/bits.hpp>
 
+namespace fudge {
+
 Controller::Controller(const Fudge* plugin)
 	: plugin_(plugin)
 {
@@ -105,4 +107,6 @@ float Controller::snap_pitch_to_scale(float pitch, std::int32_t scale) const
 	}
 
 	return pitch;
+}
+
 }

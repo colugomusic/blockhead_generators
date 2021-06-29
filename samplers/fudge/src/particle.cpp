@@ -4,6 +4,8 @@
 #include <blink/math.hpp>
 #include <cassert>
 
+namespace fudge {
+
 Particle::Particle(const Controller& controller, int harmonic)
 	: controller_(&controller)
 	, harmonic_(harmonic)
@@ -309,4 +311,6 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	grains_[flip_flop_].frame = 0.f;
 	grains_[flip_flop_].frame_amp = fade_in ? 0.f : 1.f;
 	grains_[flip_flop_].duck = 1.f;
+}
+
 }

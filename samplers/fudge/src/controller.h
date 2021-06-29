@@ -10,9 +10,12 @@
 #include <DSP/MLDSPOps.h>
 #pragma warning(pop)
 
-class Fudge;
 struct SampleAnalysis;
 struct AudioData;
+
+namespace fudge {
+
+class Fudge;
 
 class Controller
 {
@@ -68,3 +71,5 @@ private:
 	float frame_increment_ = 1.0f;
 	bool sample_loop_;
 };
+
+}

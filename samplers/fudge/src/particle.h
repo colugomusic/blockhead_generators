@@ -6,6 +6,8 @@
 
 #include "grain.h"
 
+namespace fudge {
+
 class Controller;
 
 class Particle
@@ -37,3 +39,5 @@ private:
 	std::array<Grain, 2> grains_;
 
 };
+
+}

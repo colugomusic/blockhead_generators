@@ -14,6 +14,8 @@
 #include "controller.h"
 #include "particle.h"
 
+namespace fudge {
+
 class Fudge;
 
 class Audio : public blink::Sampler
@@ -43,3 +45,5 @@ private:
 	Controller controller_;
 	std::array<Particle, 4> particles_;
 };
+
+}

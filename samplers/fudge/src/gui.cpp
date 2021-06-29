@@ -3,6 +3,8 @@
 
 using namespace blink;
 
+namespace fudge {
+
 struct Data
 {
 	struct Sliders
@@ -187,4 +189,6 @@ blink_Error GUI::draw(const Fudge* plugin, const blink_SamplerBuffer* buffer, bl
 	}
 
 	return BLINK_OK;
+}
+
 }

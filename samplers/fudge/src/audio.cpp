@@ -4,6 +4,8 @@
 
 using namespace blink;
 
+namespace fudge {
+
 Audio::Audio(Fudge* plugin, int instance_group)
 	: Sampler(plugin, instance_group)
 	, plugin_(plugin)
@@ -95,4 +97,6 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
 
 	return BLINK_OK;
+}
+
 }
