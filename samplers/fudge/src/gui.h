@@ -3,6 +3,8 @@
 #include <blink/standard_traversers/fudge.hpp>
 #include <blink_sampler.h>
 
+namespace fudge {
+
 class Fudge;
 
 class GUI
@@ -18,3 +20,5 @@ private:
 	blink::std_traversers::Fudge position_traverser_;
 
 };
+
+}

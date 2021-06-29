@@ -5,6 +5,8 @@
 #include "gui.h"
 #include "sample_analysis.h"
 
+namespace fudge {
+
 class Fudge : public blink::Plugin
 {
 public:
@@ -88,3 +90,5 @@ private:
 	std::shared_ptr<blink::ToggleParameter> tog_loop_;
 	std::shared_ptr<blink::ToggleParameter> tog_revers_;
 };
+
+}
