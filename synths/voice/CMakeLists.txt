@@ -18,6 +18,8 @@ list(APPEND SRC
     ./src/plugin.cpp
     ./src/simplexnoise1234.h
     ./src/simplexnoise1234.cpp
+    ./src/tract.h
+    ./src/tract.cpp
 	../../shared/noise_generator.h
 	../../shared/noise_generator.cpp
 )
