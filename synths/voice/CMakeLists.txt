@@ -12,6 +12,8 @@ cpm_export_variables(bleat)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/glottis.h
+    ./src/glottis.cpp
     ./src/plugin.h
     ./src/plugin.cpp
     ./src/simplexnoise1234.h
