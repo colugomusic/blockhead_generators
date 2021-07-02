@@ -13,34 +13,63 @@ static constexpr float lambda_fn(int i) { return i / static_cast<float>(kFloatsP
 
 Glottis::Glottis()
 {
-	const auto t = 0.7f;
+	reset();
+}
 
-	ui_tenseness_ = 1.0f - std::cos(t * float(M_PI) * 0.5f);
-	loudness_ = std::pow(ui_tenseness_, 0.25f);
+void Glottis::reset()
+{
+	ui_frequency_ = 140.0f;
+	smooth_frequency_ = 140.0f;
+	vibrato_amount_ = 0.005f;
+	vibrato_frequency_ = 6.0f;
+	intensity_ = 0.0f;
+	time_in_waveform_ = 0.0f;
+	total_time_ = 0.0f;
+	waveform_length_ = 0.0f;
+	frequency_ = 0.0f;
+	old_frequency_ = 140.0f;
+	new_frequency_ = 140.0f;
+	old_tenseness_ = 0.6f;
+	new_tenseness_ = 0.6f;
+	rd_ = 0.0f;
+	alpha_ = 0.0f;
+	e0_ = 0.0f;
+	epsilon_ = 0.0f;
+	shift_ = 0.0f;
+	delta_ = 0.0f;
+	te_ = 0.0f;
+	omega_ = 0.0f;
 
 	setup_waveform(0.0f);
 }
 
-ml::DSPVector Glottis::operator()(int SR, const ml::DSPVector& aspirate_noise)
+ml::DSPVector Glottis::operator()(int SR, float formant, const ml::DSPVector& aspirate_noise)
 {
 	ml::DSPVector out;
+
+	ui_tenseness_ = 1.0f - std::cos(formant * float(M_PI) * 0.5f);
+	loudness_ = std::pow(ui_tenseness_, 0.25f);
 
 	constexpr ml::DSPVector ramp { lambda_fn };
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
-		out[i] = step(SR, ramp[i], aspirate_noise[i]);
+		out[i] = step(1.0f / float(SR), i, ramp[i], aspirate_noise[i]);
 	}
+
+	out *= intensity_ * loudness_;
+
+	auto aspiration = intensity_ * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator_ * aspirate_noise;
+
+	aspiration *= 0.2f + 0.02f * snoise1(total_time_vec_ * 1.99f);
 
 	finish_block();
 
-	return out;
+	return out + aspiration;
 }
 
-float Glottis::step(int SR, float lambda, float noise)
+float Glottis::step(float time_step, int i, float lambda, float noise)
 {
-	const auto time_step = 1.0f / float(SR);
-
 	time_in_waveform_ += time_step;
 	total_time_ += time_step;
 
@@ -50,14 +79,10 @@ float Glottis::step(int SR, float lambda, float noise)
 		setup_waveform(lambda);
 	}
 
-	float out = normalized_lf_waveform(time_in_waveform_ / waveform_length_);
-	auto aspiration = intensity_ * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator() * noise;
+	noise_modulator_[i] = noise_modulator_step();
+	total_time_vec_[i] = total_time_;
 
-	aspiration *= 0.2f + 0.02f * snoise1(total_time_ * 1.99f);
-
-	out += aspiration;
-
-	return out;
+	return normalized_lf_waveform(time_in_waveform_ / waveform_length_);
 }
 
 void Glottis::setup_waveform(float lambda)
@@ -111,10 +136,10 @@ float Glottis::normalized_lf_waveform(float t)
 		out = e0_ * std::exp(alpha_ * t) * std::sin(omega_ * t);
 	}
 
-	return out * intensity_ * loudness_;
+	return out;
 }
 
-float Glottis::noise_modulator()
+float Glottis::noise_modulator_step()
 {
 	const auto voiced = 0.1f + 0.2f * std::max(0.0f, std::sin(float(M_PI) * 2.0f * time_in_waveform_ / waveform_length_));
 
@@ -125,9 +150,9 @@ void Glottis::finish_block()
 {
 	auto vibrato = 0.0f;
 
-	//vibrato += vibrato_amount * std::sin(2.0f * float(M_PI) * total_time * vibrato_frequency);
-	//vibrato += 0.02f * snoise1(total_time * 4.07f);
-	//vibrato += 0.04f * snoise1(total_time * 2.15f);
+	vibrato += vibrato_amount_ * std::sin(2.0f * float(M_PI) * total_time_ * vibrato_frequency_);
+	vibrato += 0.02f * snoise1(total_time_ * 4.07f);
+	vibrato += 0.04f * snoise1(total_time_ * 2.15f);
 
 	if (ui_frequency_ > smooth_frequency_)
 	{

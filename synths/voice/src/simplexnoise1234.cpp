@@ -101,6 +101,7 @@ unsigned char perm[512] = {151,160,137,91,90,15,
  * float SLnoise = (noise(x,y,z) + 1.0) * 0.5;
  */
 
+
 float  grad1( int hash, float x ) {
     int h = hash & 15;
     float grad = 1.0f + (h & 7);   // Gradient value 1.0, 2.0, ..., 8.0
@@ -142,6 +143,39 @@ float  grad4( int hash, float x, float y, float z, float t ) {
     {0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},
     {2,0,1,3},{0,0,0,0},{0,0,0,0},{0,0,0,0},{3,0,1,2},{3,0,2,1},{0,0,0,0},{3,1,2,0},
     {2,1,0,3},{0,0,0,0},{0,0,0,0},{0,0,0,0},{3,1,0,2},{0,0,0,0},{3,2,0,1},{3,2,1,0}};
+
+ml::DSPVector snoise1(const ml::DSPVector& x)
+{
+	auto i0 = ml::truncateFloatToInt(x);
+	auto i1 = i0 + ml::DSPVectorInt(1);
+	auto x0 = x - ml::intToFloat(i0);
+	auto x1 = x0 - 1.0f;
+
+	ml::DSPVector n0, n1;
+
+	auto t0 = 1.0f - x0 * x0;
+
+	t0 *= t0;
+
+	for (int i = 0; i < kFloatsPerDSPVector; i++)
+	{
+		n0[i] = t0[i] * t0[i] * grad1(perm[i0[i] & 0xff], x0[i]);
+	}
+
+	auto t1 = 1.0f - x1 * x1;
+
+	t1 *= t1;
+
+	for (int i = 0; i < kFloatsPerDSPVector; i++)
+	{
+		n1[i] = t1[i] * t1[i] * grad1(perm[i1[i] & 0xff], x1[i]);
+	}
+
+	// The maximum value of this noise is 8*(3/4)^4 = 2.53125
+	// A factor of 0.395 would scale to fit exactly within [-1,1], but
+	// we want to match PRMan's 1D noise, so we scale it down some more.
+	return 0.25f * (n0 + n1);
+}
 
 // 1D simplex noise
 float snoise1(float x) {

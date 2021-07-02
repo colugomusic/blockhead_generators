@@ -11,15 +11,21 @@ public:
 
 	Glottis();
 
-	ml::DSPVector operator()(int SR, const ml::DSPVector& aspirate_noise);
+	ml::DSPVector operator()(int SR, float formant, const ml::DSPVector& aspirate_noise);
+	void reset();
+
+	const ml::DSPVector& noise_modulator() const { return noise_modulator_; }
 
 private:
 
-	float step(int SR, float lambda, float noise);
+	float step(float time_step, int i, float lambda, float noise);
 	void setup_waveform(float lambda);
 	float normalized_lf_waveform(float t);
-	float noise_modulator();
+	float noise_modulator_step();
 	void finish_block();
+
+	ml::DSPVector noise_modulator_;
+	ml::DSPVector total_time_vec_;
 
 	float ui_tenseness_ = 0.6f;
 	float ui_frequency_ = 140.0f;

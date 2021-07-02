@@ -26,8 +26,6 @@ public:
 
 private:
 
-	ml::DSPVector voice(int SR, const ml::DSPVector& aspirate_noise, const ml::DSPVector& fricative_noise);
-
 	ml::Bandpass aspirate_filter_;
 	ml::Bandpass fricative_filter_;
 	ml::NoiseGen noise_;
