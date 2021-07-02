@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #endif
 
+#include <blink/math.hpp>
 #include "glottis.h"
 #include "simplexnoise1234.h"
 
@@ -18,8 +19,8 @@ Glottis::Glottis()
 
 void Glottis::reset()
 {
-	ui_frequency_ = 140.0f;
-	smooth_frequency_ = 140.0f;
+	ui_frequency_ = 261.63f;
+	smooth_frequency_ = 261.63f;
 	vibrato_amount_ = 0.005f;
 	vibrato_frequency_ = 6.0f;
 	intensity_ = 0.0f;
@@ -27,8 +28,8 @@ void Glottis::reset()
 	total_time_ = 0.0f;
 	waveform_length_ = 0.0f;
 	frequency_ = 0.0f;
-	old_frequency_ = 140.0f;
-	new_frequency_ = 140.0f;
+	old_frequency_ = 261.63f;
+	new_frequency_ = 261.63f;
 	old_tenseness_ = 0.6f;
 	new_tenseness_ = 0.6f;
 	rd_ = 0.0f;
@@ -43,11 +44,24 @@ void Glottis::reset()
 	setup_waveform(0.0f);
 }
 
-ml::DSPVector Glottis::operator()(int SR, float formant, const ml::DSPVector& aspirate_noise)
+ml::DSPVector Glottis::operator()(int SR, float pitch, float formant, const ml::DSPVector& aspirate_noise)
 {
 	ml::DSPVector out;
 
-	ui_tenseness_ = 1.0f - std::cos(formant * float(M_PI) * 0.5f);
+	ui_frequency_ = blink::math::convert::pitch_to_frequency(pitch + 60.0f);
+
+	auto t = std::clamp((((-pitch) + 24.0f) / 60.0f), 0.0f, 1.0f);
+	
+	if (formant > 0.5f)
+	{
+		t = blink::math::lerp(t, 1.0f, (formant - 0.5f) * 2.0f);
+	}
+	else
+	{
+		t = blink::math::lerp(0.0f, t, formant * 2.0f);
+	}
+
+	ui_tenseness_ = 1.0f - std::cos(t * float(M_PI) * 0.5f);
 	loudness_ = std::pow(ui_tenseness_, 0.25f);
 
 	constexpr ml::DSPVector ramp { lambda_fn };

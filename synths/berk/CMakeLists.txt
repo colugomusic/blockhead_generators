@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(synth_voice VERSION 0.1.0)
+project(synth_berk VERSION 0.1.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
@@ -14,6 +14,8 @@ list(APPEND SRC
     ./src/audio.cpp
     ./src/glottis.h
     ./src/glottis.cpp
+    ./src/parameters.h
+    ./src/parameters.cpp
     ./src/plugin.h
     ./src/plugin.cpp
     ./src/simplexnoise1234.h
@@ -25,7 +27,7 @@ list(APPEND SRC
 )
 
 blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_synth_target_properties("voice")
+blink_plugin_set_synth_target_properties("berk")
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${bleat_SOURCE_DIR}/include
 	../..

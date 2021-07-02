@@ -13,13 +13,13 @@
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-class Voice;
+class Berk;
 
 class Audio : public blink::Synth
 {
 public:
 
-	Audio(Voice* plugin, int instance_group);
+	Audio(Berk* plugin, int instance_group);
 
 	blink_Error process(const blink_SynthBuffer* buffer, float* out) override;
 	void reset() override;
@@ -29,7 +29,7 @@ private:
 	ml::Bandpass aspirate_filter_;
 	ml::Bandpass fricative_filter_;
 	ml::NoiseGen noise_;
-	const Voice* plugin_;
+	const Berk* plugin_;
 
 	Glottis glottis_;
 	Tract tract_;

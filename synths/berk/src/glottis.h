@@ -11,7 +11,7 @@ public:
 
 	Glottis();
 
-	ml::DSPVector operator()(int SR, float formant, const ml::DSPVector& aspirate_noise);
+	ml::DSPVector operator()(int SR, float pitch, float formant, const ml::DSPVector& aspirate_noise);
 	void reset();
 
 	const ml::DSPVector& noise_modulator() const { return noise_modulator_; }
@@ -28,8 +28,8 @@ private:
 	ml::DSPVector total_time_vec_;
 
 	float ui_tenseness_ = 0.6f;
-	float ui_frequency_ = 140.0f;
-	float smooth_frequency_ = 140.0f;
+	float ui_frequency_ = 261.63f;
+	float smooth_frequency_ = 261.63f;
 	float vibrato_amount_ = 0.005f;
 	float vibrato_frequency_ = 6.0f;
 	float intensity_ = 0.0f;
