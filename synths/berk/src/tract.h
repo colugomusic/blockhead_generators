@@ -64,7 +64,7 @@ private:
 
 		Step();
 
-		float operator()(int SR, float lambda, const Input& input);
+		void operator()(int SR, float lambda, const Input& input, float* lip_out, float* nose_out);
 		void finish_block(int SR);
 		void reset();
 

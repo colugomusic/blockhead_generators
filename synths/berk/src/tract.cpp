@@ -169,7 +169,7 @@ void Tract::Step::set_rest_diameter(const Input& input)
 	}
 }
 
-float Tract::Step::operator()(int SR, float lambda, const Input& input)
+void Tract::Step::operator()(int SR, float lambda, const Input& input, float* lip_out, float* nose_out)
 {
 	configure(input);
 	process_transients(SR);
@@ -202,7 +202,7 @@ float Tract::Step::operator()(int SR, float lambda, const Input& input)
 		L_[i] = junction_output_L_[i + 1] * 0.999f;
 	}
 
-	const auto lip_output = R_[N - 1];
+	*lip_out = R_[N - 1];
 
 	nose_junction_output_L_[NOSE_LENGTH] = nose_R_[NOSE_LENGTH - 1] * lip_reflection_;
 
@@ -220,9 +220,7 @@ float Tract::Step::operator()(int SR, float lambda, const Input& input)
 		nose_L_[i] = nose_junction_output_L_[i + 1] * fade_;
 	}
 
-	const auto nose_output = nose_R_[NOSE_LENGTH - 1];
-
-	return lip_output + nose_output;
+	*nose_out = nose_R_[NOSE_LENGTH - 1];
 }
 
 static constexpr float lambda1_fn(int i) { return i / static_cast<float>(kFloatsPerDSPVector); }
@@ -234,6 +232,9 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 
 	constexpr ml::DSPVector lambda1{ lambda1_fn };
 	constexpr ml::DSPVector lambda2{ lambda2_fn };
+
+	ml::DSPVector lip;
+	ml::DSPVector nose;
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
@@ -247,9 +248,11 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 		step_input.tongue.diameter = input.tongue.diameter[i];
 		step_input.tongue.index = input.tongue.index[i];
 
-		out[i] += float(step_(SR, float(lambda1[i]), step_input));
-		out[i] += float(step_(SR, float(lambda2[i]), step_input));
+		step_(SR, float(lambda1[i]), step_input, &(lip[i]), &(nose[i]));
+		step_(SR, float(lambda1[i]), step_input, &(lip[i]), &(nose[i]));
 	}
+
+	out = lip + nose;
 
 	step_.finish_block(SR);
 
