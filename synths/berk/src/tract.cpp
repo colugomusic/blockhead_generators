@@ -263,7 +263,7 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 
 	out = (lip + nose) / 2.0f;
 
-	step_.finish_block(44100);
+	step_.finish_block(SR);
 
 	ml::validate(out);
 
