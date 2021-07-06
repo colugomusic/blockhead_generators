@@ -12,6 +12,8 @@ public:
 
 	struct Input
 	{
+		int quality;
+
 		ml::DSPVector glottal_output;
 		ml::DSPVector fricative_noise;
 		ml::DSPVector fricative_intensity;
@@ -76,9 +78,9 @@ private:
 		void process_transients(int SR);
 		void add_turbulence_noise(const Input& input);
 		void add_turbulence_noise_at_index(float noise, float index, float diameter);
-		void calculate_reflections();
+		void calculate_reflections(int SR);
 		void calculate_nose_reflections();
-		void reshape_tract(float delta_time);
+		void reshape_tract(int SR);
 
 		struct Transients
 		{

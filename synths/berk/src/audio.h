@@ -7,6 +7,7 @@
 #include <blink/synth.hpp>
 #include "glottis.h"
 #include "tract.h"
+#include "resampler.h"
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
@@ -26,6 +27,8 @@ public:
 
 private:
 
+	ml::DSPVector get_source();
+
 	ml::Bandpass aspirate_filter_;
 	ml::Bandpass fricative_filter_;
 	ml::NoiseGen noise_;
@@ -33,4 +36,6 @@ private:
 
 	Glottis glottis_;
 	Tract tract_;
+	ml::DSPBuffer buffer_;
+	Resampler<1> resampler_;
 };

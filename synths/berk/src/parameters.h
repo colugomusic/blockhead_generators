@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/envelope_spec.hpp>
+#include <blink/option_spec.hpp>
 
 namespace parameters {
 namespace envelopes {
@@ -16,4 +17,10 @@ extern blink::EnvelopeSpec tongue_diameter();
 extern blink::EnvelopeSpec fricative_intensity();
 
 } // envelopes
+
+namespace options {
+
+extern blink::OptionSpec quality();
+
+} // options
 } // parameters

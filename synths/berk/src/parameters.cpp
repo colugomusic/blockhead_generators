@@ -1,5 +1,6 @@
 #include "parameters.h"
 #include <blink/standard_parameters.hpp>
+#include "plugin.h"
 
 using namespace blink;
 
@@ -93,9 +94,30 @@ blink::EnvelopeSpec fricative_intensity()
 	out.uuid = "53c94f7f-d6b7-497e-8deb-9acd35f0d60e";
 	out.name = "Intensity";
 	out.default_value = 1.0f;
+	out.options.push_back(blink_Index(Berk::ParameterIndex::Opt_Quality));
 
 	return out;
 }
 
 } // envelopes
+
+namespace options {
+
+blink::OptionSpec quality()
+{
+	blink::OptionSpec out;
+
+	out.uuid = "99655183-80c1-4cce-a2ba-94caf32b0703";
+	out.name = "Quality";
+	out.default_index = 1;
+	out.options.push_back("Fast");
+	out.options.push_back("Normal");
+	out.options.push_back("Good");
+	out.options.push_back("Best");
+
+	return out;
+}
+
+} // options
+
 } // parameters

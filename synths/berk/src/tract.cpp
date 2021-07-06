@@ -71,7 +71,7 @@ void Tract::Step::reset()
 
 	new_reflection_L_ = new_reflection_R_ = new_reflection_nose_ = 0.0f;
 
-	calculate_reflections();
+	calculate_reflections(44100);
 	calculate_nose_reflections();
 	nose_diameter_[0] = velum_target_;
 }
@@ -153,7 +153,6 @@ void Tract::Step::set_rest_diameter(const Input& input)
 		const auto fixed_tongue_diameter = 2.0f + (input.tongue.diameter - 2.0f) / 1.5f;
 
 		auto curve = (1.5f - fixed_tongue_diameter + grid_offset_) * std::cos(t);
-		//auto curve = (1.5 - fixed_tongue_diameter) * std::cos(t);
 
 		if (i == BLADE_START - 2 || i == LIP_START - 1)
 		{
@@ -230,11 +229,14 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 {
 	ml::DSPVector out;
 
-	constexpr ml::DSPVector lambda1{ lambda1_fn };
-	constexpr ml::DSPVector lambda2{ lambda2_fn };
+	static constexpr ml::DSPVector lambda1{ lambda1_fn };
+	static constexpr ml::DSPVector lambda2{ lambda2_fn };
 
 	ml::DSPVector lip;
 	ml::DSPVector nose;
+
+	float lip_value = 0.0f;
+	float nose_value = 0.0f;
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
@@ -248,13 +250,20 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 		step_input.tongue.diameter = input.tongue.diameter[i];
 		step_input.tongue.index = input.tongue.index[i];
 
-		step_(SR, float(lambda1[i]), step_input, &(lip[i]), &(nose[i]));
-		step_(SR, float(lambda1[i]), step_input, &(lip[i]), &(nose[i]));
+		step_(SR, lambda1[i], step_input, &lip_value, &nose_value);
+
+		lip[i] += lip_value;
+		nose[i] += nose_value;
+
+		step_(SR, lambda2[i], step_input, &lip_value, &nose_value);
+
+		lip[i] += lip_value;
+		nose[i] += nose_value;
 	}
 
-	out = lip + nose;
+	out = (lip + nose) / 2.0f;
 
-	step_.finish_block(SR);
+	step_.finish_block(44100);
 
 	ml::validate(out);
 
@@ -332,8 +341,9 @@ void Tract::Step::add_turbulence_noise_at_index(float noise, float index, float 
 	L_[i + 2] += noise1 / 2;
 }
 
-void Tract::Step::reshape_tract(float delta_time)
+void Tract::Step::reshape_tract(int SR)
 {
+	const auto delta_time = float(kFloatsPerDSPVector) / SR;
 	auto amount = delta_time * MOVEMENT_SPEED;
 	auto new_last_obstruction = -1;
 
@@ -382,7 +392,7 @@ void Tract::Step::reshape_tract(float delta_time)
 	nose_a_[0] = nose_diameter_[0] * nose_diameter_[0];
 }
 
-void Tract::Step::calculate_reflections()
+void Tract::Step::calculate_reflections(int SR)
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -429,7 +439,7 @@ void Tract::Step::calculate_nose_reflections()
 
 void Tract::Step::finish_block(int SR)
 {
-	reshape_tract(float(kFloatsPerDSPVector) / SR);
-	calculate_reflections();
+	reshape_tract(SR);
+	calculate_reflections(SR);
 }
 

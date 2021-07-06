@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "simplexnoise1234.h"
 #include <blink/math.hpp>
+#include <cassert>
 
 using namespace blink;
 
@@ -9,12 +10,14 @@ Audio::Audio(Berk* plugin, int instance_group)
 	: Synth(plugin, instance_group)
 	, plugin_(plugin)
 {
+	buffer_.resize(kFloatsPerDSPVector * 2);
 }
 
 blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 {
 	struct Data
 	{
+		const blink_OptionData* opt_quality;
 		const blink_EnvelopeData* env_amp;
 		const blink_EnvelopeData* env_pitch;
 		const blink_EnvelopeData* env_formant;
@@ -25,6 +28,7 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		const blink_EnvelopeData* env_fricative_intensity;
 	} data;
 
+	data.opt_quality = plugin_->get_option_data(buffer->parameter_data, int(Berk::ParameterIndex::Opt_Quality));
 	data.env_amp = plugin_->get_envelope_data(buffer->parameter_data, int(Berk::ParameterIndex::Env_Amp));
 	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(Berk::ParameterIndex::Env_Pitch));
 	data.env_formant = plugin_->get_envelope_data(buffer->parameter_data, int(Berk::ParameterIndex::Env_Formant));
@@ -63,29 +67,34 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 	fricative_filter_.mCoeffs = ml::Bandpass::coeffs(1000.0f / float(buffer->sample_rate), 0.5f);
 
 	ml::DSPVector out_vec;
+	
+	static constexpr auto MODEL_SR = 44100;
 
-	const auto glottal_output = glottis_(buffer->sample_rate, pitch, formant, aspirate_filter_(noise));
+	auto source = [&]()
+	{
+		const auto glottal_output = glottis_(MODEL_SR, pitch, formant, aspirate_filter_(noise));
 
-	Tract::Input tract_input;
+		Tract::Input tract_input;
 
-	tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
-	tract_input.fricative_intensity = fricative_intensity;
-	tract_input.fricative_noise = fricative_filter_(noise) * glottis_.noise_modulator();;
-	tract_input.glottal_output = glottal_output;
-	tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, index);
-	tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
-	tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, tongue_index);
+		tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
+		tract_input.fricative_intensity = fricative_intensity;
+		tract_input.fricative_noise = fricative_filter_(noise) * glottis_.noise_modulator();;
+		tract_input.glottal_output = glottal_output;
+		tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, index);
+		tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
+		tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, tongue_index);
+		tract_input.quality = data.opt_quality->index;
 
-	const auto vocal_output = tract_(buffer->sample_rate, tract_input);
+		return tract_(MODEL_SR, tract_input);
+	};
 
-	out_vec = vocal_output * amp;
+	out_vec = resampler_(source, float(MODEL_SR) / buffer->sample_rate) * amp;
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(0), out + kFloatsPerDSPVector);
 
 	return BLINK_OK;
 }
-
 void Audio::reset()
 {
 	glottis_.reset();

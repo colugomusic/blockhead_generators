@@ -18,6 +18,7 @@ list(APPEND SRC
     ./src/parameters.cpp
     ./src/plugin.h
     ./src/plugin.cpp
+    ./src/resampler.h
     ./src/simplexnoise1234.h
     ./src/simplexnoise1234.cpp
     ./src/tract.h
