@@ -11,8 +11,6 @@ public:
 
 	enum class ParameterIndex
 	{
-		Opt_Quality,
-
 		Env_Amp,
 		Env_Pan,
 		Env_Pitch,

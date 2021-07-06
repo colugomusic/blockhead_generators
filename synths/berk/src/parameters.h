@@ -17,10 +17,4 @@ extern blink::EnvelopeSpec tongue_diameter();
 extern blink::EnvelopeSpec fricative_intensity();
 
 } // envelopes
-
-namespace options {
-
-extern blink::OptionSpec quality();
-
-} // options
 } // parameters

@@ -12,8 +12,6 @@ public:
 
 	struct Input
 	{
-		int quality;
-
 		ml::DSPVector glottal_output;
 		ml::DSPVector fricative_noise;
 		ml::DSPVector fricative_intensity;

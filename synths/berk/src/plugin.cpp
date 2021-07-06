@@ -11,8 +11,6 @@ using namespace blink;
 
 Berk::Berk()
 {
-	add_parameter(parameters::options::quality());
-
 	env_amp_ = add_parameter(parameters::envelopes::amp());
 	env_pan_ = add_parameter(parameters::envelopes::pan());
 	env_pitch_ = add_parameter(parameters::envelopes::pitch());
