@@ -21,7 +21,6 @@ void Glottis::reset()
 {
 	ui_frequency_ = 261.63f;
 	smooth_frequency_ = 261.63f;
-	vibrato_amount_ = 0.005f;
 	vibrato_frequency_ = 6.0f;
 	intensity_ = 0.0f;
 	time_in_waveform_ = 0.0f;
@@ -68,7 +67,7 @@ ml::DSPVector Glottis::operator()(int SR, float pitch, float formant, const ml::
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
-		out[i] = step(1.0f / float(SR), i, ramp[i], aspirate_noise[i]);
+		out[i] = step(1.0f / float(SR), i, ramp[i]);
 	}
 
 	out *= intensity_ * loudness_;
@@ -82,7 +81,7 @@ ml::DSPVector Glottis::operator()(int SR, float pitch, float formant, const ml::
 	return out + aspiration;
 }
 
-float Glottis::step(float time_step, int i, float lambda, float noise)
+float Glottis::step(float time_step, int i, float lambda)
 {
 	time_in_waveform_ += time_step;
 	total_time_ += time_step;
@@ -101,9 +100,9 @@ float Glottis::step(float time_step, int i, float lambda, float noise)
 
 void Glottis::setup_waveform(float lambda)
 {
-	frequency_ = old_frequency_ * (1.0f - lambda) + new_frequency_ * lambda;
+	frequency_ = ml::lerp(old_frequency_, new_frequency_, lambda);
 
-	const auto tenseness = old_tenseness_ * (1.0f - lambda) + new_tenseness_ * lambda;
+	const auto tenseness = ml::lerp(old_tenseness_, new_tenseness_, lambda);
 
 	rd_ = 3.0f * (1.0f - tenseness);
 	waveform_length_ = 1.0f / frequency_;
@@ -165,8 +164,8 @@ void Glottis::finish_block()
 	auto vibrato = 0.0f;
 
 	vibrato += vibrato_amount_ * std::sin(2.0f * float(M_PI) * total_time_ * vibrato_frequency_);
-	vibrato += 0.02f * snoise1(total_time_ * 4.07f);
-	vibrato += 0.04f * snoise1(total_time_ * 2.15f);
+	vibrato += wobble_amount_ * 0.02f * snoise1(total_time_ * 4.07f);
+	vibrato += wobble_amount_ * 0.04f * snoise1(total_time_ * 2.15f);
 
 	if (ui_frequency_ > smooth_frequency_)
 	{

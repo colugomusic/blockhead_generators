@@ -18,7 +18,7 @@ public:
 
 private:
 
-	float step(float time_step, int i, float lambda, float noise);
+	float step(float time_step, int i, float lambda);
 	void setup_waveform(float lambda);
 	float normalized_lf_waveform(float t);
 	float noise_modulator_step();
@@ -31,6 +31,7 @@ private:
 	float ui_frequency_ = 261.63f;
 	float smooth_frequency_ = 261.63f;
 	float vibrato_amount_ = 0.005f;
+	float wobble_amount_ = 1.0f;
 	float vibrato_frequency_ = 6.0f;
 	float intensity_ = 0.0f;
 	float loudness_ = 1.0f;

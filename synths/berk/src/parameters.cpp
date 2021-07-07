@@ -31,9 +31,14 @@ blink::EnvelopeSpec pitch()
 	return out;
 }
 
-blink::EnvelopeSpec formant()
+blink::EnvelopeSpec buzz()
 {
-	return std_params::envelopes::formant();
+	auto out = std_params::envelopes::formant();
+
+	out.uuid = "a62d1f52-d493-4902-b92d-c09f5a92e8d2";
+	out.name = "Buzz";
+
+	return out;
 }
 
 blink::EnvelopeSpec index()
@@ -72,6 +77,7 @@ blink::EnvelopeSpec tongue_index()
 
 	out.uuid = "1059abc4-3a1c-42cc-a21b-235b2c08775b";
 	out.name = "Index";
+	out.default_value = 0.0f;
 
 	return out;
 }
@@ -82,7 +88,7 @@ blink::EnvelopeSpec tongue_diameter()
 
 	out.uuid = "a14bfe06-b84d-4778-b50c-7290478cb6b3";
 	out.name = "Diameter";
-	out.default_value = 1.0f;
+	out.default_value = 0.5f;
 
 	return out;
 }
@@ -94,6 +100,17 @@ blink::EnvelopeSpec fricative_intensity()
 	out.uuid = "53c94f7f-d6b7-497e-8deb-9acd35f0d60e";
 	out.name = "Intensity";
 	out.default_value = 1.0f;
+
+	return out;
+}
+
+blink::EnvelopeSpec quality()
+{
+	auto out = std_params::envelopes::generic::percentage();
+
+	out.uuid = "0111ffd7-78d1-4604-8d7b-956c34e280c3";
+	out.name = "Quality";
+	out.default_value = 0.5f;
 
 	return out;
 }
