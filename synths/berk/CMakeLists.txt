@@ -12,6 +12,8 @@ cpm_export_variables(bleat)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/audio_data.h
+    ./src/audio_data.cpp
     ./src/glottis.h
     ./src/glottis.cpp
     ./src/parameters.h

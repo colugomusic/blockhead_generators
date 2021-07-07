@@ -117,3 +117,41 @@ blink::EnvelopeSpec quality()
 
 } // envelopes
 } // parameters
+
+
+Parameters::Parameters(blink::Plugin* plugin)
+{
+	env.amp = plugin->add_parameter(parameters::envelopes::amp());
+	env.pan = plugin->add_parameter(parameters::envelopes::pan());
+
+	auto group_voice = plugin->add_group("Voice");
+	{
+		env.pitch = plugin->add_parameter(parameters::envelopes::pitch());
+		env.buzz = plugin->add_parameter(parameters::envelopes::buzz());
+		env.index = plugin->add_parameter(parameters::envelopes::index());
+		env.diameter = plugin->add_parameter(parameters::envelopes::diameter());
+
+		env.pitch->set_group_index(group_voice);
+		env.buzz->set_group_index(group_voice);
+		env.index->set_group_index(group_voice);
+		env.diameter->set_group_index(group_voice);
+	}
+
+	auto group_tongue = plugin->add_group("Tongue");
+	{
+		env.tongue_index = plugin->add_parameter(parameters::envelopes::tongue_index());
+		env.tongue_diameter = plugin->add_parameter(parameters::envelopes::tongue_diameter());
+
+		env.tongue_index->set_group_index(group_tongue);
+		env.tongue_diameter->set_group_index(group_tongue);
+	}
+
+	auto group_fricatives = plugin->add_group("Fricatives");
+	{
+		env.fricative_intensity = plugin->add_parameter(parameters::envelopes::fricative_intensity());
+
+		env.fricative_intensity->set_group_index(group_fricatives);
+	}
+
+	env.quality = plugin->add_parameter(parameters::envelopes::quality());
+}

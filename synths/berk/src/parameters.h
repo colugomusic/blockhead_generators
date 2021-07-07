@@ -2,20 +2,23 @@
 
 #include <blink/envelope_spec.hpp>
 #include <blink/option_spec.hpp>
+#include <blink/plugin.hpp>
 
-namespace parameters {
-namespace envelopes {
+struct Parameters
+{
+	struct Envelopes
+	{
+		std::shared_ptr<blink::EnvelopeParameter> amp;
+		std::shared_ptr<blink::EnvelopeParameter> pan;
+		std::shared_ptr<blink::EnvelopeParameter> pitch;
+		std::shared_ptr<blink::EnvelopeParameter> buzz;
+		std::shared_ptr<blink::EnvelopeParameter> index;
+		std::shared_ptr<blink::EnvelopeParameter> diameter;
+		std::shared_ptr<blink::EnvelopeParameter> tongue_index;
+		std::shared_ptr<blink::EnvelopeParameter> tongue_diameter;
+		std::shared_ptr<blink::EnvelopeParameter> fricative_intensity;
+		std::shared_ptr<blink::EnvelopeParameter> quality;
+	} env;
 
-extern blink::EnvelopeSpec amp();
-extern blink::EnvelopeSpec pan();
-extern blink::EnvelopeSpec pitch();
-extern blink::EnvelopeSpec buzz();
-extern blink::EnvelopeSpec index();
-extern blink::EnvelopeSpec diameter();
-extern blink::EnvelopeSpec tongue_index();
-extern blink::EnvelopeSpec tongue_diameter();
-extern blink::EnvelopeSpec fricative_intensity();
-extern blink::EnvelopeSpec quality();
-
-} // envelopes
-} // parameters
+	Parameters(blink::Plugin* plugin);
+};

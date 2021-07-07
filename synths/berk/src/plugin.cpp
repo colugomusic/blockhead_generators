@@ -10,40 +10,8 @@
 using namespace blink;
 
 Berk::Berk()
+	: params_(this)
 {
-	env_amp_ = add_parameter(parameters::envelopes::amp());
-	env_pan_ = add_parameter(parameters::envelopes::pan());
-
-	auto group_voice = add_group("Voice");
-	{
-		env_pitch_ = add_parameter(parameters::envelopes::pitch());
-		env_buzz_ = add_parameter(parameters::envelopes::buzz());
-		env_index_ = add_parameter(parameters::envelopes::index());
-		env_diameter_ = add_parameter(parameters::envelopes::diameter());
-
-		env_pitch_->set_group_index(group_voice);
-		env_buzz_->set_group_index(group_voice);
-		env_index_->set_group_index(group_voice);
-		env_diameter_->set_group_index(group_voice);
-	}
-
-	auto group_tongue = add_group("Tongue");
-	{
-		env_tongue_index_ = add_parameter(parameters::envelopes::tongue_index());
-		env_tongue_diameter_ = add_parameter(parameters::envelopes::tongue_diameter());
-
-		env_tongue_index_->set_group_index(group_tongue);
-		env_tongue_diameter_->set_group_index(group_tongue);
-	}
-
-	auto group_fricatives = add_group("Fricatives");
-	{
-		env_fricative_intensity_ = add_parameter(parameters::envelopes::fricative_intensity());
-
-		env_fricative_intensity_->set_group_index(group_fricatives);
-	}
-
-	env_quality_ = add_parameter(parameters::envelopes::quality());
 }
 
 enum class Error

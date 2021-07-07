@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/plugin.hpp>
+#include "parameters.h"
 
 class Berk : public blink::Plugin
 {
@@ -19,33 +20,15 @@ public:
 		Env_Diameter,
 		Env_TongueIndex,
 		Env_TongueDiameter,
-		Env_Fricative_Intensity,
+		Env_FricativeIntensity,
 		Env_Quality,
 	};
 
 	Berk();
 
-	const blink::EnvelopeParameter& env_amp() const { return *env_amp_; }
-	const blink::EnvelopeParameter& env_pan() const { return *env_pan_; }
-	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
-	const blink::EnvelopeParameter& env_buzz() const { return *env_buzz_; }
-	const blink::EnvelopeParameter& env_index() const { return *env_index_; }
-	const blink::EnvelopeParameter& env_diameter() const { return *env_diameter_; }
-	const blink::EnvelopeParameter& env_tongue_index() const { return *env_tongue_index_; }
-	const blink::EnvelopeParameter& env_tongue_diameter() const { return *env_tongue_diameter_; }
-	const blink::EnvelopeParameter& env_fricative_intensity() const { return *env_fricative_intensity_; }
-	const blink::EnvelopeParameter& env_quality() const { return *env_quality_; }
+	const auto& params() const { return params_; }
 
 private:
 
-	Params::Envelope env_amp_;
-	Params::Envelope env_pan_;
-	Params::Envelope env_pitch_;
-	Params::Envelope env_buzz_;
-	Params::Envelope env_index_;
-	Params::Envelope env_diameter_;
-	Params::Envelope env_tongue_index_;
-	Params::Envelope env_tongue_diameter_;
-	Params::Envelope env_fricative_intensity_;
-	Params::Envelope env_quality_;
+	Parameters params_;
 };
