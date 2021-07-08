@@ -4,8 +4,25 @@
 #include <blink/option_spec.hpp>
 #include <blink/plugin.hpp>
 
+namespace berk {
+
 struct Parameters
 {
+	enum class Index
+	{
+		Tog_AutoAttack,
+		Env_Amp,
+		Env_Pan,
+		Env_Pitch,
+		Env_Buzz,
+		Env_Index,
+		Env_Diameter,
+		Env_TongueIndex,
+		Env_TongueDiameter,
+		Env_FricativeIntensity,
+		Env_Quality,
+	};
+
 	struct Envelopes
 	{
 		std::shared_ptr<blink::EnvelopeParameter> amp;
@@ -22,3 +39,5 @@ struct Parameters
 
 	Parameters(blink::Plugin* plugin);
 };
+
+}

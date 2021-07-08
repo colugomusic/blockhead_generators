@@ -14,6 +14,8 @@
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
+namespace berk {
+
 class Berk;
 
 class Audio : public blink::Synth
@@ -27,8 +29,6 @@ public:
 
 private:
 
-	ml::DSPVector get_source();
-
 	ml::Bandpass aspirate_filter_;
 	ml::Bandpass fricative_filter_;
 	ml::NoiseGen noise_;
@@ -39,3 +39,5 @@ private:
 	ml::DSPBuffer buffer_;
 	Resampler<1> resampler_;
 };
+
+} // berk

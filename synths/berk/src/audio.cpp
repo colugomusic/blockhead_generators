@@ -7,6 +7,8 @@
 
 using namespace blink;
 
+namespace berk {
+
 Audio::Audio(Berk* plugin, int instance_group)
 	: Synth(plugin, instance_group)
 	, plugin_(plugin)
@@ -42,7 +44,7 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 
 	ml::DSPVector out_vec;
 
-	const auto model_SR = int(math::lerp(22050.0f, 88200.0f, quality));
+	const auto model_SR = int(std::pow(2.0f, quality - 1.0f) * 44100.0f);
 
 	auto source = [&]()
 	{
@@ -76,8 +78,11 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 
 	return BLINK_OK;
 }
+
 void Audio::reset()
 {
 	glottis_.reset();
 	tract_.reset();
 }
+
+} // berk

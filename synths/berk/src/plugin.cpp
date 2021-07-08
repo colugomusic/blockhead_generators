@@ -9,6 +9,8 @@
 
 using namespace blink;
 
+namespace berk {
+
 Berk::Berk()
 	: params_(this)
 {
@@ -21,6 +23,10 @@ enum class Error
 };
 
 Berk* g_plugin = nullptr;
+
+} // berk
+
+using namespace berk;
 
 blink_UUID blink_get_plugin_uuid() { return Berk::UUID; }
 blink_UUID blink_get_plugin_name() { return Berk::NAME; }
