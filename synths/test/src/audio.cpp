@@ -53,9 +53,9 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		const auto fm0_freq = std::max(((fm0[i] * fm0[i] * 20000.0f) * oscs_[1].value()) + freq0[i], 0.0f);
 		const auto fm1_freq = std::max(((fm1[i] * fm1[i] * 20000.0f) * oscs_[0].value()) + freq1[i], 0.0f);
 
-		osc_out[i] = oscs_[0](fm0_freq / buffer->sample_rate, 0.5f, wave[i]);
+		osc_out[i] = oscs_[0](fm0_freq / SR(), 0.5f, wave[i]);
 
-		oscs_[1](fm1_freq / buffer->sample_rate, 0.5f, bleat::oscillators::scalar::MultiWaveOsc::WAVE_SINE);
+		oscs_[1](fm1_freq / SR(), 0.5f, bleat::oscillators::scalar::MultiWaveOsc::WAVE_SINE);
 	}
 
 	auto out_vec = ml::repeatRows<2>(osc_out);

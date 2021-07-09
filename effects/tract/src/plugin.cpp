@@ -4,19 +4,14 @@
 
 #include <blink/bind.hpp>
 #include <blink/math.hpp>
-#include <blink/standard_parameters.hpp>
 
 using namespace blink;
 
-RingModulator::RingModulator()
+namespace tract {
+
+Tract::Tract()
+	: params_(this)
 {
-	auto spec_env_pitch = std_params::envelopes::pitch();
-	auto spec_env_mix = std_params::envelopes::mix();
-
-	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_pitch_ = add_parameter(spec_env_pitch);
-	env_mix_ = add_parameter(spec_env_mix);
 }
 
 enum class Error
@@ -25,24 +20,26 @@ enum class Error
 	NotInitialized,
 };
 
-RingModulator* g_plugin = nullptr;
+} // tract
 
-blink_UUID blink_get_plugin_uuid() { return RingModulator::UUID; }
-blink_UUID blink_get_plugin_name() { return RingModulator::NAME; }
+tract::Tract* g_plugin = nullptr;
+
+blink_UUID blink_get_plugin_uuid() { return tract::Tract::UUID; }
+blink_UUID blink_get_plugin_name() { return tract::Tract::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (g_plugin) return blink_Error(tract::Error::AlreadyInitialized);
 
-	g_plugin = new RingModulator();
+	g_plugin = new tract::Tract();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_Error(tract::Error::NotInitialized);
 
 	delete g_plugin;
 
@@ -51,7 +48,7 @@ blink_Error blink_terminate()
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_Error(tract::Error::NotInitialized);
 
 	g_plugin->stream_init(SR);
 
@@ -62,7 +59,7 @@ blink_Effect blink_make_effect(int instance_group)
 {
 	if (!g_plugin) return blink_Effect{ 0, 0 };
 
-	const auto instance = new Audio(g_plugin, instance_group);
+	const auto instance = new tract::Audio(g_plugin, instance_group);
 	const auto out = bind::effect(instance);
 
 	g_plugin->register_instance(instance);
@@ -72,7 +69,7 @@ blink_Effect blink_make_effect(int instance_group)
 
 blink_Error blink_destroy_effect(blink_Effect effect)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_Error(tract::Error::NotInitialized);
 
 	g_plugin->unregister_instance((blink::Effect*)(effect.proc_data));
 
@@ -110,10 +107,10 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
+	switch (tract::Error(error))
 	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
+		case tract::Error::AlreadyInitialized: return "already initialized";
+		case tract::Error::NotInitialized: return "not initialized";
 		default: return "unknown error";
 	}
 }

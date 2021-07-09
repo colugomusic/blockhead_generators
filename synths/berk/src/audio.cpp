@@ -13,14 +13,13 @@ Audio::Audio(Berk* plugin, int instance_group)
 	: Synth(plugin, instance_group)
 	, plugin_(plugin)
 {
-	buffer_.resize(kFloatsPerDSPVector * 2);
 }
 
 blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 {
 	berk::AudioData data(plugin_, buffer);
 	
-	const auto amp = data.envelopes.amp.search_vec(block_positions());
+	const auto amp = data.envelopes.amp.search(block_positions());
 	const auto pitch = data.envelopes.pitch.search(block_positions());
 	const auto buzz = data.envelopes.buzz.search(block_positions());
 	const auto index = data.envelopes.index.search_vec(block_positions());
@@ -42,12 +41,16 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 	static const ml::DSPVector MIN_TONGUE_DIAMETER(2.05f);
 	static const ml::DSPVector MAX_TONGUE_DIAMETER(3.5f);
 
-	ml::DSPVector out_vec;
+	const auto min_position = ml::min(ml::intToFloat(block_positions().positions.pos));
+	const auto gate = min_position >= 0.0f;
 
 	const auto model_SR = int(std::pow(2.0f, quality - 1.0f) * 44100.0f);
+	const auto speed = float(model_SR) / SR();
 
 	auto source = [&]()
 	{
+		if (!gate) return ml::DSPVector();
+
 		const auto noise = noise_();
 
 		aspirate_filter_.mCoeffs = ml::Bandpass::coeffs(500.0f / model_SR, 0.9f);
@@ -56,7 +59,13 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		const auto fricative_noise = fricative_filter_(noise);
 		const auto aspirate_noise = aspirate_filter_(noise);
 
-		const auto glottal_output = glottis_(model_SR, pitch, buzz, aspirate_noise);
+		Glottis::Input glottis_input;
+
+		glottis_input.aspirate_noise = aspirate_noise;
+		glottis_input.buzz = buzz;
+		glottis_input.pitch = pitch;
+
+		const auto glottal_output = glottis_(model_SR, speed, glottis_input);
 
 		Tract::Input tract_input;
 
@@ -68,10 +77,10 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
 		tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, tongue_index);
 
-		return tract_(model_SR, tract_input);
+		return tract_(model_SR, speed, tract_input);
 	};
 
-	out_vec = resampler_(source, float(model_SR) / buffer->sample_rate) * amp;
+	auto out_vec = resampler_(source, speed) * amp;
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(0), out + kFloatsPerDSPVector);

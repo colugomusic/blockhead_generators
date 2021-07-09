@@ -38,7 +38,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec(in);
 
-	controller_.process(data, *buffer);
+	controller_.process(data, *buffer, SR());
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{

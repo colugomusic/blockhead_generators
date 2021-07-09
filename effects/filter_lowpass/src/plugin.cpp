@@ -53,15 +53,33 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
+blink_Error blink_stream_init(blink_SR SR)
+{
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->stream_init(SR);
+
+	return BLINK_OK;
+}
+
 blink_Effect blink_make_effect(int instance_group)
 {
-	if (!g_plugin) return blink_Effect { 0, 0 };
+	if (!g_plugin) return blink_Effect{ 0, 0 };
 
-	return bind::make_effect<Audio>(g_plugin, instance_group);
+	const auto instance = new Audio(g_plugin, instance_group);
+	const auto out = bind::effect(instance);
+
+	g_plugin->register_instance(instance);
+
+	return out;
 }
 
 blink_Error blink_destroy_effect(blink_Effect effect)
 {
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->unregister_instance((blink::Effect*)(effect.proc_data));
+
 	return bind::destroy_effect(effect);
 }
 

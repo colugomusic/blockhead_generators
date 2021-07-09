@@ -36,8 +36,8 @@ ml::Projection unityToDecay(ml::projections::intervalMap({ 0, 1 }, { kDecayLo, k
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
-	glide_size_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
-	glide_decay_.setGlideTimeInSamples(0.1f * buffer->sample_rate);
+	glide_size_.setGlideTimeInSamples(0.1f * SR());
+	glide_decay_.setGlideTimeInSamples(0.1f * SR());
 
 	struct Data
 	{
@@ -58,7 +58,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	plugin_->env_size().search_vec(data.env_size, block_positions(), 1, &size);
 	plugin_->env_decay().search_vec(data.env_decay, block_positions(), 1, &decay);
 
-	const float sr = float(buffer->sample_rate);
+	const float sr = float(SR());
 	const float RT60const = 0.001f;
 
 	float sizeU = ml::lerp(0.01f, 1.0f, size);

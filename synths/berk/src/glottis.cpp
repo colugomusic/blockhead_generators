@@ -43,25 +43,31 @@ void Glottis::reset()
 	setup_waveform(0.0f);
 }
 
-ml::DSPVector Glottis::operator()(int SR, float pitch, float formant, const ml::DSPVector& aspirate_noise)
+static float calculate_tenseness(float pitch, float buzz)
 {
-	ml::DSPVector out;
+	float out = std::clamp((((-pitch) + 24.0f) / 60.0f), 0.0f, 1.0f);
 
-	ui_frequency_ = blink::math::convert::pitch_to_frequency(pitch + 60.0f);
-
-	auto t = std::clamp((((-pitch) + 24.0f) / 60.0f), 0.0f, 1.0f);
-	
-	if (formant > 0.5f)
+	if (buzz > 0.5f)
 	{
-		t = blink::math::lerp(t, 1.0f, (formant - 0.5f) * 2.0f);
+		out = blink::math::lerp(out, 1.0f, (buzz - 0.5f) * 2.0f);
 	}
 	else
 	{
-		t = blink::math::lerp(0.0f, t, formant * 2.0f);
+		out = blink::math::lerp(0.0f, out, buzz * 2.0f);
 	}
+	
+	return out;
+}
 
-	ui_tenseness_ = 1.0f - std::cos(t * float(M_PI) * 0.5f);
-	loudness_ = std::pow(ui_tenseness_, 0.25f);
+ml::DSPVector Glottis::operator()(int SR, float speed, const Input& input)
+{
+	ml::DSPVector out;
+
+	ui_frequency_ = blink::math::convert::pitch_to_frequency(input.pitch + 60.0f);
+
+	ui_tenseness_ = calculate_tenseness(input.pitch, input.buzz);
+
+	const auto loudness = std::pow(ui_tenseness_, 0.25f);
 
 	constexpr ml::DSPVector ramp { lambda_fn };
 
@@ -70,13 +76,15 @@ ml::DSPVector Glottis::operator()(int SR, float pitch, float formant, const ml::
 		out[i] = step(1.0f / float(SR), i, ramp[i]);
 	}
 
-	out *= intensity_ * loudness_;
+	float intensity = input.auto_attack ? intensity_ : 1.0f;
 
-	auto aspiration = intensity_ * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator_ * aspirate_noise;
+	out *= intensity_ * loudness;
+
+	auto aspiration = intensity_ * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator_ * input.aspirate_noise;
 
 	aspiration *= 0.2f + 0.02f * snoise1(total_time_vec_ * 1.99f);
 
-	finish_block();
+	finish_block(speed, input);
 
 	return out + aspiration;
 }
@@ -159,7 +167,7 @@ float Glottis::noise_modulator_step()
 	return ui_tenseness_ * intensity_ * voiced + (1.0f - ui_tenseness_ * intensity_) * 0.3f;
 }
 
-void Glottis::finish_block()
+void Glottis::finish_block(float speed, const Input& input)
 {
 	auto vibrato = 0.0f;
 
@@ -182,19 +190,6 @@ void Glottis::finish_block()
 	old_tenseness_ = new_tenseness_;
 	new_tenseness_ = ui_tenseness_ + 0.1f * snoise1(total_time_ * 0.46f) + 0.05f * snoise1(total_time_ * 0.36f);
 
-	// if (!is_touched && always_voice)
-	// {
-	new_tenseness_ += (3.0f - ui_tenseness_) * (1.0f - intensity_);
-	// }
-
-	// if (is_touched || always_voice)
-	// {
-	intensity_ += 0.13f;
-	// }
-	// else
-	// {
-	//	intensity -= 0.05f;
-	// }
-
-	intensity_ = std::clamp(intensity_, 0.0f, 1.0f);
+	new_tenseness_ += ((3.0f - ui_tenseness_) * speed) * (1.0f - intensity_);
+	intensity_ = std::clamp(intensity_ + (0.13f * speed), 0.0f, 1.0f);
 }

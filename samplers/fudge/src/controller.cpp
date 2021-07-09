@@ -17,8 +17,10 @@ void Controller::process(
 	const blink_SamplerBuffer& buffer,
 	const SampleAnalysis* analysis_data,
 	const blink::Traverser& block_traverser,
-	const blink::BlockPositions& block_positions)
+	const blink::BlockPositions& block_positions,
+	blink_SR SR)
 {
+	SR_ = SR;
 	block_positions_ = &block_positions;
 
 	position_traverser_.get_positions(
@@ -47,7 +49,7 @@ void Controller::process(
 	}
 
 	buffer_ = &buffer;
-	frame_increment_ = float(buffer.sample_info->SR) / buffer.sample_rate;
+	frame_increment_ = float(buffer.sample_info->SR) / SR;
 	sample_loop_ = data.toggle_loop;
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();

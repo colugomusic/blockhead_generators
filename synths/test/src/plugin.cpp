@@ -98,15 +98,33 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
+blink_Error blink_stream_init(blink_SR SR)
+{
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->stream_init(SR);
+
+	return BLINK_OK;
+}
+
 blink_Synth blink_make_synth(int instance_group)
 {
-	if (!g_plugin) return blink_Synth { 0, 0 };
+	if (!g_plugin) return blink_Synth{ 0, 0 };
 
-	return bind::make_synth<Audio>(g_plugin, instance_group);
+	const auto instance = new Audio(g_plugin, instance_group);
+	const auto out = bind::synth(instance);
+
+	g_plugin->register_instance(instance);
+
+	return out;
 }
 
 blink_Error blink_destroy_synth(blink_Synth synth)
 {
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->unregister_instance((blink::Synth*)(synth.proc_data));
+
 	return bind::destroy_synth(synth);
 }
 

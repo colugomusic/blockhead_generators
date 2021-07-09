@@ -1,7 +1,3 @@
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <chrono>
 #include "tract.h"
 
 Tract::Step::Step()
@@ -71,7 +67,7 @@ void Tract::Step::reset()
 
 	new_reflection_L_ = new_reflection_R_ = new_reflection_nose_ = 0.0f;
 
-	calculate_reflections(44100);
+	calculate_reflections();
 	calculate_nose_reflections();
 	nose_diameter_[0] = velum_target_;
 }
@@ -225,7 +221,7 @@ void Tract::Step::operator()(int SR, float lambda, const Input& input, float* li
 static constexpr float lambda1_fn(int i) { return i / static_cast<float>(kFloatsPerDSPVector); }
 static constexpr float lambda2_fn(int i) { return (float(i) + 0.5f) / static_cast<float>(kFloatsPerDSPVector); }
 
-ml::DSPVector Tract::operator()(int SR, const Input& input)
+ml::DSPVector Tract::operator()(int SR, float speed, const Input& input)
 {
 	ml::DSPVector out;
 
@@ -263,7 +259,7 @@ ml::DSPVector Tract::operator()(int SR, const Input& input)
 
 	out = (lip + nose) / 2.0f;
 
-	step_.finish_block(SR);
+	step_.finish_block(SR, speed);
 
 	ml::validate(out);
 
@@ -277,7 +273,7 @@ void Tract::reset()
 	step_.reset();
 }
 
-void Tract::Step::add_transient(int position)
+void Tract::Step::add_transient(int position, float speed)
 {
 	if (transients_.count == transients_.list.size()) return;
 
@@ -285,10 +281,10 @@ void Tract::Step::add_transient(int position)
 
 	t.position = position;
 	t.time_alive = 0.0f;
-	t.life_time = 0.2f;
+	t.life_time = 0.2f * (1.0f / speed);
 	t.strength = 0.3f;
 	t.exponent = 200.0f;
-	
+
 	transients_.list[transients_.count++] = t;
 }
 
@@ -341,7 +337,7 @@ void Tract::Step::add_turbulence_noise_at_index(float noise, float index, float 
 	L_[i + 2] += noise1 / 2;
 }
 
-void Tract::Step::reshape_tract(int SR)
+void Tract::Step::reshape_tract(int SR, float speed)
 {
 	const auto delta_time = float(kFloatsPerDSPVector) / SR;
 	auto amount = delta_time * MOVEMENT_SPEED;
@@ -383,7 +379,7 @@ void Tract::Step::reshape_tract(int SR)
 
 	if (last_obstruction_ > -1 && new_last_obstruction == -1 && nose_a_[0] < 0.05f)
 	{
-		add_transient(last_obstruction_);
+		add_transient(last_obstruction_, speed);
 	}
 
 	last_obstruction_ = new_last_obstruction;
@@ -392,7 +388,7 @@ void Tract::Step::reshape_tract(int SR)
 	nose_a_[0] = nose_diameter_[0] * nose_diameter_[0];
 }
 
-void Tract::Step::calculate_reflections(int SR)
+void Tract::Step::calculate_reflections()
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -437,9 +433,9 @@ void Tract::Step::calculate_nose_reflections()
 	}
 }
 
-void Tract::Step::finish_block(int SR)
+void Tract::Step::finish_block(int SR, float speed)
 {
-	reshape_tract(SR);
-	calculate_reflections(SR);
+	reshape_tract(SR, speed);
+	calculate_reflections();
 }
 

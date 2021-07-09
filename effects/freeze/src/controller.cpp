@@ -11,7 +11,8 @@ Controller::Controller(const Freeze* plugin, const FreezeBuffer& buffer, const b
 
 void Controller::process(
 	const AudioData& data,
-	const blink_EffectBuffer& effect_data)
+	const blink_EffectBuffer& effect_data,
+	blink_SR SR)
 {
 	effect_data_ = &effect_data;
 
@@ -19,5 +20,5 @@ void Controller::process(
 	const auto formant = plugin_->env_formant().search_vec(data.env_formant, traverser_->block_positions());
 
 	ff_ = blink::math::convert::p_to_ff(blink::math::convert::uni_to_bi(formant) * 24.0f);
-	size_ = float(effect_data.sample_rate) / blink::math::convert::p_to_ff(pitch);
+	size_ = float(SR) / blink::math::convert::p_to_ff(pitch);
 }

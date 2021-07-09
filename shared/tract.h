@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
 #include <random>
 
 #pragma warning(push, 0)
@@ -25,7 +28,7 @@ public:
 		} tongue;
 	};
 
-	ml::DSPVector operator()(int SR, const Input& input);
+	ml::DSPVector operator()(int SR, float speed, const Input& input);
 	void reset();
 
 private:
@@ -65,20 +68,20 @@ private:
 		Step();
 
 		void operator()(int SR, float lambda, const Input& input, float* lip_out, float* nose_out);
-		void finish_block(int SR);
+		void finish_block(int SR, float speed);
 		void reset();
 
 	private:
 
 		void configure(const Input& input);
 		void set_rest_diameter(const Input& input);
-		void add_transient(int position);
+		void add_transient(int position, float speed);
 		void process_transients(int SR);
 		void add_turbulence_noise(const Input& input);
 		void add_turbulence_noise_at_index(float noise, float index, float diameter);
-		void calculate_reflections(int SR);
+		void calculate_reflections();
 		void calculate_nose_reflections();
-		void reshape_tract(int SR);
+		void reshape_tract(int SR, float speed);
 
 		struct Transients
 		{

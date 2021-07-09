@@ -41,7 +41,12 @@ blink_Effect Freeze::make_effect(int instance_group)
 
 	initialize_instance_group(instance_group);
 
-	return bind::make_effect<Audio>(this, instance_group, instance_group_data_[instance_group]);
+	const auto instance = new Audio(this, instance_group, instance_group_data_[instance_group]);
+	const auto out = bind::effect(instance);
+
+	register_instance(instance);
+
+	return out;
 }
 
 blink_Error Freeze::destroy_effect(blink_Effect effect)
@@ -54,7 +59,11 @@ blink_Error Freeze::destroy_effect(blink_Effect effect)
 		instance_group_data_.erase(instance_group);
 	}
 
-	return bind::destroy_effect(effect);
+	unregister_instance(audio);
+
+	delete audio;
+
+	return BLINK_OK;
 }
 
 void Freeze::hard_reset(int instance_group)
@@ -85,6 +94,15 @@ blink_Error blink_terminate()
 	if (!g_plugin) return blink_Error(Error::NotInitialized);
 
 	delete g_plugin;
+
+	return BLINK_OK;
+}
+
+blink_Error blink_stream_init(blink_SR SR)
+{
+	if (!g_plugin) return blink_Error(Error::NotInitialized);
+
+	g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }

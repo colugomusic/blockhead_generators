@@ -20,7 +20,8 @@ public:
 
 	void process(
 		const AudioData& data,
-		const blink_EffectBuffer& effect_data);
+		const blink_EffectBuffer& effect_data,
+		blink_SR SR);
 
 	const blink::BlockPositions& block_positions() const { return traverser_->block_positions(); }
 

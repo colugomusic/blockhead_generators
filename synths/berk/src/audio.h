@@ -1,13 +1,15 @@
 #pragma once
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 
 #include <random>
 #include <blink.h>
 #include <blink/synth.hpp>
 #include "glottis.h"
-#include "tract.h"
-#include "resampler.h"
+#include "shared/tract.h"
+#include "shared/resampler.h"
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
@@ -36,7 +38,6 @@ private:
 
 	Glottis glottis_;
 	Tract tract_;
-	ml::DSPBuffer buffer_;
 	Resampler<1> resampler_;
 };
 

@@ -263,7 +263,7 @@ std::array<float, 2> Particle::get_stereo_positions(int index, float pos, bool a
 		}
 	}
 
-	if (std::abs(pos_R - pos_L) < 0.01f * controller_->buffer().sample_rate)
+	if (std::abs(pos_R - pos_L) < 0.01f * controller_->SR())
 	{
 		pos_R = pos_L;
 	}

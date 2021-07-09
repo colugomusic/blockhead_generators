@@ -4,36 +4,30 @@
 #include <blink/option_spec.hpp>
 #include <blink/plugin.hpp>
 
-namespace berk {
+namespace tract {
 
 struct Parameters
 {
 	enum class Index
 	{
-		Env_Amp,
-		Env_Pan,
-		Env_Pitch,
-		Env_Buzz,
 		Env_Index,
 		Env_Diameter,
 		Env_TongueIndex,
 		Env_TongueDiameter,
 		Env_FricativeIntensity,
 		Env_Quality,
+		Env_Mix,
 	};
 
 	struct Envelopes
 	{
-		std::shared_ptr<blink::EnvelopeParameter> amp;
-		std::shared_ptr<blink::EnvelopeParameter> pan;
-		std::shared_ptr<blink::EnvelopeParameter> pitch;
-		std::shared_ptr<blink::EnvelopeParameter> buzz;
 		std::shared_ptr<blink::EnvelopeParameter> index;
 		std::shared_ptr<blink::EnvelopeParameter> diameter;
 		std::shared_ptr<blink::EnvelopeParameter> tongue_index;
 		std::shared_ptr<blink::EnvelopeParameter> tongue_diameter;
 		std::shared_ptr<blink::EnvelopeParameter> fricative_intensity;
 		std::shared_ptr<blink::EnvelopeParameter> quality;
+		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;
 
 	Parameters(blink::Plugin* plugin);

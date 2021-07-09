@@ -30,7 +30,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	res = ml::lerp(1.0f, 0.1f, res);
 
-	const auto omega = math::convert::linear_to_filter_hz(freq) / buffer->sample_rate;
+	const auto omega = math::convert::linear_to_filter_hz(freq) / SR();
 	const auto coeffs = ml::Bandpass::coeffs(omega, res);
 
 	filter_[0].mCoeffs = coeffs;

@@ -9,9 +9,18 @@ class Glottis
 
 public:
 
+	struct Input
+	{
+		bool gate;
+		bool auto_attack;
+		float pitch;
+		float buzz;
+		ml::DSPVector aspirate_noise;
+	};
+
 	Glottis();
 
-	ml::DSPVector operator()(int SR, float pitch, float formant, const ml::DSPVector& aspirate_noise);
+	ml::DSPVector operator()(int SR, float speed, const Input& input);
 	void reset();
 
 	const ml::DSPVector& noise_modulator() const { return noise_modulator_; }
@@ -22,7 +31,7 @@ private:
 	void setup_waveform(float lambda);
 	float normalized_lf_waveform(float t);
 	float noise_modulator_step();
-	void finish_block();
+	void finish_block(float speed, const Input& input);
 
 	ml::DSPVector noise_modulator_;
 	ml::DSPVector total_time_vec_;
@@ -34,7 +43,6 @@ private:
 	float wobble_amount_ = 1.0f;
 	float vibrato_frequency_ = 6.0f;
 	float intensity_ = 0.0f;
-	float loudness_ = 1.0f;
 	float time_in_waveform_ = 0.0f;
 	float total_time_ = 0.0f;
 	float waveform_length_ = 0.0f;

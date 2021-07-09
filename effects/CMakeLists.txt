@@ -7,5 +7,6 @@ add_subdirectory(filter_lowpass)
 add_subdirectory(freeze)
 add_subdirectory(ring_modulator)
 add_subdirectory(spring_reverb)
+add_subdirectory(tract)
 
 cpm_export_variables(blink)

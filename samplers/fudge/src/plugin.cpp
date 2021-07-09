@@ -140,15 +140,33 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
+blink_Error blink_stream_init(blink_SR SR)
+{
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+
+	fudge::g_plugin->stream_init(SR);
+
+	return BLINK_OK;
+}
+
 blink_Sampler blink_make_sampler(int instance_group)
 {
-	if (!fudge::g_plugin) return blink_Sampler { 0, 0 };
+	if (!fudge::g_plugin) return { 0, 0 };
 
-	return bind::make_sampler<fudge::Audio>(fudge::g_plugin, instance_group);
+	const auto instance = new fudge::Audio(fudge::g_plugin, instance_group);
+	const auto out = bind::sampler(instance);
+
+	fudge::g_plugin->register_instance(instance);
+
+	return out;
 }
 
 blink_Error blink_destroy_sampler(blink_Sampler sampler)
 {
+	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+
+	fudge::g_plugin->unregister_instance((blink::Sampler*)(sampler.proc_data));
+
 	return bind::destroy_sampler(sampler);
 }
 

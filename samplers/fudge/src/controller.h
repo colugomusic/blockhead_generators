@@ -28,7 +28,8 @@ public:
 		const blink_SamplerBuffer& buffer,
 		const SampleAnalysis* analysis_data,
 		const blink::Traverser& block_traverser,
-		const blink::BlockPositions& block_positions);
+		const blink::BlockPositions& block_positions,
+		blink_SR SR);
 
 	const blink::BlockPositions& block_positions() const { return *block_positions_; }
 	const std::int32_t data_offset() const { return std::int32_t(block_positions_->data_offset); }
@@ -46,6 +47,7 @@ public:
 	bool sample_loop() const { return sample_loop_; }
 	const blink_SamplerBuffer& buffer() const { return *buffer_; }
 	float get_harmonic_ratio(int index, int harmonic) const;
+	blink_SR SR() const { return SR_; }
 
 private:
 
@@ -70,6 +72,7 @@ private:
 	const SampleAnalysis* analysis_data_;
 	float frame_increment_ = 1.0f;
 	bool sample_loop_;
+	blink_SR SR_;
 };
 
 }
