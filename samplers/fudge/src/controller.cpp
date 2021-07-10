@@ -6,7 +6,7 @@
 
 namespace fudge {
 
-Controller::Controller(const Fudge* plugin)
+Controller::Controller(const Plugin* plugin)
 	: plugin_(plugin)
 {
 

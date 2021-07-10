@@ -1,8 +1,10 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/effect_plugin.hpp>
 
-class SpringReverb : public blink::Plugin
+namespace spring_reverb {
+
+class Plugin : public blink::EffectPlugin
 {
 public:
 
@@ -16,7 +18,7 @@ public:
 		Env_Mix = 2,
 	};
 
-	SpringReverb();
+	Plugin();
 
 	const blink::EnvelopeParameter& env_size() const { return *env_size_; }
 	const blink::EnvelopeParameter& env_decay() const { return *env_decay_; }
@@ -24,7 +26,11 @@ public:
 
 private:
 
+	blink::EffectInstance* make_instance() override;
+
 	std::shared_ptr<blink::EnvelopeParameter> env_size_;
 	std::shared_ptr<blink::EnvelopeParameter> env_decay_;
 	std::shared_ptr<blink::EnvelopeParameter> env_mix_;
 };
+
+} // spring_reverb

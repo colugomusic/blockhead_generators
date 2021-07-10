@@ -16,6 +16,8 @@ list(APPEND SRC
     ./src/grain.h
     ./src/gui.h
     ./src/gui.cpp
+    ./src/instance.h
+    ./src/instance.cpp
     ./src/limits.h
     ./src/parameters.h
     ./src/parameters.cpp

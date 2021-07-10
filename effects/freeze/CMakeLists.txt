@@ -14,6 +14,8 @@ list(APPEND SRC
     ./src/controller.h
     ./src/controller.cpp
     ./src/grain.h
+    ./src/instance.h
+    ./src/instance.cpp
     ./src/particle.h
     ./src/particle.cpp
     ./src/plugin.h

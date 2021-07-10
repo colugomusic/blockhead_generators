@@ -10,13 +10,15 @@
 #include <DSP/MLDSPOps.h>
 #pragma warning(pop)
 
-class Freeze;
+namespace freeze {
+
+class Plugin;
 
 class Controller
 {
 public:
 
-	Controller(const Freeze* plugin, const FreezeBuffer& buffer, const blink::Traverser& traverser);
+	Controller(const Plugin* plugin, const FreezeBuffer& buffer, const blink::Traverser& traverser);
 
 	void process(
 		const AudioData& data,
@@ -34,7 +36,7 @@ public:
 
 private:
 
-	const Freeze* plugin_;
+	const Plugin* plugin_;
 	const blink_EffectBuffer* effect_data_;
 	const blink::Traverser* traverser_;
 
@@ -42,3 +44,5 @@ private:
 	ml::DSPVector size_;
 	const FreezeBuffer* buffer_;
 };
+
+} // freeze

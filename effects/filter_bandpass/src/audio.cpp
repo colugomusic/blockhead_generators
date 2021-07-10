@@ -1,11 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
-Audio::Audio(Filter* plugin, int instance_group)
-	: Effect(plugin, instance_group)
-	, plugin_(plugin)
+namespace bandpass {
+
+Audio::Audio(Instance* instance)
+	: EffectUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
@@ -18,9 +21,9 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		const blink_EnvelopeData* env_mix;
 	} data;
 
-	data.env_freq = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Freq));
-	data.env_res  = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Res));
-	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Filter::ParameterIndex::Env_Mix));
+	data.env_freq = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Freq));
+	data.env_res  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Res));
+	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
 
 	float freq;
 	float res;
@@ -56,3 +59,5 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 void Audio::reset()
 {
 }
+
+} // bandpass

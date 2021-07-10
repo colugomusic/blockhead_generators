@@ -2,17 +2,17 @@
 #include "plugin.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include <blink/standard_parameters.hpp>
 
-#include "audio.h"
+#include "instance.h"
 #include "parameters.h"
 
 using namespace blink;
 
 namespace fudge {
 
-Fudge::Fudge()
+Plugin::Plugin()
 {
 	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
 	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
@@ -68,15 +68,19 @@ Fudge::Fudge()
 	sld_sample_offset_ = add_parameter(std_params::sliders::parameters::sample_offset());
 	tog_loop_ = add_parameter(std_params::toggles::loop());
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
-
 }
 
-GUI& Fudge::gui()
+blink::SamplerInstance* Plugin::make_instance()
+{
+	return new Instance(this);
+}
+
+GUI& Plugin::gui()
 {
 	return gui_;
 }
 
-const SampleAnalysis* Fudge::get_analysis_data(blink_ID sample_id) const
+const SampleAnalysis* Plugin::get_analysis_data(blink_ID sample_id) const
 {
 	const auto pos = sample_analysis_.find(sample_id);
 
@@ -85,7 +89,7 @@ const SampleAnalysis* Fudge::get_analysis_data(blink_ID sample_id) const
 	return pos->second.get();
 }
 
-void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
+void Plugin::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
 	auto pos = sample_analysis_.find(sample_info->id);
 
@@ -99,7 +103,7 @@ void Fudge::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, c
 	}
 }
 
-void Fudge::on_sample_deleted(blink_ID id)
+void Plugin::on_sample_deleted(blink_ID id)
 {
 	const auto pos = sample_analysis_.find(id);
 
@@ -108,32 +112,26 @@ void Fudge::on_sample_deleted(blink_ID id)
 	sample_analysis_.erase(pos);
 }
 
-enum class Error
-{
-	AlreadyInitialized,
-	NotInitialized,
-};
-
-Fudge* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
 }
 
-blink_UUID blink_get_plugin_uuid() { return fudge::Fudge::UUID; }
-blink_UUID blink_get_plugin_name() { return fudge::Fudge::NAME; }
+blink_UUID blink_get_plugin_uuid() { return fudge::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return fudge::Plugin::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (fudge::g_plugin) return blink_Error(fudge::Error::AlreadyInitialized);
+	if (fudge::g_plugin) return blink_StdError_AlreadyInitialized;
 
-    fudge::g_plugin = new fudge::Fudge();
+    fudge::g_plugin = new fudge::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
 	delete fudge::g_plugin;
 
@@ -142,32 +140,29 @@ blink_Error blink_terminate()
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
 	fudge::g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Sampler blink_make_sampler(int instance_group)
+blink_SamplerInstance blink_make_sampler_instance()
 {
-	if (!fudge::g_plugin) return { 0, 0 };
+	if (!fudge::g_plugin) return blink_SamplerInstance{ 0 };
 
-	const auto instance = new fudge::Audio(fudge::g_plugin, instance_group);
-	const auto out = bind::sampler(instance);
-
-	fudge::g_plugin->register_instance(instance);
-
-	return out;
+	return bind::sampler_instance(fudge::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_sampler(blink_Sampler sampler)
+blink_Error blink_destroy_sampler_instance(blink_SamplerInstance instance)
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
-	fudge::g_plugin->unregister_instance((blink::Sampler*)(sampler.proc_data));
+	const auto obj = (fudge::Instance*)(instance.proc_data);
 
-	return bind::destroy_sampler(sampler);
+	fudge::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 blink_Bool blink_sampler_enable_warp_markers()
@@ -182,7 +177,7 @@ blink_Bool blink_sampler_requires_preprocessing()
 
 blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
     fudge::g_plugin->preprocess_sample(host, callbacks, sample_info);
 
@@ -191,7 +186,7 @@ blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallback
 
 blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
     fudge::g_plugin->on_sample_deleted(sample_id);
 
@@ -229,17 +224,12 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (fudge::Error(error))
-	{
-        case fudge::Error::AlreadyInitialized: return "already initialized";
-        case fudge::Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }
 
 blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
-	if (!fudge::g_plugin) return blink_Error(fudge::Error::NotInitialized);
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
     fudge::g_plugin->gui().draw(fudge::g_plugin, buffer, n, out);
 

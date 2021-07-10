@@ -3,6 +3,8 @@
 
 using namespace blink;
 
+namespace classic {
+
 struct Data
 {
 	struct Sliders
@@ -29,13 +31,13 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 {
 	Data out;
 
-	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Amp));
-	out.sliders.pitch = Plugin::get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pitch));
-	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_SampleOffset));
-	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
-	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
-	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Amp));
-	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pitch));
+	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_Amp));
+	out.sliders.pitch = Plugin::get_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_Pitch));
+	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_SampleOffset));
+	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Tog_Loop));
+	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Tog_Reverse));
+	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Amp));
+	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Pitch));
 
 	return out;
 }
@@ -107,7 +109,7 @@ static void calculate_positions(
 	}
 }
 
-static void calculate_amp(const Classic* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
+static void calculate_amp(const classic::Plugin* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
 	ml::DSPVector amp(1.0f);
 
@@ -124,7 +126,7 @@ static void calculate_amp(const Classic* plugin, const Data& data, const blink::
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::draw(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error GUI::draw(const classic::Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 
@@ -166,3 +168,5 @@ blink_Error GUI::draw(const Classic* plugin, const blink_SamplerBuffer* buffer, 
 
 	return BLINK_OK;
 }
+
+} // classic

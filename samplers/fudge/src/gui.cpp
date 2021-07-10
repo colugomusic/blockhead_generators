@@ -33,13 +33,13 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 {
 	Data out;
 
-	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
-	out.sliders.speed = Plugin::get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Speed));
-	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_SampleOffset));
-	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
-	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
-	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Amp));
-	out.envelopes.speed = Plugin::get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
+	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Amp));
+	out.sliders.speed = Plugin::get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Speed));
+	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_SampleOffset));
+	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Loop));
+	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
+	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
+	out.envelopes.speed = Plugin::get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Speed));
 	out.warp_points = buffer->warp_points;
 
 	return out;
@@ -131,7 +131,7 @@ static void calculate_positions(
 	}
 }
 
-static void calculate_amp(const Fudge* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
+static void calculate_amp(const Plugin* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
 	ml::DSPVector amp(1.0f);
 
@@ -148,7 +148,7 @@ static void calculate_amp(const Fudge* plugin, const Data& data, const blink::Bl
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::draw(const Fudge* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 

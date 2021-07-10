@@ -167,8 +167,12 @@ void Tract::Step::set_rest_diameter(const Input& input)
 void Tract::Step::operator()(int SR, float lambda, const Input& input, float* lip_out, float* nose_out)
 {
 	configure(input);
-	process_transients(SR);
-	add_turbulence_noise(input);
+
+	if (input.fricatives)
+	{
+		process_transients(SR);
+		add_turbulence_noise(input);
+	}
 
 	junction_output_R_[0] = L_[0] * glottal_reflection_ + input.glottal_output;
 	junction_output_L_[N] = R_[N - 1] * lip_reflection_;
@@ -238,6 +242,7 @@ ml::DSPVector Tract::operator()(int SR, float speed, const Input& input)
 	{
 		Step::Input step_input;
 
+		step_input.fricatives = input.fricatives;
 		step_input.diameter = input.diameter[i];
 		step_input.fricative_intensity = input.fricative_intensity[i];
 		step_input.fricative_noise = input.fricative_noise[i];
@@ -259,7 +264,8 @@ ml::DSPVector Tract::operator()(int SR, float speed, const Input& input)
 
 	out = (lip + nose) / 2.0f;
 
-	step_.finish_block(SR, speed);
+	step_.reshape_tract(SR, speed, input.fricatives);
+	step_.calculate_reflections();
 
 	ml::validate(out);
 
@@ -337,7 +343,7 @@ void Tract::Step::add_turbulence_noise_at_index(float noise, float index, float 
 	L_[i + 2] += noise1 / 2;
 }
 
-void Tract::Step::reshape_tract(int SR, float speed)
+void Tract::Step::reshape_tract(int SR, float speed, bool fricatives)
 {
 	const auto delta_time = float(kFloatsPerDSPVector) / SR;
 	auto amount = delta_time * MOVEMENT_SPEED;
@@ -354,7 +360,7 @@ void Tract::Step::reshape_tract(int SR, float speed)
 		auto diameter = diameter_[i];
 		auto target_diameter = target_diameter_[i];
 
-		if (diameter <= 0.0f)
+		if (fricatives && diameter <= 0.0f)
 		{
 			new_last_obstruction = i;
 		}
@@ -377,12 +383,15 @@ void Tract::Step::reshape_tract(int SR, float speed)
 		diameter_[i] = move_towards(diameter, target_diameter, slow_return * amount, 2.0f * amount);
 	}
 
-	if (last_obstruction_ > -1 && new_last_obstruction == -1 && nose_a_[0] < 0.05f)
+	if (fricatives)
 	{
-		add_transient(last_obstruction_, speed);
-	}
+		if (last_obstruction_ > -1 && new_last_obstruction == -1 && nose_a_[0] < 0.05f)
+		{
+			add_transient(last_obstruction_, speed);
+		}
 
-	last_obstruction_ = new_last_obstruction;
+		last_obstruction_ = new_last_obstruction;
+	}
 
 	nose_diameter_[0] = move_towards(nose_diameter_[0], velum_target_, amount * 0.25f, amount * 0.1f);
 	nose_a_[0] = nose_diameter_[0] * nose_diameter_[0];
@@ -431,11 +440,5 @@ void Tract::Step::calculate_nose_reflections()
 	{
 		nose_reflection_[i] = (nose_a_[i - 1] - nose_a_[i]) / (nose_a_[i - 1] + nose_a_[i]);
 	}
-}
-
-void Tract::Step::finish_block(int SR, float speed)
-{
-	reshape_tract(SR, speed);
-	calculate_reflections();
 }
 

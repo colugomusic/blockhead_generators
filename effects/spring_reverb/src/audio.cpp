@@ -1,11 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
-Audio::Audio(SpringReverb* plugin, int instance_group)
-	: Effect(plugin, instance_group)
-	, plugin_(plugin)
+namespace spring_reverb {
+
+Audio::Audio(Instance* instance)
+	: EffectUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 	// set allpass filter coefficients
 	mAp1.mGain = 0.75f;
@@ -46,9 +49,9 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		const blink_EnvelopeData* env_mix;
 	} data;
 
-	data.env_size = plugin_->get_envelope_data(buffer->parameter_data, int(SpringReverb::ParameterIndex::Env_Size));
-	data.env_decay = plugin_->get_envelope_data(buffer->parameter_data, int(SpringReverb::ParameterIndex::Env_Decay));
-	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(SpringReverb::ParameterIndex::Env_Mix));
+	data.env_size = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Size));
+	data.env_decay = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Decay));
+	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
 
 	float size;
 	float decay;
@@ -139,3 +142,5 @@ void Audio::reset()
 	mvFeedbackL = ml::DSPVector();
 	mvFeedbackR = ml::DSPVector();
 }
+
+} // spring_reverb

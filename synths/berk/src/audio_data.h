@@ -1,7 +1,6 @@
 #pragma once
 
 #include <blink/envelope_data.hpp>
-#include <blink/synth.hpp>
 #include "plugin.h"
 
 namespace berk {
@@ -20,10 +19,10 @@ struct AudioData
 		blink::EnvelopeData<int(berk::Parameters::Index::Env_FricativeIntensity)> fricative_intensity;
 		blink::EnvelopeData<int(berk::Parameters::Index::Env_Quality)> quality;
 
-		Envelopes(const Berk* plugin, const blink_SynthBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_SynthBuffer* buffer);
 	} envelopes;
 
-	AudioData(const Berk* plugin, const blink_SynthBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_SynthBuffer* buffer);
 };
 
 } // berk

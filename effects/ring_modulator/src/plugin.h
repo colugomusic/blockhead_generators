@@ -1,8 +1,10 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/effect_plugin.hpp>
 
-class RingModulator : public blink::Plugin
+namespace ring_modulator {
+
+class Plugin : public blink::EffectPlugin
 {
 public:
 
@@ -15,13 +17,17 @@ public:
 		Env_Mix,
 	};
 
-	RingModulator();
+	Plugin();
 
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 	const blink::EnvelopeParameter& env_mix() const { return *env_mix_; }
 
 private:
 
+	blink::EffectInstance* make_instance() override;
+
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_mix_;
 };
+
+} // ring_modulator

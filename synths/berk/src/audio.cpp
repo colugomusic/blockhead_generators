@@ -1,6 +1,7 @@
 #include "audio.h"
 #include "audio_data.h"
 #include "plugin.h"
+#include "instance.h"
 #include "simplexnoise1234.h"
 #include <blink/math.hpp>
 #include <cassert>
@@ -9,9 +10,9 @@ using namespace blink;
 
 namespace berk {
 
-Audio::Audio(Berk* plugin, int instance_group)
-	: Synth(plugin, instance_group)
-	, plugin_(plugin)
+Audio::Audio(Instance* instance)
+	: SynthUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
@@ -69,6 +70,7 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 
 		Tract::Input tract_input;
 
+		tract_input.fricatives = true;
 		tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
 		tract_input.fricative_intensity = fricative_intensity;
 		tract_input.fricative_noise = fricative_noise * glottis_.noise_modulator();

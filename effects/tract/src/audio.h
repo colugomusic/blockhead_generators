@@ -1,22 +1,25 @@
 #include <blink.h>
-#include <blink/effect.hpp>
+#include <blink/effect_unit.hpp>
 #include "shared/tract.h"
 #include "shared/resampler.h"
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPBuffer.h>
-#include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
 namespace tract {
 
-class Tract;
+static constexpr auto BASE_MODEL_SR = 44100;
+static constexpr auto ROWS = 2;
 
-class Audio : public blink::Effect
+class Plugin;
+class Instance;
+
+class Audio : public blink::EffectUnit
 {
 public:
 
-	Audio(Tract* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
 	void reset() override;
@@ -25,10 +28,7 @@ private:
 
 	void stream_init() override;
 
-	ml::Bandpass aspirate_filter_;
-	ml::Bandpass fricative_filter_;
-	ml::NoiseGen noise_;
-	const Tract* plugin_;
+	const Plugin* plugin_;
 	ml::DSPBuffer input_buffer_;
 	std::array<::Tract, 2> tract_;
 	Resampler<2> resampler_;

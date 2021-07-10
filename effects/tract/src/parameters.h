@@ -14,7 +14,6 @@ struct Parameters
 		Env_Diameter,
 		Env_TongueIndex,
 		Env_TongueDiameter,
-		Env_FricativeIntensity,
 		Env_Quality,
 		Env_Mix,
 	};
@@ -25,7 +24,6 @@ struct Parameters
 		std::shared_ptr<blink::EnvelopeParameter> diameter;
 		std::shared_ptr<blink::EnvelopeParameter> tongue_index;
 		std::shared_ptr<blink::EnvelopeParameter> tongue_diameter;
-		std::shared_ptr<blink::EnvelopeParameter> fricative_intensity;
 		std::shared_ptr<blink::EnvelopeParameter> quality;
 		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;

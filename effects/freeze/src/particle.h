@@ -6,6 +6,8 @@
 
 #include "grain.h"
 
+namespace freeze {
+
 class Controller;
 
 struct LR { float L = 0.0f, R = 0.0f; };
@@ -36,5 +38,6 @@ private:
 	std::array<Grain, 2> grains_;
 	std::function<float(int, std::size_t, float)> read_;
 	bool queue_reset_ = false;
-
 };
+
+} // freeze

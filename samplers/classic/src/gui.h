@@ -3,13 +3,15 @@
 #include <blink/standard_traversers/classic.hpp>
 #include <blink_sampler.h>
 
-class Classic;
+namespace classic {
+
+class Plugin;
 
 class GUI
 {
 public:
 
-	blink_Error draw(const Classic* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
+	blink_Error draw(const classic::Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
 
 private:
 
@@ -18,3 +20,5 @@ private:
 	blink::std_traversers::Classic position_traverser_;
 
 };
+
+} // classic

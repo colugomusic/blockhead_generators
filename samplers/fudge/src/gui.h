@@ -5,13 +5,13 @@
 
 namespace fudge {
 
-class Fudge;
+class Plugin;
 
 class GUI
 {
 public:
 
-	blink_Error draw(const Fudge* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
+	blink_Error draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
 
 private:
 

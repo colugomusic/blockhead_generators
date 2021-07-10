@@ -11,6 +11,8 @@ list(APPEND SRC
     ./src/audio.cpp
     ./src/gui.h
     ./src/gui.cpp
+    ./src/instance.h
+    ./src/instance.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 	../../shared/noise_generator.h

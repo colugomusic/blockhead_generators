@@ -2,13 +2,11 @@
 
 #include <map>
 #include <memory>
-#include <blink_effect.h>
-#include <blink/plugin.hpp>
-#include "buffer.h"
+#include <blink/effect_plugin.hpp>
 
-class Audio;
+namespace freeze {
 
-class Freeze : public blink::Plugin
+class Plugin : public blink::EffectPlugin
 {
 public:
 
@@ -23,28 +21,19 @@ public:
 		Sld_Pitch,
 	};
 
-	Freeze();
+	Plugin();
 
 	const blink::EnvelopeParameter& env_pitch() const { return *env_pitch_; }
 	const blink::EnvelopeParameter& env_formant() const { return *env_formant_; }
 	const blink::EnvelopeParameter& env_mix() const { return *env_mix_; }
 
-	blink_Effect make_effect(int instance_group);
-	blink_Error destroy_effect(blink_Effect effect);
-
-	struct InstanceGroupData
-	{
-		Audio* master_instance = nullptr;
-		FreezeBuffer buffer;
-	};
-
 private:
 
-	void hard_reset(int instance_group) override;
+	blink::EffectInstance* make_instance() override;
 
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_formant_;
 	std::shared_ptr<blink::EnvelopeParameter> env_mix_;
-
-	std::map<int, std::shared_ptr<InstanceGroupData>> instance_group_data_;
 };
+
+} // freeze

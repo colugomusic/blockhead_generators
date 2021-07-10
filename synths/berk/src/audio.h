@@ -5,8 +5,7 @@
 #endif
 
 #include <random>
-#include <blink.h>
-#include <blink/synth.hpp>
+#include <blink/synth_unit.hpp>
 #include "glottis.h"
 #include "shared/tract.h"
 #include "shared/resampler.h"
@@ -18,13 +17,14 @@
 
 namespace berk {
 
-class Berk;
+class Plugin;
+class Instance;
 
-class Audio : public blink::Synth
+class Audio : public blink::SynthUnit
 {
 public:
 
-	Audio(Berk* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_SynthBuffer* buffer, float* out) override;
 	void reset() override;
@@ -34,7 +34,7 @@ private:
 	ml::Bandpass aspirate_filter_;
 	ml::Bandpass fricative_filter_;
 	ml::NoiseGen noise_;
-	const Berk* plugin_;
+	const Plugin* plugin_;
 
 	Glottis glottis_;
 	Tract tract_;

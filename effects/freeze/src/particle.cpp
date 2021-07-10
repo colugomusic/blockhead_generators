@@ -3,6 +3,8 @@
 #include <blink/math.hpp>
 #include <cassert>
 
+namespace freeze {
+
 Particle::Particle(const Controller& controller, std::function<float(int, std::size_t, float)> read)
 	: controller_(&controller)
 	, read_(read)
@@ -154,3 +156,5 @@ void Particle::trigger_next_grain(int index)
 	grains_[flip_flop_].frame_amp = fade_in ? 0.f : 1.f;
 	grains_[flip_flop_].duck = 1.f;
 }
+
+} // freeze

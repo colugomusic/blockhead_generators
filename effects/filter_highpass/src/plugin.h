@@ -1,8 +1,10 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/effect_plugin.hpp>
 
-class Filter : public blink::Plugin
+namespace highpass {
+
+class Plugin : public blink::EffectPlugin
 {
 public:
 
@@ -16,7 +18,7 @@ public:
 		Env_Mix,
 	};
 
-	Filter();
+	Plugin();
 
 	const blink::EnvelopeParameter& env_freq() const { return *env_freq_; }
 	const blink::EnvelopeParameter& env_res() const { return *env_res_; }
@@ -24,7 +26,11 @@ public:
 
 private:
 
+	blink::EffectInstance* make_instance() override;
+
 	std::shared_ptr<blink::EnvelopeParameter> env_freq_;
 	std::shared_ptr<blink::EnvelopeParameter> env_res_;
 	std::shared_ptr<blink::EnvelopeParameter> env_mix_;
 };
+
+} // highpass

@@ -1,15 +1,16 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 #include "audio_data.h"
 
 using namespace blink;
 
 namespace fudge {
 
-Audio::Audio(Fudge* plugin, int instance_group)
-	: Sampler(plugin, instance_group)
-	, plugin_(plugin)
-	, controller_(plugin)
+Audio::Audio(Instance* instance)
+	: SamplerUnit(instance)
+	, plugin_(instance->get_plugin())
+	, controller_(plugin_)
 	, particles_{ controller_, { controller_, 1 }, { controller_, 2 }, { controller_, 3 } }
 {
 }
@@ -22,27 +23,27 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	AudioData data;
 
-	data.option_noise_mode     = plugin_->get_option_data(buffer->parameter_data, int(Fudge::ParameterIndex::Option_NoiseMode));
-	data.chord_harmonics_scale = plugin_->get_chord_data(buffer->parameter_data, int(Fudge::ParameterIndex::Chord_Harmonics_Scale));
-	data.env_amp               = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Amp));
-	data.env_pan               = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pan));
-	data.env_pitch             = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Pitch));
-	data.env_speed             = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Speed));
-	data.env_grain_size        = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainSize));
-	data.env_grain_transpose   = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_GrainTranspose));
-	data.env_uniformity        = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Uniformity));
-	data.env_harmonics_amount  = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Harmonics_Amount));
-	data.env_harmonics_spread  = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_Harmonics_Spread));
-	data.env_noise_amount      = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color       = plugin_->get_envelope_data(buffer->parameter_data, int(Fudge::ParameterIndex::Env_NoiseColor));
-	data.slider_amp            = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Amp));
-	data.slider_pan            = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pan));
-	data.slider_pitch          = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Pitch));
-	data.slider_speed          = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_Speed));
-	data.slider_sample_offset  = plugin_->get_int_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_SampleOffset));
-	data.slider_noise_width    = plugin_->get_slider_data(buffer->parameter_data, int(Fudge::ParameterIndex::Sld_NoiseWidth));
-	data.toggle_loop           = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Loop));
-	data.toggle_reverse        = plugin_->get_toggle_data(buffer->parameter_data, int(Fudge::ParameterIndex::Tog_Reverse));
+	data.option_noise_mode     = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
+	data.chord_harmonics_scale = plugin_->get_chord_data(buffer->parameter_data, int(Plugin::ParameterIndex::Chord_Harmonics_Scale));
+	data.env_amp               = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
+	data.env_pan               = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pan));
+	data.env_pitch             = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
+	data.env_speed             = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Speed));
+	data.env_grain_size        = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_GrainSize));
+	data.env_grain_transpose   = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_GrainTranspose));
+	data.env_uniformity        = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Uniformity));
+	data.env_harmonics_amount  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Harmonics_Amount));
+	data.env_harmonics_spread  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Harmonics_Spread));
+	data.env_noise_amount      = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseAmount));
+	data.env_noise_color       = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseColor));
+	data.slider_amp            = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Amp));
+	data.slider_pan            = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pan));
+	data.slider_pitch          = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pitch));
+	data.slider_speed          = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Speed));
+	data.slider_sample_offset  = plugin_->get_int_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_SampleOffset));
+	data.slider_noise_width    = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_NoiseWidth));
+	data.toggle_loop           = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Loop));
+	data.toggle_reverse        = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
 	data.warp_points           = buffer->warp_points;
 
 	traverser_resetter_.check(data.env_speed, &block_traverser_);

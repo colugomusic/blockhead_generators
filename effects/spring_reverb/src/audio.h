@@ -1,25 +1,27 @@
-#include <blink.h>
-#include <blink/effect.hpp>
+#include <blink/effect_unit.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-class SpringReverb;
+namespace spring_reverb {
 
-class Audio : public blink::Effect
+class Plugin;
+class Instance;
+
+class Audio : public blink::EffectUnit
 {
 public:
 
-	Audio(SpringReverb* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
 	void reset() override;
 
 private:
 	
-	const SpringReverb* plugin_;
+	const Plugin* plugin_;
 
 	ml::LinearGlide glide_size_;
 	ml::LinearGlide glide_decay_;
@@ -33,3 +35,5 @@ private:
 
 	int buffer_count_ = 0;
 };
+
+} // spring_reverb

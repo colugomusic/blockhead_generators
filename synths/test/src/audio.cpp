@@ -1,11 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
-Audio::Audio(Test* plugin, int instance_group)
-	: Synth(plugin, instance_group)
-	, plugin_(plugin)
+namespace test {
+
+Audio::Audio(Instance* instance)
+	: SynthUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
@@ -25,16 +28,16 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		const blink_SliderData* slider_noise_width;
 	} data;
 
-	data.env_amp = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_Amp));
-	data.env_wave = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_Wave));
-	data.env_p0 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_Pitch0));
-	data.env_p1 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_Pitch1));
-	data.env_fm0 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_FM0));
-	data.env_fm1 = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_FM1));
-	data.option_noise_mode = plugin_->get_option_data(buffer->parameter_data, int(Test::ParameterIndex::Option_NoiseMode));
-	data.env_noise_amount = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color = plugin_->get_envelope_data(buffer->parameter_data, int(Test::ParameterIndex::Env_NoiseColor));
-	data.slider_noise_width = plugin_->get_slider_data(buffer->parameter_data, int(Test::ParameterIndex::Sld_NoiseWidth));
+	data.env_amp = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
+	data.env_wave = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Wave));
+	data.env_p0 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch0));
+	data.env_p1 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch1));
+	data.env_fm0 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_FM0));
+	data.env_fm1 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_FM1));
+	data.option_noise_mode = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
+	data.env_noise_amount = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseAmount));
+	data.env_noise_color = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseColor));
+	data.slider_noise_width = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_NoiseWidth));
 
 	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions());
  	const auto wave = plugin_->env_wave().search_vec(data.env_wave, block_positions());
@@ -84,3 +87,5 @@ void Audio::reset()
 	oscs_[0].reset();
 	oscs_[1].reset();
 }
+
+} // test

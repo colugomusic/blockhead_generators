@@ -1,13 +1,13 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/sampler_plugin.hpp>
 
 #include "gui.h"
 #include "sample_analysis.h"
 
 namespace fudge {
 
-class Fudge : public blink::Plugin
+class Plugin : public blink::SamplerPlugin
 {
 public:
 
@@ -42,7 +42,7 @@ public:
 		Tog_Reverse,
 	};
 
-	Fudge();
+	Plugin();
 
 	GUI& gui();
 
@@ -64,6 +64,8 @@ public:
 	void on_sample_deleted(blink_ID id);
 
 private:
+
+	blink::SamplerInstance* make_instance() override;
 
 	std::map<blink_ID, std::shared_ptr<SampleAnalysis>> sample_analysis_;
 	GUI gui_;
@@ -91,4 +93,4 @@ private:
 	std::shared_ptr<blink::ToggleParameter> tog_revers_;
 };
 
-}
+} // fudge

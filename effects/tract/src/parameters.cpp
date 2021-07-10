@@ -27,17 +27,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 		env.tongue_diameter->set_group_index(group_tongue);
 	}
 
-	auto group_fricatives = plugin->add_group("Fricatives");
-	{
-		auto spec_fricative_intensity = tract_parameters::fricative_intensity();
-
-		spec_fricative_intensity.default_value = 0.0f;
-
-		env.fricative_intensity = plugin->add_parameter(spec_fricative_intensity);
-
-		env.fricative_intensity->set_group_index(group_fricatives);
-	}
-
 	env.quality = plugin->add_parameter(tract_parameters::quality());
 	env.mix = plugin->add_parameter(std_params::envelopes::mix());
 }

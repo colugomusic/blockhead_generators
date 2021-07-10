@@ -1,21 +1,16 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include <blink/standard_parameters.hpp>
 
 using namespace blink;
 
-enum class Error
-{
-	AlreadyInitialized,
-	NotInitialized,
-	InvalidInstanceGroup,
-};
+namespace freeze {
 
-Freeze::Freeze()
+Plugin::Plugin()
 {
 	auto spec_env_pitch = std_params::envelopes::pitch();
 	auto spec_env_formant = std_params::envelopes::formant();
@@ -32,129 +27,94 @@ Freeze::Freeze()
 	add_parameter(spec_sld_pitch);
 }
 
-blink_Effect Freeze::make_effect(int instance_group)
+blink::EffectInstance* Plugin::make_instance()
 {
-	if (instance_group_data_.find(instance_group) == instance_group_data_.end())
-	{
-		instance_group_data_[instance_group] = std::make_shared<InstanceGroupData>();
-	}
-
-	initialize_instance_group(instance_group);
-
-	const auto instance = new Audio(this, instance_group, instance_group_data_[instance_group]);
-	const auto out = bind::effect(instance);
-
-	register_instance(instance);
-
-	return out;
+	return new Instance(this);
 }
 
-blink_Error Freeze::destroy_effect(blink_Effect effect)
-{
-	const auto audio = (Audio*)(effect.proc_data);
-	const auto instance_group = audio->get_instance_group();
+Plugin* g_plugin = nullptr;
 
-	if (instance_group_data_.find(instance_group) != instance_group_data_.end())
-	{
-		instance_group_data_.erase(instance_group);
-	}
+} // freeze
 
-	unregister_instance(audio);
-
-	delete audio;
-
-	return BLINK_OK;
-}
-
-void Freeze::hard_reset(int instance_group)
-{
-	auto& instance_group_data = instance_group_data_[instance_group];
-
-	instance_group_data->buffer.clear();
-	instance_group_data->master_instance = nullptr;
-}
-
-Freeze* g_plugin = nullptr;
-
-blink_UUID blink_get_plugin_uuid() { return Freeze::UUID; }
-blink_UUID blink_get_plugin_name() { return Freeze::NAME; }
+blink_UUID blink_get_plugin_uuid() { return freeze::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return freeze::Plugin::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (freeze::g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new Freeze();
+	freeze::g_plugin = new freeze::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!freeze::g_plugin) return blink_StdError_NotInitialized;
 
-	delete g_plugin;
+	delete freeze::g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!freeze::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->stream_init(SR);
+	freeze::g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Effect blink_make_effect(int instance_group)
+blink_EffectInstance blink_make_effect_instance()
 {
-	if (!g_plugin) return blink_Effect { 0, 0 };
+	if (!freeze::g_plugin) return blink_EffectInstance{ 0 };
 
-	return g_plugin->make_effect(instance_group);
+	return bind::effect_instance(freeze::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_effect(blink_Effect effect)
+blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
-	return g_plugin->destroy_effect(effect);
+	if (!freeze::g_plugin) return blink_StdError_NotInitialized;
+
+	const auto obj = (freeze::Instance*)(instance.proc_data);
+
+	freeze::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!g_plugin) return 0;
+	if (!freeze::g_plugin) return 0;
 
-	return g_plugin->get_num_groups();
+	return freeze::g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!g_plugin) return 0;
+	if (!freeze::g_plugin) return 0;
 
-	return g_plugin->get_num_parameters();
+	return freeze::g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(g_plugin->get_group(index));
+	return bind::group(freeze::g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(g_plugin->get_parameter(index));
+	return bind::parameter(freeze::g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(freeze::g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		case Error::InvalidInstanceGroup: return "invalid instance group";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

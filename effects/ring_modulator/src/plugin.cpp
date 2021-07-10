@@ -1,14 +1,16 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include <blink/standard_parameters.hpp>
 
 using namespace blink;
 
-RingModulator::RingModulator()
+namespace ring_modulator {
+
+Plugin::Plugin()
 {
 	auto spec_env_pitch = std_params::envelopes::pitch();
 	auto spec_env_mix = std_params::envelopes::mix();
@@ -19,101 +21,94 @@ RingModulator::RingModulator()
 	env_mix_ = add_parameter(spec_env_mix);
 }
 
-enum class Error
+blink::EffectInstance* Plugin::make_instance()
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	return new Instance(this);
+}
 
-RingModulator* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid() { return RingModulator::UUID; }
-blink_UUID blink_get_plugin_name() { return RingModulator::NAME; }
+} // ring_modulator
+
+blink_UUID blink_get_plugin_uuid() { return ring_modulator::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return ring_modulator::Plugin::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (ring_modulator::g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new RingModulator();
+	ring_modulator::g_plugin = new ring_modulator::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!ring_modulator::g_plugin) return blink_StdError_NotInitialized;
 
-	delete g_plugin;
+	delete ring_modulator::g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!ring_modulator::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->stream_init(SR);
+	ring_modulator::g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Effect blink_make_effect(int instance_group)
+blink_EffectInstance blink_make_effect_instance()
 {
-	if (!g_plugin) return blink_Effect{ 0, 0 };
+	if (!ring_modulator::g_plugin) return blink_EffectInstance{ 0 };
 
-	const auto instance = new Audio(g_plugin, instance_group);
-	const auto out = bind::effect(instance);
-
-	g_plugin->register_instance(instance);
-
-	return out;
+	return bind::effect_instance(ring_modulator::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_effect(blink_Effect effect)
+blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!ring_modulator::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->unregister_instance((blink::Effect*)(effect.proc_data));
+	const auto obj = (ring_modulator::Instance*)(instance.proc_data);
 
-	return bind::destroy_effect(effect);
+	ring_modulator::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!g_plugin) return 0;
+	if (!ring_modulator::g_plugin) return 0;
 
-	return g_plugin->get_num_groups();
+	return ring_modulator::g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!g_plugin) return 0;
+	if (!ring_modulator::g_plugin) return 0;
 
-	return g_plugin->get_num_parameters();
+	return ring_modulator::g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(g_plugin->get_group(index));
+	return bind::group(ring_modulator::g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(g_plugin->get_parameter(index));
+	return bind::parameter(ring_modulator::g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(ring_modulator::g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

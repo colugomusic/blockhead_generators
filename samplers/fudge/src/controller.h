@@ -15,13 +15,13 @@ struct AudioData;
 
 namespace fudge {
 
-class Fudge;
+class Plugin;
 
 class Controller
 {
 public:
 
-	Controller(const Fudge* plugin);
+	Controller(const Plugin* plugin);
 
 	void process(
 		const AudioData& data,
@@ -54,7 +54,7 @@ private:
 	float snap_ratio_to_scale(int index, float ff) const;
 	float snap_pitch_to_scale(float pitch, std::int32_t scale) const;
 
-	const Fudge* plugin_;
+	const Plugin* plugin_;
 	blink::std_traversers::Fudge position_traverser_;
 
 	const blink_SamplerBuffer* buffer_;

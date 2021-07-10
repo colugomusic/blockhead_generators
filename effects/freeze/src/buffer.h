@@ -5,6 +5,8 @@
 
 #include <blink/math.hpp>
 
+namespace freeze {
+
 template <std::size_t SIZE>
 class Buffer
 {
@@ -67,3 +69,5 @@ private:
 };
 
 using FreezeBuffer = Buffer<8192*2>;
+
+} // freeze

@@ -1,10 +1,12 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/sampler_plugin.hpp>
 
 #include "gui.h"
 
-class Classic : public blink::Plugin
+namespace classic {
+
+class Plugin : public blink::SamplerPlugin
 {
 public:
 
@@ -31,7 +33,7 @@ public:
 		Tog_Reverse = 12,
 	};
 
-	Classic();
+	Plugin();
 
 	GUI& gui();
 
@@ -42,6 +44,8 @@ public:
 	const blink::EnvelopeParameter& env_noise_color() const { return *env_noise_color_; }
 
 private:
+
+	blink::SamplerInstance* make_instance() override;
 
 	GUI gui_;
 
@@ -59,3 +63,5 @@ private:
 	std::shared_ptr<blink::ToggleParameter> tog_loop_;
 	std::shared_ptr<blink::ToggleParameter> tog_revers_;
 };
+
+} // classic

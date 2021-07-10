@@ -1,49 +1,48 @@
 #define BLINK_EXPORT
 
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include "parameters.h"
 
 using namespace blink;
 
 namespace berk {
 
-Berk::Berk()
+Plugin::Plugin()
 	: params_(this)
 {
 }
 
-enum class Error
+blink::SynthInstance* Plugin::make_instance()
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	return new Instance(this);
+}
 
-Berk* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
 } // berk
 
 using namespace berk;
 
-blink_UUID blink_get_plugin_uuid() { return Berk::UUID; }
-blink_UUID blink_get_plugin_name() { return Berk::NAME; }
+blink_UUID blink_get_plugin_uuid() { return berk::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return berk::Plugin::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new Berk();
+	g_plugin = new berk::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
 	delete g_plugin;
 
@@ -52,32 +51,29 @@ blink_Error blink_terminate()
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
 	g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Synth blink_make_synth(int instance_group)
+blink_SynthInstance blink_make_synth_instance()
 {
-	if (!g_plugin) return blink_Synth { 0, 0 };
+	if (!berk::g_plugin) return blink_SynthInstance{ 0 };
 
-	const auto instance = new Audio(g_plugin, instance_group);
-	const auto out = bind::synth(instance);
-
-	g_plugin->register_instance(instance);
-
-	return out;
+	return bind::synth_instance(berk::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_synth(blink_Synth synth)
+blink_Error blink_destroy_synth_instance(blink_SynthInstance instance)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!berk::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->unregister_instance((blink::Synth*)(synth.proc_data));
+	const auto obj = (berk::Instance*)(instance.proc_data);
 
-	return bind::destroy_synth(synth);
+	berk::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
@@ -111,10 +107,5 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

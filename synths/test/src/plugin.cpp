@@ -1,15 +1,17 @@
 #define BLINK_EXPORT
 
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include <blink/standard_parameters.hpp>
 
 using namespace blink;
 
-Test::Test()
+namespace test {
+
+Plugin::Plugin()
 {
 	auto spec_env_amp = std_params::envelopes::amp();
 	auto spec_env_wave = std_params::envelopes::resonance();
@@ -68,101 +70,94 @@ Test::Test()
 	}
 }
 
-enum class Error
+blink::SynthInstance* Plugin::make_instance()
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	return new Instance(this);
+}
 
-Test* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid() { return Test::UUID; }
-blink_UUID blink_get_plugin_name() { return Test::NAME; }
+} // test
+
+blink_UUID blink_get_plugin_uuid() { return test::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return test::Plugin::NAME; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (test::g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new Test();
+	test::g_plugin = new test::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!test::g_plugin) return blink_StdError_NotInitialized;
 
-	delete g_plugin;
+	delete test::g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!test::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->stream_init(SR);
+	test::g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Synth blink_make_synth(int instance_group)
+blink_SynthInstance blink_make_synth_instance()
 {
-	if (!g_plugin) return blink_Synth{ 0, 0 };
+	if (!test::g_plugin) return blink_SynthInstance{ 0 };
 
-	const auto instance = new Audio(g_plugin, instance_group);
-	const auto out = bind::synth(instance);
-
-	g_plugin->register_instance(instance);
-
-	return out;
+	return bind::synth_instance(test::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_synth(blink_Synth synth)
+blink_Error blink_destroy_synth_instance(blink_SynthInstance instance)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!test::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->unregister_instance((blink::Synth*)(synth.proc_data));
+	const auto obj = (test::Instance*)(instance.proc_data);
 
-	return bind::destroy_synth(synth);
+	test::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!g_plugin) return 0;
+	if (!test::g_plugin) return 0;
 
-	return g_plugin->get_num_groups();
+	return test::g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!g_plugin) return 0;
+	if (!test::g_plugin) return 0;
 
-	return g_plugin->get_num_parameters();
+	return test::g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(g_plugin->get_group(index));
+	return bind::group(test::g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(g_plugin->get_parameter(index));
+	return bind::parameter(test::g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(test::g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

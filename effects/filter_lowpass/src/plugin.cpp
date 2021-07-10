@@ -1,14 +1,16 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
+#include <blink/errors.hpp>
 #include <blink/standard_parameters.hpp>
 
 using namespace blink;
 
-Filter::Filter()
+namespace lowpass {
+
+Plugin::Plugin()
 {
 	auto spec_env_freq = std_params::envelopes::filter_frequency();
 	auto spec_env_res = std_params::envelopes::resonance();
@@ -22,102 +24,95 @@ Filter::Filter()
 	env_mix_ = add_parameter(spec_env_mix);
 }
 
-enum class Error
+blink::EffectInstance* Plugin::make_instance()
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	return new Instance(this);
+}
 
-Filter* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid() { return Filter::UUID; }
-blink_UUID blink_get_plugin_name() { return Filter::NAME; }
+} // lowpass
+
+blink_UUID blink_get_plugin_uuid() { return lowpass::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return lowpass::Plugin::NAME; }
 const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (lowpass::g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new Filter();
+	lowpass::g_plugin = new lowpass::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!lowpass::g_plugin) return blink_StdError_NotInitialized;
 
-	delete g_plugin;
+	delete lowpass::g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!lowpass::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->stream_init(SR);
+	lowpass::g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
-blink_Effect blink_make_effect(int instance_group)
+blink_EffectInstance blink_make_effect_instance()
 {
-	if (!g_plugin) return blink_Effect{ 0, 0 };
+	if (!lowpass::g_plugin) return blink_EffectInstance{ 0 };
 
-	const auto instance = new Audio(g_plugin, instance_group);
-	const auto out = bind::effect(instance);
-
-	g_plugin->register_instance(instance);
-
-	return out;
+	return bind::effect_instance(lowpass::g_plugin->add_instance());
 }
 
-blink_Error blink_destroy_effect(blink_Effect effect)
+blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!lowpass::g_plugin) return blink_StdError_NotInitialized;
 
-	g_plugin->unregister_instance((blink::Effect*)(effect.proc_data));
+	const auto obj = (lowpass::Instance*)(instance.proc_data);
 
-	return bind::destroy_effect(effect);
+	lowpass::g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!g_plugin) return 0;
+	if (!lowpass::g_plugin) return 0;
 
-	return g_plugin->get_num_groups();
+	return lowpass::g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!g_plugin) return 0;
+	if (!lowpass::g_plugin) return 0;
 
-	return g_plugin->get_num_parameters();
+	return lowpass::g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(g_plugin->get_group(index));
+	return bind::group(lowpass::g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(g_plugin->get_parameter(index));
+	return bind::parameter(lowpass::g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(lowpass::g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

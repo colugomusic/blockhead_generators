@@ -12,6 +12,8 @@ cpm_export_variables(bleat)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/instance.h
+    ./src/instance.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 	../../shared/noise_generator.h

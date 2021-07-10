@@ -15,6 +15,7 @@ public:
 
 	struct Input
 	{
+		bool fricatives = false;
 		ml::DSPVector glottal_output;
 		ml::DSPVector fricative_noise;
 		ml::DSPVector fricative_intensity;
@@ -52,6 +53,7 @@ private:
 
 		struct Input
 		{
+			bool fricatives = false;
 			float glottal_output;
 			float fricative_noise;
 			float fricative_intensity;
@@ -68,8 +70,9 @@ private:
 		Step();
 
 		void operator()(int SR, float lambda, const Input& input, float* lip_out, float* nose_out);
-		void finish_block(int SR, float speed);
 		void reset();
+		void reshape_tract(int SR, float speed, bool fricatives);
+		void calculate_reflections();
 
 	private:
 
@@ -79,9 +82,7 @@ private:
 		void process_transients(int SR);
 		void add_turbulence_noise(const Input& input);
 		void add_turbulence_noise_at_index(float noise, float index, float diameter);
-		void calculate_reflections();
 		void calculate_nose_reflections();
-		void reshape_tract(int SR, float speed);
 
 		struct Transients
 		{

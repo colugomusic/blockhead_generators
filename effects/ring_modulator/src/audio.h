@@ -1,23 +1,29 @@
-#include <blink.h>
-#include <blink/effect.hpp>
+#pragma once
+
+#include <blink/effect_unit.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-class RingModulator;
+namespace ring_modulator {
 
-class Audio : public blink::Effect
+class Plugin;
+class Instance;
+
+class Audio : public blink::EffectUnit
 {
 public:
 
-	Audio(RingModulator* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
 	void reset() override;
 
 private:
 	
-	const RingModulator* plugin_;
+	const Plugin* plugin_;
 	ml::SineGen sine_;
 };
+
+} // ring_modulator

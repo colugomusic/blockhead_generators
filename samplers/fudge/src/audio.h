@@ -1,6 +1,6 @@
-#include <blink.h>
-#include <blink_sampler.h>
-#include <blink/sampler.hpp>
+#pragma once
+
+#include <blink/sampler_unit.hpp>
 #include <blink/standard_traversers/fudge.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
@@ -16,13 +16,14 @@
 
 namespace fudge {
 
-class Fudge;
+class Plugin;
+class Instance;
 
-class Audio : public blink::Sampler
+class Audio : public blink::SamplerUnit
 {
 public:
 
-	Audio(Fudge* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
 
@@ -38,7 +39,7 @@ private:
 		const blink_SliderData* sld_noise_width,
 		const blink::BlockPositions& block_positions);
 	
-	const Fudge* plugin_;
+	const Plugin* plugin_;
 	blink::Traverser block_traverser_;
 	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	NoiseGenerator noise_gen_;
@@ -46,4 +47,4 @@ private:
 	std::array<Particle, 4> particles_;
 };
 
-}
+} // fudge

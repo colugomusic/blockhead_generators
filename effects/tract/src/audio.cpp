@@ -1,23 +1,22 @@
 #include "audio.h"
 #include "audio_data.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
 namespace tract {
 
-static constexpr auto BASE_MODEL_SR = 44100;
-static constexpr auto ROWS = 2;
-
-Audio::Audio(Tract* plugin, int instance_group)
-	: Effect(plugin, instance_group)
-	, plugin_(plugin)
+Audio::Audio(Instance* instance)
+	: EffectUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
 void Audio::stream_init()
 {
-	const auto buffer_size = 2 * int(std::ceil(kFloatsPerDSPVector * ROWS * (float(SR()) / float(BASE_MODEL_SR / 2))));
+	const auto MIN_MODEL_SR = BASE_MODEL_SR / 2;
+	const auto buffer_size = 2 * int(std::ceil(kFloatsPerDSPVector * ROWS * (float(SR()) / float(MIN_MODEL_SR))));
 
 	input_buffer_.resize(buffer_size);
 }
@@ -30,7 +29,6 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	const auto diameter = data.envelopes.diameter.search_vec(block_positions());
 	const auto tongue_index = data.envelopes.tongue_index.search_vec(block_positions());
 	const auto tongue_diameter = data.envelopes.tongue_diameter.search_vec(block_positions());
-	const auto fricative_intensity = data.envelopes.fricative_intensity.search_vec(block_positions());
 	const auto quality = data.envelopes.quality.search(block_positions());
 	const auto mix = data.envelopes.mix.search_vec(block_positions());
 
@@ -63,14 +61,6 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	{
 		auto source = [&]()
 		{
-			const auto noise = noise_();
-
-			aspirate_filter_.mCoeffs = ml::Bandpass::coeffs(500.0f / model_SR, 0.9f);
-			fricative_filter_.mCoeffs = ml::Bandpass::coeffs(1000.0f / model_SR, 0.9f);
-
-			const auto fricative_noise = fricative_filter_(noise);
-			const auto aspirate_noise = aspirate_filter_(noise);
-
 			auto input_source = [&]()
 			{
 				ml::DSPVectorArray<2> out;
@@ -88,8 +78,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 				::Tract::Input tract_input;
 
 				tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
-				tract_input.fricative_intensity = fricative_intensity;
-				tract_input.fricative_noise = fricative_noise;
+				tract_input.fricative_intensity = 0.0f;
 				tract_input.glottal_output = tract_in.constRow(r);
 				tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, index);
 				tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);

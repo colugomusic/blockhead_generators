@@ -2,7 +2,7 @@
 
 namespace berk {
 
-AudioData::Envelopes::Envelopes(const Berk* plugin, const blink_SynthBuffer* buffer)
+AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_SynthBuffer* buffer)
 	: amp(plugin, buffer->parameter_data, plugin->params().env.amp.get())
 	, pitch(plugin, buffer->parameter_data, plugin->params().env.pitch.get())
 	, buzz(plugin, buffer->parameter_data, plugin->params().env.buzz.get())
@@ -15,7 +15,7 @@ AudioData::Envelopes::Envelopes(const Berk* plugin, const blink_SynthBuffer* buf
 {
 }
 
-AudioData::AudioData(const Berk* plugin, const blink_SynthBuffer* buffer)
+AudioData::AudioData(const Plugin* plugin, const blink_SynthBuffer* buffer)
 	: envelopes(plugin, buffer)
 {
 }

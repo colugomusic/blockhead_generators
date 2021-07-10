@@ -1,11 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
-Audio::Audio(Classic* plugin, int instance_group)
-	: Sampler(plugin, instance_group)
-	, plugin_(plugin)
+namespace classic {
+
+Audio::Audio(Instance* instance)
+	: SamplerUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
@@ -32,19 +35,19 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		const blink_ToggleData* toggle_reverse;
 	} data;
 
-	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Classic::ParameterIndex::Option_NoiseMode));
-	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Amp));
-	data.env_pan              = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pan));
-	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_Pitch));
-	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Classic::ParameterIndex::Env_NoiseColor));
-	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Amp));
-	data.slider_pan           = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pan));
-	data.slider_pitch         = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_Pitch));
-	data.slider_sample_offset = plugin_->get_int_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_SampleOffset));
-	data.slider_noise_width   = plugin_->get_slider_data(buffer->parameter_data, int(Classic::ParameterIndex::Sld_NoiseWidth));
-	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Loop));
-	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Classic::ParameterIndex::Tog_Reverse));
+	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
+	data.env_amp              = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
+	data.env_pan              = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pan));
+	data.env_pitch            = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
+	data.env_noise_amount     = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseAmount));
+	data.env_noise_color      = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseColor));
+	data.slider_amp           = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Amp));
+	data.slider_pan           = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pan));
+	data.slider_pitch         = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pitch));
+	data.slider_sample_offset = plugin_->get_int_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_SampleOffset));
+	data.slider_noise_width   = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_NoiseWidth));
+	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Loop));
+	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
 
 	traverser_resetter_.check(data.env_pitch, &block_traverser_);
 
@@ -124,3 +127,4 @@ blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callb
 	return BLINK_OK;
 }
 
+} // classic

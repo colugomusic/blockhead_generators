@@ -1,6 +1,6 @@
-#include <blink.h>
-#include <blink_sampler.h>
-#include <blink/sampler.hpp>
+#pragma once
+
+#include <blink/sampler_unit.hpp>
 #include <blink/standard_traversers/classic.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
@@ -11,13 +11,16 @@
 #include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-class Classic;
+namespace classic {
 
-class Audio : public blink::Sampler
+class Plugin;
+class Instance;
+
+class Audio : public blink::SamplerUnit
 {
 public:
 
-	Audio(Classic* plugin, int instance_group);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
 	blink_Error preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const;
@@ -29,9 +32,11 @@ private:
 	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);
 	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);
 	
-	const Classic* plugin_;
+	const Plugin* plugin_;
 	blink::Traverser block_traverser_;
 	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	blink::std_traversers::Classic position_traverser_;
 	NoiseGenerator noise_gen_;
 };
+
+} // classic

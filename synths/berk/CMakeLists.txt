@@ -16,6 +16,8 @@ list(APPEND SRC
     ./src/audio_data.cpp
     ./src/glottis.h
     ./src/glottis.cpp
+    ./src/instance.h
+    ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
     ./src/plugin.h

@@ -1,11 +1,14 @@
 #include "audio.h"
 #include "plugin.h"
+#include "instance.h"
 
 using namespace blink;
 
-Audio::Audio(RingModulator* plugin, int instance_group)
-	: Effect(plugin, instance_group)
-	, plugin_(plugin)
+namespace ring_modulator {
+
+Audio::Audio(Instance* instance)
+	: EffectUnit(instance)
+	, plugin_(instance->get_plugin())
 {
 }
 
@@ -17,8 +20,8 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		const blink_EnvelopeData* env_mix;
 	} data;
 
-	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(RingModulator::ParameterIndex::Env_Pitch));
-	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(RingModulator::ParameterIndex::Env_Mix));
+	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
+	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
 
 	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, block_positions()) + 60.0f;
 	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
@@ -38,3 +41,5 @@ void Audio::reset()
 {
 	sine_.clear();
 }
+
+} // ring_modulator

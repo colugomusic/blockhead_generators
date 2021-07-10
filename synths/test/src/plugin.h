@@ -1,8 +1,10 @@
 #pragma once
 
-#include <blink/plugin.hpp>
+#include <blink/synth_plugin.hpp>
 
-class Test : public blink::Plugin
+namespace test {
+
+class Plugin : public blink::SynthPlugin
 {
 public:
 
@@ -23,7 +25,7 @@ public:
 		Sld_NoiseWidth,
 	};
 
-	Test();
+	Plugin();
 
 	const blink::EnvelopeParameter& env_amp() const { return *env_amp_; }
 	const blink::EnvelopeParameter& env_wave() const { return *env_wave_; }
@@ -36,6 +38,8 @@ public:
 
 private:
 
+	blink::SynthInstance* make_instance() override;
+
 	std::shared_ptr<blink::EnvelopeParameter> env_amp_;
 	std::shared_ptr<blink::EnvelopeParameter> env_wave_;
 	std::shared_ptr<blink::EnvelopeParameter> env_p0_;
@@ -47,3 +51,5 @@ private:
 	std::shared_ptr<blink::EnvelopeParameter> env_noise_color_;
 	std::shared_ptr<blink::SliderParameter<float>> sld_noise_width_;
 };
+
+} // test
