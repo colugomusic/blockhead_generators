@@ -1,6 +1,7 @@
 #include "audio.h"
 #include "plugin.h"
 #include "instance.h"
+#include "audio_data.h"
 
 using namespace blink;
 
@@ -39,27 +40,14 @@ ml::Projection unityToDecay(ml::projections::intervalMap({ 0, 1 }, { kDecayLo, k
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
+	AudioData data(plugin_, buffer);
+
 	glide_size_.setGlideTimeInSamples(0.1f * SR());
 	glide_decay_.setGlideTimeInSamples(0.1f * SR());
 
-	struct Data
-	{
-		const blink_EnvelopeData* env_size;
-		const blink_EnvelopeData* env_decay;
-		const blink_EnvelopeData* env_mix;
-	} data;
-
-	data.env_size = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Size));
-	data.env_decay = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Decay));
-	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
-
-	float size;
-	float decay;
-
-	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
-
-	plugin_->env_size().search_vec(data.env_size, block_positions(), 1, &size);
-	plugin_->env_decay().search_vec(data.env_decay, block_positions(), 1, &decay);
+	const auto size = data.envelopes.size.search(block_positions());
+	const auto decay = data.envelopes.decay.search(block_positions());
+	const auto mix = data.envelopes.mix.search_vec(block_positions());
 
 	const float sr = float(SR());
 	const float RT60const = 0.001f;
