@@ -1,61 +1,78 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "audio.h"
+#include "instance.h"
 
 #include <blink/bind.hpp>
-#include <blink/math.hpp>
-#include "parameters.h"
+#include <blink/errors.hpp>
 
 using namespace blink;
 
-Lofi::Lofi()
+namespace lofi {
+
+Plugin::Plugin()
+	: params_(this)
 {
-	env_SR_ = add_parameter(parameters::envelopes::SR());
-	env_res_ = add_parameter(parameters::envelopes::BR());
-	env_mix_ = add_parameter(std_params::envelopes::mix());
 }
 
-enum class Error
+blink::EffectInstance* Plugin::make_instance()
 {
-	AlreadyInitialized,
-	NotInitialized,
-};
+	return new Instance(this);
+}
 
-Lofi* g_plugin = nullptr;
+Plugin* g_plugin = nullptr;
 
-blink_UUID blink_get_plugin_uuid() { return Lofi::UUID; }
-blink_UUID blink_get_plugin_name() { return Lofi::NAME; }
+} // lofi
+
+using namespace lofi;
+
+blink_UUID blink_get_plugin_uuid() { return lofi::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return lofi::Plugin::NAME; }
 const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (g_plugin) return blink_Error(Error::AlreadyInitialized);
+	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new Lofi();
+	g_plugin = new lofi::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!g_plugin) return blink_Error(Error::NotInitialized);
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
 	delete g_plugin;
 
 	return BLINK_OK;
 }
 
-blink_Effect blink_make_effect(int instance_group)
+blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!g_plugin) return blink_Effect { 0, 0, 0 };
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	return bind::make_effect<Audio>(g_plugin);
+	g_plugin->stream_init(SR);
+
+	return BLINK_OK;
 }
 
-blink_Error blink_destroy_effect(blink_Effect effect)
+blink_EffectInstance blink_make_effect_instance()
 {
-	return bind::destroy_effect(effect);
+	if (!g_plugin) return blink_EffectInstance{0};
+
+	return bind::effect_instance(g_plugin->add_instance());
+}
+
+blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
+{
+	if (!g_plugin) return blink_StdError_NotInitialized;
+
+	const auto obj = (lofi::Instance*)(instance.proc_data);
+
+	g_plugin->destroy_instance(obj);
+
+	return BLINK_OK;
 }
 
 int blink_get_num_groups()
@@ -89,10 +106,5 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 
 const char* blink_get_error_string(blink_Error error)
 {
-	switch (Error(error))
-	{
-		case Error::AlreadyInitialized: return "already initialized";
-		case Error::NotInitialized: return "not initialized";
-		default: return "unknown error";
-	}
+	return blink::get_std_error_string(blink_StdError(error));
 }

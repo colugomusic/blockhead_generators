@@ -1,12 +1,27 @@
 #pragma once
 
 #include <blink/envelope_spec.hpp>
+#include <blink/plugin.hpp>
 
-namespace parameters {
-namespace envelopes {
+namespace lofi {
 
-extern blink::EnvelopeSpec SR();
-extern blink::EnvelopeSpec BR();
+struct Parameters
+{
+	enum class Index
+	{
+		Env_SR,
+		Env_BR,
+		Env_Mix,
+	};
 
-} // envelopes
-} // parameters
+	struct Envelopes
+	{
+		std::shared_ptr<blink::EnvelopeParameter> sr;
+		std::shared_ptr<blink::EnvelopeParameter> br;
+		std::shared_ptr<blink::EnvelopeParameter> mix;
+	} env;
+
+	Parameters(blink::Plugin* plugin);
+};
+
+} // lofi

@@ -1,21 +1,29 @@
 #include <blink.h>
-#include <blink/effect.hpp>
+#include <blink/effect_unit.hpp>
 
 #pragma warning(push, 0)
+#include <DSP/MLDSPGens.h>
 #pragma warning(pop)
 
-class Lofi;
+namespace lofi {
 
-class Audio : public blink::Effect
+class Plugin;
+class Instance;
+
+class Audio : public blink::EffectUnit
 {
 public:
 
-	Audio(const Lofi* plugin);
+	Audio(Instance* instance);
 
 	blink_Error process(const blink_EffectBuffer* buffer, const float* in, float* out) override;
-	blink_Error reset() override;
+	void reset() override;
 
 private:
 	
-	const Lofi* plugin_;
+	const Plugin* plugin_;
+	float phase_ = 0.0f;
+	std::array<float, 2> value_;
 };
+
+} // lofi

@@ -2,7 +2,7 @@
 #include "audio.h"
 #include "plugin.h"
 
-namespace bandpass {
+namespace lofi {
 
 Instance::Instance(Plugin* plugin)
 	: blink::EffectInstance(plugin)
@@ -15,4 +15,4 @@ std::shared_ptr<blink::EffectUnit> Instance::make_unit()
 	return std::make_shared<Audio>(this);
 }
 
-} // bandpass
+} // lofi

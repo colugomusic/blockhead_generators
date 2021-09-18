@@ -9,9 +9,19 @@ include(blink_plugin)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/audio_data.h
+    ./src/audio_data.cpp
+    ./src/instance.h
+    ./src/instance.cpp
+    ./src/parameters.h
+    ./src/parameters.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
 
 blink_plugin_add(${PROJECT_NAME} "${SRC}")
 blink_plugin_set_effect_target_properties("filter.lofi")
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+	../..
+)
