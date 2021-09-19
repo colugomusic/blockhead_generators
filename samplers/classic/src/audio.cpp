@@ -33,6 +33,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		const blink_SliderData* slider_noise_width;
 		const blink_ToggleData* toggle_loop;
 		const blink_ToggleData* toggle_reverse;
+		const blink_WarpPoints* warp_points;
 	} data;
 
 	data.option_noise_mode    = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
@@ -48,10 +49,23 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.slider_noise_width   = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_NoiseWidth));
 	data.toggle_loop          = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Loop));
 	data.toggle_reverse       = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
+	data.warp_points          = buffer->warp_points;
 
 	traverser_resetter_.check(data.env_pitch, &block_traverser_);
 
-	auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
+	snd::transport::DSPVectorFramePosition sample_pos;
+	//auto sample_pos = position_traverser_.get_positions(data.slider_pitch->value, data.env_pitch, block_traverser_, data.slider_sample_offset->value, kFloatsPerDSPVector);
+
+	position_traverser_.get_positions(
+		data.slider_pitch->value,
+		data.env_pitch,
+		data.warp_points,
+		block_traverser_,
+		data.slider_sample_offset->value,
+		kFloatsPerDSPVector,
+		nullptr,
+		&sample_pos,
+		nullptr);
 
 	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
 

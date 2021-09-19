@@ -25,6 +25,8 @@ struct Data
 		const blink_EnvelopeData* amp;
 		const blink_EnvelopeData* pitch;
 	} envelopes;
+
+	const blink_WarpPoints* warp_points;
 };
 
 static Data get_data(const blink_SamplerBuffer* buffer)
@@ -38,6 +40,7 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Tog_Reverse));
 	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Amp));
 	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Pitch));
+	out.warp_points = buffer->warp_points;
 
 	return out;
 }
@@ -52,19 +55,24 @@ static void calculate_positions(
 	int count,
 	blink_SamplerDrawInfo* out)
 {
+	snd::transport::DSPVectorFramePosition sculpted_block_positions;
+	snd::transport::DSPVectorFramePosition warped_block_positions;
 	ml::DSPVector derivatives;
 
-	auto sculpted_block_positions =
-		classic_traverser->get_positions(
-			data.sliders.pitch ? data.sliders.pitch->value : 0,
-			data.envelopes.pitch,
-			block_traverser,
-			data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
-			count,
-			&derivatives);
+	classic_traverser->get_positions(
+		data.sliders.pitch ? data.sliders.pitch->value : 0,
+		data.envelopes.pitch,
+		data.warp_points,
+		block_traverser,
+		data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
+		count,
+		&sculpted_block_positions,
+		&warped_block_positions,
+		&derivatives);
 
 	auto sculpted_sample_positions = sculpted_block_positions / (float(song_rate) / sample_info.SR);
-	auto final_sample_positions = sculpted_sample_positions;
+	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_info.SR);
+	auto final_sample_positions = warped_sample_positions;
 
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
@@ -94,6 +102,20 @@ static void calculate_positions(
 		const auto doubles = sculpted_sample_positions.as_doubles();
 
 		std::copy(doubles[0].data(), doubles[0].data() + count, out->sculpted_sample_positions + index);
+	}
+
+	if (out->warped_block_positions)
+	{
+		const auto doubles = warped_block_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->warped_block_positions + index);
+	}
+
+	if (out->warped_sample_positions)
+	{
+		const auto doubles = warped_sample_positions.as_doubles();
+
+		std::copy(doubles[0].data(), doubles[0].data() + count, out->warped_sample_positions + index);
 	}
 
 	if (out->final_sample_positions)

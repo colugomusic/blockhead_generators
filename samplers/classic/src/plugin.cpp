@@ -128,7 +128,7 @@ blink_Error blink_destroy_sampler_instance(blink_SamplerInstance instance)
 
 blink_Bool blink_sampler_enable_warp_markers()
 {
-	return BLINK_FALSE;
+	return BLINK_TRUE;
 }
 
 blink_Bool blink_sampler_requires_preprocessing()
