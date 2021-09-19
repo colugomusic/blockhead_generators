@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(effect_lofi VERSION 0.1.1)
+project(effect_lofi VERSION 0.0.1)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
@@ -20,7 +20,7 @@ list(APPEND SRC
 )
 
 blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_effect_target_properties("filter.lofi")
+blink_plugin_set_effect_target_properties("lofi")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

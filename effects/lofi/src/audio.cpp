@@ -11,8 +11,7 @@ Audio::Audio(Instance* instance)
 	: EffectUnit(instance)
 	, plugin_(instance->get_plugin())
 {
-	value_[0] = 0.0f;
-	value_[1] = 0.0f;
+	reset();
 }
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
@@ -71,6 +70,9 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 void Audio::reset()
 {
+	phase_ = 0.0f;
+	value_[0] = 0.0f;
+	value_[1] = 0.0f;
 }
 
 } // lofi
