@@ -33,6 +33,16 @@ blink::EnvelopeSpec decay()
 	return out;
 }
 
+blink::EnvelopeSpec mix()
+{
+	auto out = std_params::envelopes::mix();
+
+	out.default_value = 0.5f;
+	out.flags |= blink_EnvelopeFlags_DefaultActive;
+
+	return out;
+}
+
 } // envelopes
 } // parameters
 
@@ -40,7 +50,7 @@ Parameters::Parameters(blink::Plugin* plugin)
 {
 	env.size = plugin->add_parameter(parameters::envelopes::size());
 	env.decay = plugin->add_parameter(parameters::envelopes::decay());
-	env.mix = plugin->add_parameter(std_params::envelopes::mix());
+	env.mix = plugin->add_parameter(parameters::envelopes::mix());
 }
 
 } // spring_reverb

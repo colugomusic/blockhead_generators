@@ -7,7 +7,7 @@
 
 using namespace blink;
 
-namespace zap {
+namespace saturator {
 
 Plugin::Plugin()
 	: params_(this)
@@ -21,20 +21,20 @@ blink::EffectInstance* Plugin::make_instance()
 
 Plugin* g_plugin = nullptr;
 
-} // zap
+} // saturator
 
-using namespace zap;
+using namespace saturator;
 
-blink_UUID blink_get_plugin_uuid() { return zap::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return zap::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS"|Special"; }
+blink_UUID blink_get_plugin_uuid() { return saturator::Plugin::UUID; }
+blink_UUID blink_get_plugin_name() { return saturator::Plugin::NAME; }
+const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
 const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new zap::Plugin();
+	g_plugin = new saturator::Plugin();
 
 	return BLINK_OK;
 }
@@ -68,7 +68,7 @@ blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto obj = (zap::Instance*)(instance.proc_data);
+	const auto obj = (saturator::Instance*)(instance.proc_data);
 
 	g_plugin->destroy_instance(obj);
 
