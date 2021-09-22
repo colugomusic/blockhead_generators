@@ -17,81 +17,84 @@ Audio::Audio(Instance* instance)
 
 void Audio::stream_init()
 {
-	for (int i = 0; i < 4; i++)
+	for (int c = 0; c < 2; c++)
 	{
-		buffers_[i].resize(SR());
-	}
+		for (int i = 0; i < 4; i++)
+		{
+			channels_[c].buffers[i].resize(SR());
+		}
 
-	write_.filter.mCoeffs = ml::Lopass::coeffs(200.0f / SR(), 1.0f);
+		channels_[c].write.filter.mCoeffs = ml::Lopass::coeffs(200.0f / SR(), 1.0f);
+	}
 
 	reset();
 }
 
-void Audio::write(const FrameWriteParams& params, float filtered_value, float value)
+void Audio::Channel::do_write(const FrameWriteParams& params, float filtered_value, float value)
 {
-	if (init_ == 0)
+	if (init == 0)
 	{
 		if(std::abs(value) < 0.000001f) return;
 
-		init_++;
+		init++;
 	}
 
-	write_.span.buffer[write_.span.size++] = value;
+	write.span.buffer[write.span.size++] = value;
 
-	if (write_.span.size >= buffers_[0].size())
+	if (write.span.size >= buffers[0].size())
 	{
-		std::swap(write_.span, stage_.span);
-		write_.up = false;
+		std::swap(write.span, stage.span);
+		write.up = false;
 		return;
 	}
 
-	if (write_.up && filtered_value < 0)
+	if (write.up && filtered_value < 0)
 	{
-		write_.up = false;
+		write.up = false;
 	}
-	else if (!write_.up && filtered_value > 0)
+	else if (!write.up && filtered_value > 0)
 	{
-		write_.up = true;
+		write.up = true;
 
-		if (write_.span.size > 3)
+		if (write.span.size > 3)
 		{
-			write_.counter++;
+			write.counter++;
 
-			if (write_.counter > params.bubble)
+			if (write.counter > params.bubble)
 			{
-				if (++init_ >= INIT)
+				if (++init >= INIT)
 				{
-					std::swap(write_.span, stage_.span);
+					std::swap(write.span, stage.span);
 				}
 
-				write_.span.size = 0;
-				write_.counter = 0;
+				write.span.size = 0;
+				write.counter = 0;
 			}
 		}
 	}
 }
 
-float Audio::read(const FrameReadParams& params, float in)
+float Audio::Channel::do_read(const FrameReadParams& params, float in)
 {
-	if (init_ == INIT)
+	if (init == INIT)
 	{
 		start_fade_in(params);
-		init_++;
+		init++;
 	}
 
-	if (init_ < INIT) return in;
+	if (init < INIT) return in;
 
 	float value { do_wet(params) };
 
-	if (fade_in_.active)
+	if (fade_in.active)
 	{
-		const auto amp = math::ease::quadratic::in_out(float(fade_in_.index++) / fade_in_.length);
+		const auto amp = math::ease::quadratic::in_out(float(fade_in.index++) / fade_in.length);
 
 		value = math::lerp(in, value, amp);
 		
-		if (fade_in_.index >= fade_in_.length)
+		if (fade_in.index >= fade_in.length)
 		{
-			fade_in_.active = false;
+			fade_in.active = false;
 		}
 	}
 
@@ -124,111 +127,102 @@ static float apply_tilt(float frame, float tilt, size_t size)
 	return math::lerp(pos, tilted, window(pos)) * size;
 }
 
-void Audio::prepare_xfade(const FrameReadParams& params)
+void Audio::Channel::prepare_xfade(const FrameReadParams& params)
 {
-	const auto tmp { target_.span };
+	const auto tmp { target.span };
 
-	target_.span = stage_.span;
-	target_.frame = 0.0f;
-	stage_.span = source_.span;
-	stage_.span.size = 0;
-	source_.span = tmp;
-	source_.frame = target_.frame;
+	target.span = stage.span;
+	target.frame = 0.0f;
+	stage.span = source.span;
+	stage.span.size = 0;
+	source.span = tmp;
+	source.frame = target.frame;
 }
 
-void Audio::start_fade_in(const FrameReadParams& params)
+void Audio::Channel::start_fade_in(const FrameReadParams& params)
 {
-	const auto tmp { target_.span };
+	const auto tmp { target.span };
 
-	target_.span = stage_.span;
-	target_.frame = 0.0f;
-	stage_.span = source_.span;
-	stage_.span.size = 0;
-	source_.span = tmp;
-	source_.frame = target_.frame;
+	target.span = stage.span;
+	target.frame = 0.0f;
+	stage.span = source.span;
+	stage.span.size = 0;
+	source.span = tmp;
+	source.frame = target.frame;
 
-	fade_in_.active = true;
-	fade_in_.index = 0;
-	fade_in_.length = target_.span.size * 2;
+	fade_in.active = true;
+	fade_in.index = 0;
+	fade_in.length = target.span.size * 2;
 }
 
-void Audio::start_xfade(const FrameReadParams& params)
+void Audio::Channel::start_xfade(const FrameReadParams& params)
 {
-	xfade_.active = true;
-	xfade_.index = 0;
+	xfade.active = true;
+	xfade.index = 0;
 
 	if (params.crossfade_mode == CrossfadeMode::Dynamic)
 	{
-		xfade_.length = size_t(float(math::midpoint(source_.span.size, target_.span.size)) * params.crossfade_size);
+		xfade.length = size_t(float(math::midpoint(source.span.size, target.span.size)) * params.crossfade_size);
 	}
 	else
 	{
-		xfade_.length = size_t(64.0f * params.crossfade_size);
+		xfade.length = size_t(64.0f * params.crossfade_size);
 	}
 
-	xfade_.source_speed_1 = float(source_.span.size) / float(target_.span.size);
-	xfade_.target_speed_0 = float(target_.span.size) / float(source_.span.size);
+	xfade.source_speed_1 = float(source.span.size) / float(target.span.size);
+	xfade.target_speed_0 = float(target.span.size) / float(source.span.size);
 }
 
-static float grain_window(float x, size_t size)
+float Audio::Channel::do_xfade(const FrameReadParams& params)
 {
-	const auto fade_length = std::min(128.0f, size * 0.5f);
+	const auto x { math::ease::quadratic::in_out(float(xfade.index) / (xfade.length - 1)) };
 
-	if (x < size) return 1.0f;
-	if (x < size + fade_length) return 1.0f - math::ease::parametric::in_out((x - size) / fade_length);
-	return 0.0f;
-}
-
-float Audio::do_xfade(const FrameReadParams& params)
-{
-	const auto x { math::ease::quadratic::in_out(float(xfade_.index) / (xfade_.length - 1)) };
-
-	auto source_value { source_.span.read(apply_tilt(source_.frame, params.tilt, source_.span.size)) };
-	auto target_value { target_.span.read(apply_tilt(target_.frame, params.tilt, target_.span.size)) };
+	auto source_value { source.span.read(apply_tilt(source.frame, params.tilt, source.span.size)) };
+	auto target_value { target.span.read(apply_tilt(target.frame, params.tilt, target.span.size)) };
 
 	const auto value { math::lerp(source_value, target_value, x) };
 
-	const auto source_inc = math::lerp(xfade_.source_speed_0, xfade_.source_speed_1, x) * params.ff;
-	const auto target_inc = math::lerp(xfade_.target_speed_0, xfade_.target_speed_1, x) * params.ff;
+	const auto source_inc = math::lerp(xfade.source_speed_0, xfade.source_speed_1, x) * params.ff;
+	const auto target_inc = math::lerp(xfade.target_speed_0, xfade.target_speed_1, x) * params.ff;
 
-	source_.frame += source_inc;
-	target_.frame += target_inc;
+	source.frame += source_inc;
+	target.frame += target_inc;
 
-	const auto source_end = (source_.span.size - 1);
-	const auto target_end = (target_.span.size - 1);
+	const auto source_end = (source.span.size - 1);
+	const auto target_end = (target.span.size - 1);
 
-	if (source_.frame > source_end) source_.frame -= source_end;
-	if (target_.frame > target_end) target_.frame -= target_end;
+	if (source.frame > source_end) source.frame -= source_end;
+	if (target.frame > target_end) target.frame -= target_end;
 
-	xfade_.index++;
+	xfade.index++;
 
-	if (xfade_.index >= xfade_.length)
+	if (xfade.index >= xfade.length)
 	{
-		xfade_.active = false;
+		xfade.active = false;
 	}
 
 	return value;
 }
 
-float Audio::do_wet(const FrameReadParams& params)
+float Audio::Channel::do_wet(const FrameReadParams& params)
 {
-	if (xfade_.active)
+	if (xfade.active)
 	{
 		return do_xfade(params);
 	}
 	else
 	{
-		auto value { target_.span.read(apply_tilt(target_.frame, params.tilt, target_.span.size)) };
+		auto value { target.span.read(apply_tilt(target.frame, params.tilt, target.span.size)) };
 
-		target_.frame += params.ff;
+		target.frame += params.ff;
 
-		const auto end = (target_.span.size - 1);
+		const auto end = (target.span.size - 1);
 
-		if (target_.frame > end)
+		if (target.frame > end)
 		{
-			target_.frame -= end;
+			target.frame -= end;
 
-			if (stage_.span.size > 0)
+			if (stage.span.size > 0)
 			{
 				prepare_xfade(params);
 				start_xfade(params);
@@ -237,6 +231,13 @@ float Audio::do_wet(const FrameReadParams& params)
 
 		return value;
 	}
+}
+
+float Audio::Channel::operator()(const FrameWriteParams& write_params, const FrameReadParams& read_params, float in, float filtered_in)
+{
+	do_write(write_params, filtered_in, in);
+
+	return do_read(read_params, in);
 }
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
@@ -255,31 +256,27 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec;
+	ml::DSPVectorArray<2> filtered_input;
 
-	const auto filtered_input { write_.filter(in_vec.constRow(0)) };
-
-	for (int i = 0; i < kFloatsPerDSPVector; i++)
+	for (int c = 0; c < 2; c++)
 	{
-		const auto filtered_value { filtered_input[i] };
-		const auto value { in_vec.constRow(0)[i] };
+		filtered_input.row(c) = channels_[c].write.filter(in_vec.constRow(c));
 
-		FrameWriteParams write_params;
+		for (int i = 0; i < kFloatsPerDSPVector; i++)
+		{
+			FrameWriteParams write_params;
 
-		write_params.bubble = bubble_int[i];
+			write_params.bubble = bubble_int[i];
 
-		write(write_params, filtered_value, value);
+			FrameReadParams read_params;
 
-		FrameReadParams read_params;
+			read_params.crossfade_size = crossfade_size[i];
+			read_params.crossfade_mode = CrossfadeMode(data.options.xfade_mode.get());
+			read_params.tilt = tilt[i];
+			read_params.ff = pitch[i];
 
-		read_params.crossfade_size = crossfade_size[i];
-		read_params.crossfade_mode = CrossfadeMode(data.options.xfade_mode.get());
-		read_params.tilt = tilt[i];
-		read_params.ff = pitch[i];
-
-		const auto out_value { read(read_params, value) };
-
-		out_vec.row(0)[i] = out_value;
-		out_vec.row(1)[i] = out_value;
+			out_vec.row(c)[i] = channels_[c](write_params, read_params, in_vec.constRow(c)[i], filtered_input.constRow(c)[i]);
+		}
 	}
 
 	ml::validate(out_vec.constRow(0));
@@ -294,22 +291,25 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 void Audio::reset()
 {
-	init_ = 0;
-	fade_in_.active = false;
-	xfade_.active = false;
-	write_.span.buffer = buffers_[0].data();
-	write_.span.size = 0;
-	write_.counter = 0;
-	write_.up = false;
-	stage_.span.buffer = buffers_[1].data();
-	stage_.span.size = 0;
-	source_.span.buffer = buffers_[2].data();
-	source_.span.size = 0;
-	target_.span.buffer = buffers_[3].data();
-	target_.span.size = 0;
+	for (int c = 0; c < 2; c++)
+	{
+		channels_[c].init = 0;
+		channels_[c].fade_in.active = false;
+		channels_[c].xfade.active = false;
+		channels_[c].write.span.buffer = channels_[c].buffers[0].data();
+		channels_[c].write.span.size = 0;
+		channels_[c].write.counter = 0;
+		channels_[c].write.up = false;
+		channels_[c].stage.span.buffer = channels_[c].buffers[1].data();
+		channels_[c].stage.span.size = 0;
+		channels_[c].source.span.buffer = channels_[c].buffers[2].data();
+		channels_[c].source.span.size = 0;
+		channels_[c].target.span.buffer = channels_[c].buffers[3].data();
+		channels_[c].target.span.size = 0;
+	}
 }
 
-float Audio::Span::read(float pos) const
+float Audio::Channel::Span::read(float pos) const
 {
 	const auto index_0 { size_t(std::floor(pos)) };
 	const auto index_1 { size_t(std::ceil(pos)) };

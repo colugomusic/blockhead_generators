@@ -46,71 +46,77 @@ private:
 
 	void stream_init() override;
 
-	void write(const FrameWriteParams& params, float filtered_value, float value);
-	float read(const FrameReadParams& params, float in);
+	struct Channel
+	{
+		float operator()(const FrameWriteParams& write_params, const FrameReadParams& read_params, float in, float filtered_in);
+		void do_write(const FrameWriteParams& params, float filtered_value, float value);
+		float do_read(const FrameReadParams& params, float in);
 
-	void prepare_xfade(const FrameReadParams& params);
-	void start_fade_in(const FrameReadParams& params);
-	void start_xfade(const FrameReadParams& params);
-	float do_xfade(const FrameReadParams& params);
-	float do_wet(const FrameReadParams& params);
+		void prepare_xfade(const FrameReadParams& params);
+		void start_fade_in(const FrameReadParams& params);
+		void start_xfade(const FrameReadParams& params);
+		float do_xfade(const FrameReadParams& params);
+		float do_wet(const FrameReadParams& params);
+
+		std::array<std::vector<float>, 4> buffers;
+
+		struct Span
+		{
+			float* buffer { nullptr };
+			size_t size { 0 };
+
+			float read(float pos) const;
+		};
+
+		struct
+		{
+			Span span;
+			bool up { false };
+			int counter { 0 };
+			ml::Lopass filter;
+		} write;
+		
+		struct
+		{
+			Span span;
+		} stage;
+		
+		struct
+		{
+			Span span;
+			float frame { 0.0f };
+		} source;
+		
+		struct
+		{
+			Span span;
+			float frame { 0.0f };
+		} target;
+
+		struct
+		{
+			float source_speed_0 { 1.0f };
+			float source_speed_1 { 1.0f };
+			float target_speed_0 { 1.0f };
+			float target_speed_1 { 1.0f };
+			bool active { false };
+			size_t length { 64 };
+			size_t index { 0 };
+		} xfade;
+
+		struct
+		{
+			bool active { false };
+			size_t length { 64 };
+			size_t index { 0 };
+		} fade_in;
+
+		int init { 0 };
+	};
 
 	const Plugin* plugin_;
 
-	struct Span
-	{
-		float* buffer { nullptr };
-		size_t size { 0 };
-
-		float read(float pos) const;
-	};
-
-	std::array<std::vector<float>, 4> buffers_;
-
-	struct
-	{
-		Span span;
-		bool up { false };
-		int counter { 0 };
-		ml::Lopass filter;
-	} write_;
-	
-	struct
-	{
-		Span span;
-	} stage_;
-	
-	struct
-	{
-		Span span;
-		float frame { 0.0f };
-	} source_;
-	
-	struct
-	{
-		Span span;
-		float frame { 0.0f };
-	} target_;
-
-	struct
-	{
-		float source_speed_0 { 1.0f };
-		float source_speed_1 { 1.0f };
-		float target_speed_0 { 1.0f };
-		float target_speed_1 { 1.0f };
-		bool active { false };
-		size_t length { 64 };
-		size_t index { 0 };
-	} xfade_;
-
-	struct
-	{
-		bool active { false };
-		size_t length { 64 };
-		size_t index { 0 };
-	} fade_in_;
-
-	int init_ { 0 };
+	std::array<Channel, 2> channels_;
 };
 
 } // wavebender
