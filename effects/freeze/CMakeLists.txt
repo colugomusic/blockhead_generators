@@ -22,5 +22,4 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_effect_target_properties("freeze")
+blink_plugin_add_effect("freeze" "${SRC}")

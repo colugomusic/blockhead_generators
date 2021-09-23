@@ -19,8 +19,7 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_effect_target_properties("lofi")
+blink_plugin_add_effect("lofi" "${SRC}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

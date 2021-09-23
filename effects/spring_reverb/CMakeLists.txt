@@ -19,5 +19,4 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_effect_target_properties("spring_reverb")
+blink_plugin_add_effect("spring_reverb" "${SRC}")

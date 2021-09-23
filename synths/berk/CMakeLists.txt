@@ -31,8 +31,7 @@ list(APPEND SRC
 	../../shared/tract_parameters.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_synth_target_properties("berk")
+blink_plugin_add_synth("berk" "${SRC}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

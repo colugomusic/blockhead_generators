@@ -22,9 +22,12 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_effect_target_properties("compressor")
+list(APPEND RES
+    ./res/icon.png
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+blink_plugin_add_effect_package("compressor" "${SRC}" "${RES}")
+
+target_include_directories(effect_compressor PRIVATE
 	../..
 )

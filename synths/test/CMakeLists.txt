@@ -20,8 +20,7 @@ list(APPEND SRC
 	../../shared/noise_generator.cpp
 )
 
-blink_plugin_add(${PROJECT_NAME} "${SRC}")
-blink_plugin_set_synth_target_properties("test")
+blink_plugin_add_synth("test" "${SRC}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${bleat_SOURCE_DIR}/include
