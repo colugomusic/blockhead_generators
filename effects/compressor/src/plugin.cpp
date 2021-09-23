@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "instance.h"
 
+#include <cmrc/cmrc.hpp>
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
@@ -107,4 +108,20 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
+}
+
+CMRC_DECLARE(compressor);
+
+blink_ResourceData blink_get_resource_data(const char* path)
+{
+	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
+
+	const auto fs = cmrc::compressor::get_filesystem();
+
+	if (!fs.exists(path)) return { 0, 0 };
+	if (!fs.is_file(path)) return { 0, 0 };
+
+	const auto file = fs.open(path);
+
+	return g_plugin->resources().store(path, file);
 }

@@ -24,7 +24,7 @@ list(APPEND SRC
 	../../shared/tract_parameters.cpp
 )
 
-blink_plugin_add_effect("tract" "${SRC}")
+blink_plugin_add_effect("tract" "${SRC}" "")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

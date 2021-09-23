@@ -19,7 +19,7 @@ list(APPEND SRC
 	../../shared/noise_generator.cpp
 )
 
-blink_plugin_add_sampler("classic" "${SRC}")
+blink_plugin_add_sampler("classic" "${SRC}" "")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

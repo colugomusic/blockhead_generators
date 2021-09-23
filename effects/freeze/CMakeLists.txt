@@ -22,4 +22,4 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("freeze" "${SRC}")
+blink_plugin_add_effect("freeze" "${SRC}" "")

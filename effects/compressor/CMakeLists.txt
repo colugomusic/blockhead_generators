@@ -3,7 +3,6 @@ project(effect_compressor VERSION 0.1.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(CPM)
 include(blink_plugin)
 
 CPMAddPackage("gh:colugomusic/snd#master")
@@ -26,7 +25,7 @@ list(APPEND RES
     ./res/icon.png
 )
 
-blink_plugin_add_effect_package("compressor" "${SRC}" "${RES}")
+blink_plugin_add_effect("compressor" "${SRC}" "${RES}")
 
 target_include_directories(effect_compressor PRIVATE
 	../..

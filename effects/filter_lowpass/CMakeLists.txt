@@ -15,4 +15,8 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("filter.lowpass" "${SRC}")
+list(APPEND RES
+    ./res/icon.png
+)
+
+blink_plugin_add_effect("filter.lowpass" "${SRC}" "${RES}")

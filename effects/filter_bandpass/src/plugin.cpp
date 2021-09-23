@@ -33,6 +33,8 @@ Plugin* g_plugin = nullptr;
 
 } // bandpass
 
+using namespace bandpass;
+
 blink_UUID blink_get_plugin_uuid() { return bandpass::Plugin::UUID; }
 blink_UUID blink_get_plugin_name() { return bandpass::Plugin::NAME; }
 const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS; }
@@ -40,79 +42,95 @@ const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
 
 blink_Error blink_init()
 {
-	if (bandpass::g_plugin) return blink_StdError_AlreadyInitialized;
+	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	bandpass::g_plugin = new bandpass::Plugin();
+	g_plugin = new bandpass::Plugin();
 
 	return BLINK_OK;
 }
 
 blink_Error blink_terminate()
 {
-	if (!bandpass::g_plugin) return blink_StdError_NotInitialized;
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	delete bandpass::g_plugin;
+	delete g_plugin;
 
 	return BLINK_OK;
 }
 
 blink_Error blink_stream_init(blink_SR SR)
 {
-	if (!bandpass::g_plugin) return blink_StdError_NotInitialized;
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	bandpass::g_plugin->stream_init(SR);
+	g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
 
 blink_EffectInstance blink_make_effect_instance()
 {
-	if (!bandpass::g_plugin) return blink_EffectInstance{ 0 };
+	if (!g_plugin) return blink_EffectInstance{ 0 };
 
-	return bind::effect_instance(bandpass::g_plugin->add_instance());
+	return bind::effect_instance(g_plugin->add_instance());
 }
 
 blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
-	if (!bandpass::g_plugin) return blink_StdError_NotInitialized;
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
 	const auto obj = (bandpass::Instance*)(instance.proc_data);
 
-	bandpass::g_plugin->destroy_instance(obj);
+	g_plugin->destroy_instance(obj);
 
 	return BLINK_OK;
 }
 
 int blink_get_num_groups()
 {
-	if (!bandpass::g_plugin) return 0;
+	if (!g_plugin) return 0;
 
-	return bandpass::g_plugin->get_num_groups();
+	return g_plugin->get_num_groups();
 }
 
 int blink_get_num_parameters()
 {
-	if (!bandpass::g_plugin) return 0;
+	if (!g_plugin) return 0;
 
-	return bandpass::g_plugin->get_num_parameters();
+	return g_plugin->get_num_parameters();
 }
 
 blink_Group blink_get_group(blink_Index index)
 {
-	return bind::group(bandpass::g_plugin->get_group(index));
+	return bind::group(g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
 {
-	return bind::parameter(bandpass::g_plugin->get_parameter(index));
+	return bind::parameter(g_plugin->get_parameter(index));
 }
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(bandpass::g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
+}
+
+CMRC_DECLARE(filter_bandpass);
+
+blink_ResourceData blink_get_resource_data(const char* path)
+{
+	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
+
+	const auto fs = cmrc::filter_bandpass::get_filesystem();
+
+	if (!fs.exists(path)) return { 0, 0 };
+	if (!fs.is_file(path)) return { 0, 0 };
+
+	const auto file = fs.open(path);
+
+	return g_plugin->resources().store(path, file);
 }

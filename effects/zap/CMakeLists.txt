@@ -22,7 +22,7 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("zap" "${SRC}")
+blink_plugin_add_effect("zap" "${SRC}" "")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${snd_SOURCE_DIR}/include

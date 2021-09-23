@@ -15,4 +15,4 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("ring_modulator" "${SRC}")
+blink_plugin_add_effect("ring_modulator" "${SRC}" "")

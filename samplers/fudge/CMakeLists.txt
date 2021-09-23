@@ -32,7 +32,7 @@ list(APPEND SRC
 	../../shared/noise_generator.cpp
 )
 
-blink_plugin_add_sampler("fudge" "${SRC}")
+blink_plugin_add_sampler("fudge" "${SRC}" "")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	..

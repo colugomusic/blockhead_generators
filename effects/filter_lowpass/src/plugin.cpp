@@ -33,6 +33,8 @@ Plugin* g_plugin = nullptr;
 
 } // lowpass
 
+using namespace lowpass;
+
 blink_UUID blink_get_plugin_uuid() { return lowpass::Plugin::UUID; }
 blink_UUID blink_get_plugin_name() { return lowpass::Plugin::NAME; }
 const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS; }
@@ -115,4 +117,20 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
+}
+
+CMRC_DECLARE(filter_lowpass);
+
+blink_ResourceData blink_get_resource_data(const char* path)
+{
+	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
+
+	const auto fs = cmrc::filter_lowpass::get_filesystem();
+
+	if (!fs.exists(path)) return { 0, 0 };
+	if (!fs.is_file(path)) return { 0, 0 };
+
+	const auto file = fs.open(path);
+
+	return g_plugin->resources().store(path, file);
 }
