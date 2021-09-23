@@ -3,6 +3,7 @@
 #include <blink/sampler_plugin.hpp>
 
 #include "gui.h"
+#include "instance.h"
 #include "sample_analysis.h"
 
 namespace fudge {
@@ -10,9 +11,6 @@ namespace fudge {
 class Plugin : public blink::SamplerPlugin
 {
 public:
-
-	static constexpr auto UUID = "795c8dc6-3b81-4397-abac-071bab83b10f";
-	static constexpr auto NAME = "Fudge";
 
 	enum class ParameterIndex
 	{
@@ -65,7 +63,7 @@ public:
 
 private:
 
-	blink::SamplerInstance* make_instance() override;
+	blink::SamplerInstance* make_instance() override { return new Instance(this); }
 
 	std::map<blink_ID, std::shared_ptr<SampleAnalysis>> sample_analysis_;
 	GUI gui_;

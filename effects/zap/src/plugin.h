@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/effect_plugin.hpp>
+#include "instance.h"
 #include "parameters.h"
 
 namespace zap {
@@ -9,16 +10,13 @@ class Plugin : public blink::EffectPlugin
 {
 public:
 
-	static constexpr auto UUID = "74cfcda1-1810-4852-a9b4-7a0c074d3424";
-	static constexpr auto NAME = "Zap";
-
-	Plugin();
+	Plugin() : params_(this) {}
 
 	const auto& params() const { return params_; }
 
 private:
 
-	blink::EffectInstance* make_instance() override;
+	blink::EffectInstance* make_instance() override { return new Instance(this); }
 
 	Parameters params_;
 };

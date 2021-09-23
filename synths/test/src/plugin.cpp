@@ -1,7 +1,6 @@
 #define BLINK_EXPORT
 
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
@@ -70,18 +69,21 @@ Plugin::Plugin()
 	}
 }
 
-blink::SynthInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // test
 
-blink_UUID blink_get_plugin_uuid() { return test::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return test::Plugin::NAME; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "bb0c455a-dae3-498d-b929-f18a20764528";
+	out.name = "test synth";
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

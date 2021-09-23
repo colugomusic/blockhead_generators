@@ -1,34 +1,26 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace saturator { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace saturator {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // saturator
-
 using namespace saturator;
 
-blink_UUID blink_get_plugin_uuid() { return saturator::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return saturator::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "589e1a61-9bf3-4862-b2b8-7be4e01c0386";
+	out.name = "Saturator";
+	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

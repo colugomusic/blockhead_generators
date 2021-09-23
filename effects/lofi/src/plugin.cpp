@@ -1,34 +1,26 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace lofi { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace lofi {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // lofi
-
 using namespace lofi;
 
-blink_UUID blink_get_plugin_uuid() { return lofi::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return lofi::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "90e5db1b-19c0-4ad5-aecf-3622db865584";
+	out.name = "Lofi";
+	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

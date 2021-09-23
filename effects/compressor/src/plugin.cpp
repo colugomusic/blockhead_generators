@@ -1,35 +1,27 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <cmrc/cmrc.hpp>
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace compressor { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace compressor {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // compressor
-
 using namespace compressor;
 
-blink_UUID blink_get_plugin_uuid() { return compressor::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return compressor::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DYNAMICS; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "3117af4c-905c-4bba-8e4a-35360e7ad910";
+	out.name = "Compressor";
+	out.category = BLINK_STD_CATEGORY_DYNAMICS;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

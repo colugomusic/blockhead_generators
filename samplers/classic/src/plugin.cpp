@@ -56,11 +56,6 @@ Plugin::Plugin()
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
 }
 
-blink::SamplerInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 GUI& Plugin::gui()
 {
 	return gui_;
@@ -77,9 +72,16 @@ Plugin* g_plugin = nullptr;
 
 } // classic
 
-blink_UUID blink_get_plugin_uuid() { return classic::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return classic::Plugin::NAME; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "bd64e4c8-f788-433b-a42a-d375afd92503";
+	out.name = "Classic";
+	out.version = PLUGIN_VERSION;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

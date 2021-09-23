@@ -3,15 +3,13 @@
 #include <blink/sampler_plugin.hpp>
 
 #include "gui.h"
+#include "instance.h"
 
 namespace classic {
 
 class Plugin : public blink::SamplerPlugin
 {
 public:
-
-	static constexpr auto UUID = "bd64e4c8-f788-433b-a42a-d375afd92503";
-	static constexpr auto NAME = "Classic";
 
 	enum class ParameterIndex
 	{
@@ -45,7 +43,7 @@ public:
 
 private:
 
-	blink::SamplerInstance* make_instance() override;
+	blink::SamplerInstance* make_instance() override { return new Instance(this); }
 
 	GUI gui_;
 

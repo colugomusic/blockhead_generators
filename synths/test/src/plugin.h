@@ -1,15 +1,13 @@
 #pragma once
 
 #include <blink/synth_plugin.hpp>
+#include "instance.h"
 
 namespace test {
 
 class Plugin : public blink::SynthPlugin
 {
 public:
-
-	static constexpr auto UUID = "bb0c455a-dae3-498d-b929-f18a20764528";
-	static constexpr auto NAME = "test synth";
 
 	enum class ParameterIndex
 	{
@@ -38,7 +36,7 @@ public:
 
 private:
 
-	blink::SynthInstance* make_instance() override;
+	blink::SynthInstance* make_instance() override { return new Instance(this); }
 
 	std::shared_ptr<blink::EnvelopeParameter> env_amp_;
 	std::shared_ptr<blink::EnvelopeParameter> env_wave_;

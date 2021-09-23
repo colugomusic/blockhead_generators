@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/effect_plugin.hpp>
+#include "instance.h"
 #include "parameters.h"
 
 namespace saturator {
@@ -9,16 +10,13 @@ class Plugin : public blink::EffectPlugin
 {
 public:
 
-	static constexpr auto UUID = "589e1a61-9bf3-4862-b2b8-7be4e01c0386";
-	static constexpr auto NAME = "Saturator";
-
-	Plugin();
+	Plugin() : params_(this) {}
 
 	const auto& params() const { return params_; }
 
 private:
 
-	blink::EffectInstance* make_instance() override;
+	blink::EffectInstance* make_instance() override { return new Instance(this); }
 
 	Parameters params_;
 };

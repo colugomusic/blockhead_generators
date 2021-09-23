@@ -1,6 +1,5 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
@@ -24,21 +23,24 @@ Plugin::Plugin()
 	env_mix_ = add_parameter(spec_env_mix);
 }
 
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // highpasss
 
 using namespace highpass;
 
-blink_UUID blink_get_plugin_uuid() { return highpass::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return highpass::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "bcf8e814-e0df-41a4-b16a-0344aa391c44";
+	out.name = "Highpass";
+	out.category = BLINK_STD_CATEGORY_FILTERS;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

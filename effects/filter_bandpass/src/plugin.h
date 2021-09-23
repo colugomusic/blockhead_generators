@@ -1,15 +1,13 @@
 #pragma once
 
 #include <blink/effect_plugin.hpp>
+#include "instance.h"
 
 namespace bandpass {
 
 class Plugin : public blink::EffectPlugin
 {
 public:
-
-	static constexpr auto UUID = "e3d0105f-8d22-4dba-b041-d21a52d0f930";
-	static constexpr auto NAME = "Bandpass";
 
 	enum class ParameterIndex
 	{
@@ -26,7 +24,7 @@ public:
 
 private:
 
-	blink::EffectInstance* make_instance() override;
+	blink::EffectInstance* make_instance() override { return new Instance(this); }
 
 	std::shared_ptr<blink::EnvelopeParameter> env_freq_;
 	std::shared_ptr<blink::EnvelopeParameter> env_res_;

@@ -1,15 +1,13 @@
 #pragma once
 
 #include <blink/effect_plugin.hpp>
+#include "instance.h"
 
 namespace ring_modulator {
 
 class Plugin : public blink::EffectPlugin
 {
 public:
-
-	static constexpr auto UUID = "881569c5-108b-4923-b30e-1e1ac6c1a04f";
-	static constexpr auto NAME = "Ring Modulator";
 
 	enum class ParameterIndex
 	{
@@ -24,7 +22,7 @@ public:
 
 private:
 
-	blink::EffectInstance* make_instance() override;
+	blink::EffectInstance* make_instance() override { return new Instance(this); }
 
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_mix_;

@@ -1,6 +1,5 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
@@ -27,21 +26,24 @@ Plugin::Plugin()
 	add_parameter(spec_sld_pitch);
 }
 
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // freeze
 
 using namespace freeze;
 
-blink_UUID blink_get_plugin_uuid() { return freeze::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return freeze::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "cde37ae4-a943-4b2c-b792-3eeba8107a6b";
+	out.name = "Freeze";
+	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

@@ -19,4 +19,8 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("spring_reverb" "${SRC}" "")
+list(APPEND RES
+	./res/icon.png
+)
+
+blink_plugin_add_effect("spring_reverb" "${SRC}" "${RES}")

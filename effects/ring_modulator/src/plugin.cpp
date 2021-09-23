@@ -1,6 +1,5 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
@@ -21,19 +20,22 @@ Plugin::Plugin()
 	env_mix_ = add_parameter(spec_env_mix);
 }
 
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // ring_modulator
 
-blink_UUID blink_get_plugin_uuid() { return ring_modulator::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return ring_modulator::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "881569c5-108b-4923-b30e-1e1ac6c1a04f";
+	out.name = "Ring Modulator";
+	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

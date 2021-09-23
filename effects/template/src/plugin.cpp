@@ -1,35 +1,27 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <cmrc/cmrc.hpp>
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace template { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace template {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // template
-
 using namespace template;
 
-blink_UUID blink_get_plugin_uuid() { return template::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return template::Plugin::NAME; }
-const char* blink_get_plugin_category() { return "example category"; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "742b3f81-c51b-42ab-8b01-5ddf717b322a";
+	out.name = "Template";
+	out.category = "example category";
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

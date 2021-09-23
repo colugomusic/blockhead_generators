@@ -70,11 +70,6 @@ Plugin::Plugin()
 	tog_revers_ = add_parameter(std_params::toggles::reverse());
 }
 
-blink::SamplerInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
 GUI& Plugin::gui()
 {
 	return gui_;
@@ -116,9 +111,16 @@ Plugin* g_plugin = nullptr;
 
 }
 
-blink_UUID blink_get_plugin_uuid() { return fudge::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return fudge::Plugin::NAME; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "795c8dc6-3b81-4397-abac-071bab83b10f";
+	out.name = "Fudge";
+	out.version = PLUGIN_VERSION;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

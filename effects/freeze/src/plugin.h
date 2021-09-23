@@ -3,15 +3,13 @@
 #include <map>
 #include <memory>
 #include <blink/effect_plugin.hpp>
+#include "instance.h"
 
 namespace freeze {
 
 class Plugin : public blink::EffectPlugin
 {
 public:
-
-	static constexpr auto UUID = "cde37ae4-a943-4b2c-b792-3eeba8107a6b";
-	static constexpr auto NAME = "Freeze";
 
 	enum class ParameterIndex
 	{
@@ -29,7 +27,7 @@ public:
 
 private:
 
-	blink::EffectInstance* make_instance() override;
+	blink::EffectInstance* make_instance() override { return new Instance(this); }
 
 	std::shared_ptr<blink::EnvelopeParameter> env_pitch_;
 	std::shared_ptr<blink::EnvelopeParameter> env_formant_;

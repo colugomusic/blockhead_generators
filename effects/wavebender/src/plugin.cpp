@@ -1,34 +1,26 @@
 #define BLINK_EXPORT
 #include "plugin.h"
-#include "instance.h"
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace wavebender { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace wavebender {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // wavebender
-
 using namespace wavebender;
 
-blink_UUID blink_get_plugin_uuid() { return wavebender::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return wavebender::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_DESTRUCTION; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "08304d60-c45d-4712-b492-688b4d5b8cf2";
+	out.name = "Wavebender";
+	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {

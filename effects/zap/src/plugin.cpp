@@ -5,30 +5,23 @@
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
 
+namespace zap { Plugin* g_plugin = nullptr; }
+
 using namespace blink;
-
-namespace zap {
-
-Plugin::Plugin()
-	: params_(this)
-{
-}
-
-blink::EffectInstance* Plugin::make_instance()
-{
-	return new Instance(this);
-}
-
-Plugin* g_plugin = nullptr;
-
-} // zap
-
 using namespace zap;
 
-blink_UUID blink_get_plugin_uuid() { return zap::Plugin::UUID; }
-blink_UUID blink_get_plugin_name() { return zap::Plugin::NAME; }
-const char* blink_get_plugin_category() { return BLINK_STD_CATEGORY_FILTERS"|Special"; }
-const char* blink_get_plugin_version() { return PLUGIN_VERSION; }
+blink_PluginInfo blink_get_plugin_info()
+{
+	blink_PluginInfo out = blink_PluginInfo();
+
+	out.uuid = "74cfcda1-1810-4852-a9b4-7a0c074d3424";
+	out.name = "Zap";
+	out.category = BLINK_STD_CATEGORY_FILTERS"|Special";
+	out.version = PLUGIN_VERSION;
+	out.has_icon = true;
+
+	return out;
+}
 
 blink_Error blink_init()
 {
