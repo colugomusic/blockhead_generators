@@ -11,10 +11,11 @@ struct AudioData
 {
 	struct Envelopes
 	{
-		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Bubble)> bubble;
 		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Tilt)> tilt;
-		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Pitch)> pitch;
 		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_XFadeSize)> xfade_size;
+		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Pitch)> pitch;
+		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Bubble)> bubble;
+		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Smoother)> smoother;
 		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Mix)> mix;
 
 		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);

@@ -39,6 +39,7 @@ private:
 	struct FrameReadParams
 	{
 		float tilt { 0.0f };
+		float spike { 0.0f };
 		float ff { 1.0f };
 		float crossfade_size { 1.0f };
 		CrossfadeMode crossfade_mode { CrossfadeMode::Dynamic };

@@ -49,8 +49,22 @@ EnvelopeSpec xfade_size()
 	out.name = "Crossfade";
 	out.uuid = "d9f04877-408d-4411-8983-21f66fc149a8";
 
+	out.default_value = 0.25f;
 	out.options.push_back(blink_Index(Parameters::Index::Opt_XFadeMode));
 
+	out.flags = blink_EnvelopeFlags_DefaultActive;
+
+	return out;
+}
+
+EnvelopeSpec smoother()
+{
+	EnvelopeSpec out = std_params::envelopes::generic::percentage();
+
+	out.name = "Smoother";
+	out.uuid = "357b372b-f5d1-4e41-be6c-24dda95d6ad4";
+
+	out.default_value = 0.5f;
 	out.flags = blink_EnvelopeFlags_DefaultActive;
 
 	return out;
@@ -79,10 +93,11 @@ OptionSpec xfade_mode()
 
 Parameters::Parameters(blink::Plugin* plugin)
 {
-	env.bubble = plugin->add_parameter(parameters::envelopes::bubble());
 	env.tilt = plugin->add_parameter(parameters::envelopes::tilt());
-	env.pitch = plugin->add_parameter(parameters::envelopes::pitch());
 	env.xfade_size = plugin->add_parameter(parameters::envelopes::xfade_size());
+	env.pitch = plugin->add_parameter(parameters::envelopes::pitch());
+	env.bubble = plugin->add_parameter(parameters::envelopes::bubble());
+	env.smoother = plugin->add_parameter(parameters::envelopes::smoother());
 	env.mix = plugin->add_parameter(std_params::envelopes::mix());
 
 	opt.xfade_mode = plugin->add_parameter(parameters::options::xfade_mode());

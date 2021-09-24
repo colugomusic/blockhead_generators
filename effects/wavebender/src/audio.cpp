@@ -23,8 +23,6 @@ void Audio::stream_init()
 		{
 			channels_[c].buffers[i].resize(SR());
 		}
-
-		channels_[c].write.filter.mCoeffs = ml::Lopass::coeffs(200.0f / SR(), 1.0f);
 	}
 
 	reset();
@@ -119,12 +117,13 @@ static float window(float x, float r = 0.5f)
 	}
 }
 
-static float apply_tilt(float frame, float tilt, size_t size)
+static float apply_tilt(float frame, float tilt, float spike, size_t size)
 {
 	const auto pos { frame / size };
 	const auto tilted { std::pow(pos, std::pow(2.0f, tilt)) };
+	const auto smoothed = math::lerp(pos, tilted, window(pos));
 
-	return math::lerp(pos, tilted, window(pos)) * size;
+	return math::lerp(smoothed, tilted, spike) * size;
 }
 
 void Audio::Channel::prepare_xfade(const FrameReadParams& params)
@@ -177,8 +176,8 @@ float Audio::Channel::do_xfade(const FrameReadParams& params)
 {
 	const auto x { math::ease::quadratic::in_out(float(xfade.index) / (xfade.length - 1)) };
 
-	auto source_value { source.span.read(apply_tilt(source.frame, params.tilt, source.span.size)) };
-	auto target_value { target.span.read(apply_tilt(target.frame, params.tilt, target.span.size)) };
+	auto source_value { source.span.read(apply_tilt(source.frame, params.tilt, params.spike, source.span.size)) };
+	auto target_value { target.span.read(apply_tilt(target.frame, params.tilt, params.spike, target.span.size)) };
 
 	const auto value { math::lerp(source_value, target_value, x) };
 
@@ -212,7 +211,7 @@ float Audio::Channel::do_wet(const FrameReadParams& params)
 	}
 	else
 	{
-		auto value { target.span.read(apply_tilt(target.frame, params.tilt, target.span.size)) };
+		auto value { target.span.read(apply_tilt(target.frame, params.tilt, params.spike, target.span.size)) };
 
 		target.frame += params.ff;
 
@@ -245,14 +244,18 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	AudioData data(plugin_, buffer);
 
 	auto bubble = data.envelopes.bubble.search_vec(block_positions());
-	auto tilt = math::convert::uni_to_bi(data.envelopes.tilt.search_vec(block_positions())) * 4.0f;
+	auto tilt = math::convert::uni_to_bi(data.envelopes.tilt.search_vec(block_positions())) * 8.0f;
 	auto pitch = math::convert::p_to_ff(data.envelopes.pitch.search_vec(block_positions()));
 	auto crossfade_size = data.envelopes.xfade_size.search_vec(block_positions());
+	auto smoother = math::convert::linear_to_filter_hz(1.0f - data.envelopes.smoother.search(block_positions())) / SR();
 	const auto mix = data.envelopes.mix.search_vec(block_positions());
 
 	crossfade_size = ml::lerp(ml::DSPVector(1.0f), ml::DSPVector(32.0f), crossfade_size * crossfade_size);
 
 	auto bubble_int = ml::roundFloatToInt(bubble * bubble * 64.0f);
+	const auto spike = ml::clamp(ml::abs(tilt * 0.25f) - 1.0f, ml::DSPVector(0.0f), ml::DSPVector(1.0f));
+
+	tilt = ml::clamp(tilt, ml::DSPVector(-4.0f), ml::DSPVector(4.0f));
 
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec;
@@ -260,6 +263,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	for (int c = 0; c < 2; c++)
 	{
+		channels_[c].write.filter.mCoeffs = ml::Lopass::coeffs(smoother, 1.0f);
 		filtered_input.row(c) = channels_[c].write.filter(in_vec.constRow(c));
 
 		for (int i = 0; i < kFloatsPerDSPVector; i++)
@@ -273,6 +277,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 			read_params.crossfade_size = crossfade_size[i];
 			read_params.crossfade_mode = CrossfadeMode(data.options.xfade_mode.get());
 			read_params.tilt = tilt[i];
+			read_params.spike = spike[i];
 			read_params.ff = pitch[i];
 
 			out_vec.row(c)[i] = channels_[c](write_params, read_params, in_vec.constRow(c)[i], filtered_input.constRow(c)[i]);

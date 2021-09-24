@@ -10,10 +10,11 @@ struct Parameters
 {
 	enum class Index
 	{
-		Env_Bubble,
 		Env_Tilt,
-		Env_Pitch,
 		Env_XFadeSize,
+		Env_Pitch,
+		Env_Bubble,
+		Env_Smoother,
 		Env_Mix,
 
 		Opt_XFadeMode,
@@ -21,10 +22,11 @@ struct Parameters
 
 	struct Envelopes
 	{
-		std::shared_ptr<blink::EnvelopeParameter> bubble;
 		std::shared_ptr<blink::EnvelopeParameter> tilt;
-		std::shared_ptr<blink::EnvelopeParameter> pitch;
 		std::shared_ptr<blink::EnvelopeParameter> xfade_size;
+		std::shared_ptr<blink::EnvelopeParameter> pitch;
+		std::shared_ptr<blink::EnvelopeParameter> bubble;
+		std::shared_ptr<blink::EnvelopeParameter> smoother;
 		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;
 
