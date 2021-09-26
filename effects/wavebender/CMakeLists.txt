@@ -19,7 +19,11 @@ list(APPEND SRC
     ./src/plugin.cpp
 )
 
-blink_plugin_add_effect("wavebender" "${SRC}" "")
+list(APPEND RES
+	./res/icon.png
+)
+
+blink_plugin_add_effect("wavebender" "${SRC}" "${RES}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	../..

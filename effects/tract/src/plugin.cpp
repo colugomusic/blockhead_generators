@@ -100,3 +100,19 @@ const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
 }
+
+CMRC_DECLARE(tract);
+
+blink_ResourceData blink_get_resource_data(const char* path)
+{
+	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
+
+	const auto fs = cmrc::tract::get_filesystem();
+
+	if (!fs.exists(path)) return { 0, 0 };
+	if (!fs.is_file(path)) return { 0, 0 };
+
+	const auto file = fs.open(path);
+
+	return g_plugin->resources().store(path, file);
+}
