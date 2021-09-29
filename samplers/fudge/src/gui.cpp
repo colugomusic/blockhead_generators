@@ -47,7 +47,7 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 
 static void calculate_positions(
 	const Data& data,
-	const blink_SampleInfo& sample_info,
+	const SampleData& sample_data,
 	const blink_SR song_rate,
 	const blink::Traverser& block_traverser,
 	blink::std_traversers::Fudge* fudge_traverser,
@@ -70,24 +70,21 @@ static void calculate_positions(
 		&warped_block_positions,
 		&derivatives);
 
-	auto sculpted_sample_positions = sculpted_block_positions / (float(song_rate) / sample_info.SR);
-	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_info.SR);
+	auto sculpted_sample_positions = sculpted_block_positions / (float(song_rate) / sample_data.get_SR());
+	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_data.get_SR());
 	auto final_sample_positions = warped_sample_positions;
 
 	if (data.toggles.loop && data.toggles.loop->value)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			if (final_sample_positions[i] > std::int32_t(sample_info.num_frames - 1))
-			{
-				final_sample_positions.set(i, std::fmod(final_sample_positions[i], double(sample_info.num_frames)));
-			}
+			final_sample_positions.set(i, sample_data.get_loop_pos(final_sample_positions[i]));
 		}
 	}
 
 	if (data.toggles.reverse && data.toggles.reverse->value)
 	{
-		final_sample_positions = std::int32_t(sample_info.num_frames - 1) - final_sample_positions;
+		final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
 	}
 
 	if (out->sculpted_block_positions)
@@ -153,6 +150,7 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, b
 	block_traverser_.set_reset(0);
 
 	const auto data = get_data(buffer);
+	const auto sample_data { SampleData { buffer->sample_info, buffer->channel_mode } };
 
 	auto frames_remaining = n;
 	int index = 0;
@@ -171,7 +169,7 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, b
 
 		calculate_positions(
 			data,
-			*buffer->sample_info,
+			sample_data,
 			buffer->song_rate,
 			block_traverser_,
 			&position_traverser_,
