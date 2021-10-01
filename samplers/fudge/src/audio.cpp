@@ -48,7 +48,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	traverser_resetter_.check(data.env_speed, &block_traverser_);
 
-	const auto analysis_data = buffer->sample_info->analysis_ready ? plugin_->get_analysis_data(buffer->sample_info->id) : nullptr;
+	const auto analysis_data = buffer->analysis_ready ? plugin_->get_analysis_data(buffer->sample_info->id) : nullptr;
 
 	controller_.process(data, *buffer, analysis_data, block_traverser_, block_positions(), SR());
 
