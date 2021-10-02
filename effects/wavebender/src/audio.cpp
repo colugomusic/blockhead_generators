@@ -41,6 +41,7 @@ void Audio::Channel::do_write(const FrameWriteParams& params, float filtered_val
 
 	if (write.span.size >= buffers[0].size())
 	{
+		write.span.size = buffers[0].size();
 		std::swap(write.span, stage.span);
 		write.up = false;
 		return;
@@ -317,13 +318,19 @@ void Audio::reset()
 float Audio::Channel::Span::read(float pos) const
 {
 	const auto index_0 { size_t(std::floor(pos)) };
-	const auto index_1 { size_t(std::ceil(pos)) };
+	auto index_1 { size_t(std::ceil(pos)) };
 	const auto x { pos - index_0 };
 
 	if (index_0 == index_1)
 	{
+		assert(index_0 < size);
 		return buffer[index_0];
 	}
+
+	if (index_1 >= size) index_1 -= size;
+
+	assert(index_0 < size);
+	assert(index_1 < size);
 
 	const auto value_0 { buffer[index_0] };
 	const auto value_1 { buffer[index_1] };
