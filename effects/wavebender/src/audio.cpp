@@ -266,8 +266,18 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	{
 		channels_[c].write.filter.mCoeffs = ml::Lopass::coeffs(smoother, 1.0f);
 		filtered_input.row(c) = channels_[c].write.filter(in_vec.constRow(c));
+	}
 
-		for (int i = 0; i < kFloatsPerDSPVector; i++)
+	const auto& block_pos = block_positions();
+
+	for (int i = 0; i < kFloatsPerDSPVector; i++)
+	{
+		if (block_pos[i - 1] < 0 && block_pos[i] >= 0)
+		{
+			reset();
+		}
+
+		for (int c = 0; c < 2; c++)
 		{
 			FrameWriteParams write_params;
 
