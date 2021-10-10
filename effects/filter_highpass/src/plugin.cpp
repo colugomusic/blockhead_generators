@@ -60,15 +60,6 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Error blink_stream_init(blink_SR SR)
-{
-	if (!highpass::g_plugin) return blink_StdError_NotInitialized;
-
-	highpass::g_plugin->stream_init(SR);
-
-	return BLINK_OK;
-}
-
 blink_EffectInstance blink_make_effect_instance()
 {
 	if (!highpass::g_plugin) return blink_EffectInstance{ 0 };

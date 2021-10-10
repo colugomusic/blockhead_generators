@@ -101,15 +101,6 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Error blink_stream_init(blink_SR SR)
-{
-	if (!classic::g_plugin) return blink_StdError_NotInitialized;
-
-	classic::g_plugin->stream_init(SR);
-
-	return BLINK_OK;
-}
-
 blink_SamplerInstance blink_make_sampler_instance()
 {
 	if (!classic::g_plugin) return blink_SamplerInstance{ 0 };

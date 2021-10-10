@@ -42,15 +42,6 @@ blink_Error blink_terminate()
 	return BLINK_OK;
 }
 
-blink_Error blink_stream_init(blink_SR SR)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	g_plugin->stream_init(SR);
-
-	return BLINK_OK;
-}
-
 blink_SynthInstance blink_make_synth_instance()
 {
 	if (!berk::g_plugin) return blink_SynthInstance{ 0 };
