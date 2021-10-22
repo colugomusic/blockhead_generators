@@ -25,7 +25,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec;
 
-	const auto frequency = math::convert::pitch_to_frequency(60.0f + pitch);
+	const auto frequency = math::convert::pitch_to_frequency(60.0f + (pitch));
 	const auto omega = frequency / float(SR());
 
 	dispersion = 0.5f * (ml::powApprox(ml::DSPVector(0.0001f), 1.0 - dispersion));
@@ -37,10 +37,20 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 		for (int i = 0; i < kFloatsPerDSPVector; i++)
 		{
-			velocity_[c] -= (position_[c] - in_row[i]) * omega[i];
+			velocity_[c] += (in_row[i] - position_[c]) * omega[i];
 			velocity_[c] *= (1.0f - dispersion[i]);
 			position_[c] += velocity_[c];
-			position_[c] = std::clamp(position_[c], -1.0f, 1.0f);
+			
+			if (position_[c] > 1.0f)
+			{
+				velocity_[c] -= position_[c] - 1.0f;
+				position_[c] = 1.0f;
+			}
+			else if (position_[c] < -1.0f)
+			{
+				velocity_[c] += -1.0f - position_[c];
+				position_[c] = -1.0f;
+			}
 
 			out_row[i] = position_[c];
 		}
