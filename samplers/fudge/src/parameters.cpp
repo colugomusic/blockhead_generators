@@ -113,12 +113,12 @@ SliderSpec<float> harmonic_amount()
 {
 	SliderSpec<float> out;
 
-	out.constrain = [](float v) { return tweak::constrain(v, 0.0f, 4.0f); };
+	out.constrain = [](float v) { return tweak::constrain(v, 0.0f, 3.0f); };
     out.stepify = tweak::math::stepify<100, float>;
 	out.increment = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::increment<1, 10>(v, precise))); };
 	out.decrement = [out](float v, bool precise) { return out.constrain(out.stepify(tweak::decrement<1, 10>(v, precise))); };
 	out.drag = [out](float v, int amount, bool precise) { return out.constrain(out.stepify(tweak::drag<float, 10, 100>(v, amount / 5, precise))); };
-    out.to_string = [](float v) { return std::to_string(v); };
+    out.to_string = [](float v) { return tweak::to_string(v); };
 	out.from_string = tweak::find_positive_number<float>;
 	out.default_value = 0.0f;
 
@@ -226,10 +226,10 @@ blink::EnvelopeSpec harmonics_amount()
 	out.value_slider = sliders::harmonic_amount();
 
 	out.range.min.default_value = 0.0f;
-    out.range.min.to_string = [](float v) { return std::to_string(v); };
+    out.range.min.to_string = [](float v) { return std::to_string(int(v)); };
 	out.range.max.default_value = 3.0f;
-    out.range.max.to_string = [](float v) { return std::to_string(v); };
-    out.to_string = [](float v) { return std::to_string(v); };
+    out.range.max.to_string = [](float v) { return std::to_string(int(v)); };
+    out.to_string = [](float v) { return std::to_string(int(v)); };
 
 	return out;
 }

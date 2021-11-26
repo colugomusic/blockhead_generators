@@ -81,34 +81,7 @@ float Controller::snap_ratio_to_scale(int index, float ff) const
 
 	const auto pitch = blink::math::convert::ff_to_p(ff);
 
-	return blink::math::convert::p_to_ff(snap_pitch_to_scale(pitch, scale));
-}
-
-float Controller::snap_pitch_to_scale(float pitch, std::int32_t scale) const
-{
-	auto octaves = int(std::floor(pitch / 12));
-	auto octave_offset = (octaves * 12);
-
-	auto note = int(blink::math::wrap(pitch, 12.0f));
-
-	if (blink::bits::check(scale, note)) return float(note + octave_offset);
-
-	int offset = 1;
-
-	for (int i = 0; i < 6; i++)
-	{
-		int check = blink::math::wrap(note + offset, 12);
-
-		if (blink::bits::check(scale, check)) return float(check + octave_offset);
-
-		check = blink::math::wrap(note - offset, 12);
-
-		if (blink::bits::check(scale, check)) return float(check + octave_offset);
-
-		offset++;
-	}
-
-	return pitch;
+	return blink::math::convert::p_to_ff(blink::ChordParameter::snap_pitch_to_scale(pitch, scale));
 }
 
 }
