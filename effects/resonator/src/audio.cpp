@@ -14,7 +14,10 @@ Audio::Audio(Instance* instance)
 	, SR_f_{ float(SR()) }
 	, SR_vec_{ SR_f_ }
 	, delay_{ SR_f_ }
-	, harmonics_{ SR_f_, SR_f_, SR_f_ }
+	, harmonics_{
+		Harmonic{SR_f_, {}},
+		Harmonic{SR_f_, {}},
+		Harmonic{SR_f_, {}} }
 {
 }
 
@@ -25,7 +28,8 @@ void Audio::stream_init()
 
 	for (auto& harmonic : harmonics_)
 	{
-		harmonic = snd::audio::FeedbackDelay<2> { SR_f_ };
+		harmonic.delay = snd::audio::FeedbackDelay<2> { SR_f_ };
+		harmonic.filter = snd::audio::filter::Filter_1Pole<2>{};
 	}
 
 	SR_vec_ = ml::DSPVector(SR_f_);
@@ -119,18 +123,28 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 		if (ml::max(harmonic_amp_v) > EPSILON)
 		{
+			auto& filter = harmonics_[i].filter;
+
+			const auto dampener = [this, &filter, &damper_mix, &damper_freq](const ml::DSPVectorArray<2>& x)
+			{
+				filter(x, SR(), damper_freq);
+
+				return ml::lerp(x, filter.lp(), damper_mix);
+			};
+
 			const auto harmonic_amp = ml::repeatRows<2>(harmonic_amp_v);
 			const auto ratio = get_harmonic_ratio(i);
 			const auto harmonic_frequency = frequency * ratio;
 			const auto harmonic_delay_samples = ml::repeatRows<2>(SR_vec_ / harmonic_frequency);
-			const auto harmonic_out = harmonics_[i](in_vec, harmonic_delay_samples, feedback, dampener);
+			const auto harmonic_out = harmonics_[i].delay(in_vec, harmonic_delay_samples, feedback, dampener);
 
 			out_vec += harmonic_out * harmonic_amp;
 			amp += harmonic_amp;
 		}
 		else
 		{
-			harmonics_[i].clear();
+			harmonics_[i].delay.clear();
+			harmonics_[i].filter.clear();
 		}
 	}
 
@@ -152,7 +166,8 @@ void Audio::reset()
 
 	for (auto& harmonic: harmonics_)
 	{
-		harmonic.clear();
+		harmonic.delay.clear();
+		harmonic.filter = snd::audio::filter::Filter_1Pole<2>{};
 	}
 }
 

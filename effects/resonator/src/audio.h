@@ -26,12 +26,18 @@ public:
 
 private:
 	
+	struct Harmonic
+	{
+		snd::audio::FeedbackDelay<2> delay;
+		snd::audio::filter::Filter_1Pole<2> filter;
+	};
+
 	const Plugin* plugin_;
 	float SR_f_;
 	ml::DSPVector SR_vec_;
 	snd::audio::FeedbackDelay<2> delay_;
-	std::array<snd::audio::FeedbackDelay<2>, 3> harmonics_;
 	snd::audio::filter::Filter_1Pole<2> filter_;
+	std::array<Harmonic, 3> harmonics_;
 	ml::SineGen sine_;
 };
 
