@@ -14,6 +14,8 @@ struct Parameters
 		Env_Pitch,
 		Env_Feedback,
 		Env_Damper,
+		Env_FM_Amount,
+		Env_FM_Ratio,
 		Chord_HarmonicsScale,
 		Env_HarmonicsAmount,
 		Env_HarmonicsSpread,
@@ -26,15 +28,29 @@ struct Parameters
 		std::shared_ptr<blink::EnvelopeParameter> pitch;
 		std::shared_ptr<blink::EnvelopeParameter> feedback;
 		std::shared_ptr<blink::EnvelopeParameter> damper;
-		std::shared_ptr<blink::EnvelopeParameter> harmonics_amount;
-		std::shared_ptr<blink::EnvelopeParameter> harmonics_spread;
-		std::shared_ptr<blink::EnvelopeParameter> harmonics_scale_snap_amount;
+		
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> amount;
+			std::shared_ptr<blink::EnvelopeParameter> ratio;
+		} fm;
+
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> amount;
+			std::shared_ptr<blink::EnvelopeParameter> spread;
+			std::shared_ptr<blink::EnvelopeParameter> scale_snap_amount;
+		} harmonics;
+
 		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;
 
 	struct Chords
 	{
-		std::shared_ptr<blink::ChordParameter> harmonics_scale;
+		struct
+		{
+			std::shared_ptr<blink::ChordParameter> scale;
+		} harmonics;
 	} chords;
 	
 	Parameters(blink::Plugin* plugin);

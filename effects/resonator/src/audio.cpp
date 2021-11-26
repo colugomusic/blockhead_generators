@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "instance.h"
 #include "audio_data.h"
+#include "convert.h"
 
 using namespace blink;
 
@@ -10,27 +11,30 @@ namespace resonator {
 Audio::Audio(Instance* instance)
 	: EffectUnit(instance)
 	, plugin_(instance->get_plugin())
-	, delay_(float(SR()))
-	, harmonics_{ float(SR()), float(SR()), float(SR()) }
-	, SR_vec_(float(SR()))
+	, SR_f_{ float(SR()) }
+	, SR_vec_{ SR_f_ }
+	, delay_{ SR_f_ }
+	, harmonics_{ SR_f_, SR_f_, SR_f_ }
 {
 }
 
 void Audio::stream_init()
 {
-	delay_ = snd::audio::FeedbackDelay<2> { float(SR()) };
+	SR_f_ = float(SR());
+	delay_ = snd::audio::FeedbackDelay<2> { SR_f_ };
 
 	for (auto& harmonic : harmonics_)
 	{
-		harmonic = snd::audio::FeedbackDelay<2> { float(SR()) };
+		harmonic = snd::audio::FeedbackDelay<2> { SR_f_ };
 	}
 
-	SR_vec_ = ml::DSPVector(float(SR()));
+	SR_vec_ = ml::DSPVector(SR_f_);
 }
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
 	static constexpr auto EPSILON { 0.0000001f };
+
 	AudioData data(plugin_, buffer);
 
 	struct
@@ -38,6 +42,12 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		ml::DSPVector pitch;
 		ml::DSPVector feedback;
 		ml::DSPVector damper;
+
+		struct
+		{
+			ml::DSPVector amount;
+			ml::DSPVector ratio;
+		} fm;
 
 		struct
 		{
@@ -53,6 +63,8 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	params.pitch = data.envelopes.pitch.search_vec(block_positions());
 	params.feedback = data.envelopes.feedback.search_vec(block_positions());
 	params.damper = data.envelopes.damper.search_vec(block_positions());
+	params.fm.amount = data.envelopes.fm_amount.search_vec(block_positions());
+	params.fm.ratio = data.envelopes.fm_ratio.search_vec(block_positions());
 	params.harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions());
 	params.harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions());
 	params.harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions());
@@ -61,7 +73,17 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	const auto damper_mix = ml::repeatRows<2>(params.damper);
 	const auto damper_freq = ml::repeatRows<2>(math::convert::linear_to_filter_hz<5, 30000>(1.0f - math::ease::quadratic::in(params.damper)));
-	const auto pitch = params.pitch + 60.0f;
+
+	const auto base_pitch = params.pitch + 60.0f;
+	const auto base_frequency = math::convert::pitch_to_frequency(base_pitch);
+
+	const auto fm_amount_curve = [](const ml::DSPVector& x) { return x*x*x*x*x*x; };
+
+	const auto fm_amount = fm_amount_curve(params.fm.amount);
+	const auto fm_ratio = convert::linear_to_ratio(params.fm.ratio);
+	const auto fm_freq = base_frequency * fm_ratio;
+	const auto fm = sine_(fm_freq / SR_vec_);
+	const auto pitch = base_pitch + (fm * fm_amount * 60.0f);
 	const auto frequency = math::convert::pitch_to_frequency(pitch);
 	const auto feedback = math::ease::exponential::out(ml::repeatRows<2>(params.feedback));
 
@@ -124,6 +146,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 void Audio::reset()
 {
+	sine_.clear();
 	delay_.clear();
 	filter_ = snd::audio::filter::Filter_1Pole<2>{};
 

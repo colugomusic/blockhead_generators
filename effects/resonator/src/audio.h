@@ -27,6 +27,7 @@ public:
 private:
 	
 	const Plugin* plugin_;
+	float SR_f_;
 	ml::DSPVector SR_vec_;
 	snd::audio::FeedbackDelay<2> delay_;
 	std::array<snd::audio::FeedbackDelay<2>, 3> harmonics_;

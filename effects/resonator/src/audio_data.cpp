@@ -6,15 +6,17 @@ AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* 
 	: pitch(plugin, buffer->parameter_data, plugin->params().env.pitch.get())
 	, feedback(plugin, buffer->parameter_data, plugin->params().env.feedback.get())
 	, damper(plugin, buffer->parameter_data, plugin->params().env.damper.get())
-	, harmonics_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics_amount.get())
-	, harmonics_spread(plugin, buffer->parameter_data, plugin->params().env.harmonics_spread.get())
-	, harmonics_scale_snap_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics_scale_snap_amount.get())
+	, fm_amount(plugin, buffer->parameter_data, plugin->params().env.fm.amount.get())
+	, fm_ratio(plugin, buffer->parameter_data, plugin->params().env.fm.ratio.get())
+	, harmonics_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.amount.get())
+	, harmonics_spread(plugin, buffer->parameter_data, plugin->params().env.harmonics.spread.get())
+	, harmonics_scale_snap_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.scale_snap_amount.get())
 	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
 {
 }
 
 AudioData::Chords::Chords(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: harmonics_scale(plugin, buffer->parameter_data, plugin->params().chords.harmonics_scale.get())
+	: harmonics_scale(plugin, buffer->parameter_data, plugin->params().chords.harmonics.scale.get())
 {
 }
 

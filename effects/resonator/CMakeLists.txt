@@ -10,6 +10,7 @@ list(APPEND SRC
     ./src/audio.cpp
     ./src/audio_data.h
     ./src/audio_data.cpp
+    ./src/convert.h
     ./src/instance.h
     ./src/instance.cpp
     ./src/parameters.h

@@ -15,6 +15,8 @@ struct AudioData
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_Pitch)> pitch;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_Feedback)> feedback;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_Damper)> damper;
+		blink::EnvelopeData<int(resonator::Parameters::Index::Env_FM_Amount)> fm_amount;
+		blink::EnvelopeData<int(resonator::Parameters::Index::Env_FM_Ratio)> fm_ratio;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsAmount)> harmonics_amount;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsSpread)> harmonics_spread;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsScaleSnapAmount)> harmonics_scale_snap_amount;
