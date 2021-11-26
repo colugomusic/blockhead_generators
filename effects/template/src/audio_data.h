@@ -11,8 +11,8 @@ struct AudioData
 {
 	struct Envelopes
 	{
-		blink::EnvelopeData<int(compressor::Parameters::Index::Env_Example)> example;
-		blink::EnvelopeData<int(compressor::Parameters::Index::Env_Mix)> mix;
+		blink::EnvelopeData<int(Parameters::Index::Env_Example)> example;
+		blink::EnvelopeData<int(Parameters::Index::Env_Mix)> mix;
 
 		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);
 	} envelopes;

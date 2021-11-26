@@ -35,4 +35,4 @@ void Audio::reset()
 {
 }
 
-} // compressor
+} // template

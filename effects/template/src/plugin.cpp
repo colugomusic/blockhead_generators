@@ -14,7 +14,7 @@ blink_PluginInfo blink_get_plugin_info()
 {
 	blink_PluginInfo out = blink_PluginInfo();
 
-	out.uuid = "742b3f81-c51b-42ab-8b01-5ddf717b322a";
+	out.uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 	out.name = "Template";
 	out.category = "example category";
 	out.version = PLUGIN_VERSION;
@@ -37,15 +37,6 @@ blink_Error blink_terminate()
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
 	delete g_plugin;
-
-	return BLINK_OK;
-}
-
-blink_Error blink_stream_init(blink_SR SR)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	g_plugin->stream_init(SR);
 
 	return BLINK_OK;
 }
