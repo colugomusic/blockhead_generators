@@ -26,19 +26,22 @@ public:
 
 private:
 	
-	struct Harmonic
+	struct Resonator
 	{
 		snd::audio::FeedbackDelay<2> delay;
 		snd::audio::filter::Filter_1Pole<2> filter;
+
+		ml::DSPVectorArray<2> dampener(const ml::DSPVectorArray<2>& dry, blink_SR SR, const ml::DSPVectorArray<2>& freq, const ml::DSPVectorArray<2>& mix);
 	};
 
 	const Plugin* plugin_;
 	float SR_f_;
 	ml::DSPVector SR_vec_;
-	snd::audio::FeedbackDelay<2> delay_;
-	snd::audio::filter::Filter_1Pole<2> filter_;
-	std::array<Harmonic, 3> harmonics_;
-	ml::SineGen sine_;
+	Resonator fundamental_;
+	std::array<Resonator, 3> harmonics_;
+	ml::SineGen fm_source_;
+
+	static inline const std::array<float, 4> PAN_VECTORS = { -0.5f, 0.5f, -1.0f, 1.0f };
 };
 
 } // resonator

@@ -13,94 +13,114 @@ Audio::Audio(Instance* instance)
 	, plugin_(instance->get_plugin())
 	, SR_f_{ float(SR()) }
 	, SR_vec_{ SR_f_ }
-	, delay_{ SR_f_ }
-	, harmonics_{
-		Harmonic{SR_f_, {}},
-		Harmonic{SR_f_, {}},
-		Harmonic{SR_f_, {}} }
+	, fundamental_{SR_f_, {}}
+	, harmonics_{ Resonator{SR_f_, {}}, Resonator{SR_f_, {}}, Resonator{SR_f_, {}} }
 {
 }
 
 void Audio::stream_init()
 {
 	SR_f_ = float(SR());
-	delay_ = snd::audio::FeedbackDelay<2> { SR_f_ };
+
+	fundamental_ = { SR_f_, {}};
 
 	for (auto& harmonic : harmonics_)
 	{
-		harmonic.delay = snd::audio::FeedbackDelay<2> { SR_f_ };
-		harmonic.filter = snd::audio::filter::Filter_1Pole<2>{};
+		harmonic = { SR_f_, {} };
 	}
 
 	SR_vec_ = ml::DSPVector(SR_f_);
 }
+
+ml::DSPVectorArray<2> Audio::Resonator::dampener(
+	const ml::DSPVectorArray<2>& dry,
+	blink_SR SR,
+	const ml::DSPVectorArray<2>& freq,
+	const ml::DSPVectorArray<2>& mix)
+{
+	filter(dry, SR, freq);
+
+	return ml::lerp(dry, filter.lp(), mix);
+}
+
+struct Params
+{
+	Params(const AudioData& data, const BlockPositions& block_positions)
+	{
+		pitch = data.envelopes.pitch.search_vec(block_positions);
+		feedback = data.envelopes.feedback.search_vec(block_positions);
+		damper = data.envelopes.damper.search_vec(block_positions);
+		fm.amount = data.envelopes.fm_amount.search_vec(block_positions);
+		fm.ratio = data.envelopes.fm_ratio.search_vec(block_positions);
+		harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions);
+		harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions);
+		harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions);
+		harmonics.scale_snap_amount = data.envelopes.harmonics_scale_snap_amount.search_vec(block_positions);
+		width = data.envelopes.width.search_vec(block_positions);
+		mix = data.envelopes.mix.search_vec(block_positions);
+	}
+
+	ml::DSPVector pitch;
+	ml::DSPVector feedback;
+	ml::DSPVector damper;
+
+	struct
+	{
+		ml::DSPVector amount;
+		ml::DSPVector ratio;
+	} fm;
+
+	struct
+	{
+		ml::DSPVectorInt scale;
+		ml::DSPVector amount;
+		ml::DSPVector spread;
+		ml::DSPVector scale_snap_amount;
+	} harmonics;
+
+	ml::DSPVector width;
+	ml::DSPVector mix;
+};
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
 	static constexpr auto EPSILON { 0.0000001f };
 
 	AudioData data(plugin_, buffer);
-
-	struct
-	{
-		ml::DSPVector pitch;
-		ml::DSPVector feedback;
-		ml::DSPVector damper;
-
-		struct
-		{
-			ml::DSPVector amount;
-			ml::DSPVector ratio;
-		} fm;
-
-		struct
-		{
-			ml::DSPVectorInt scale;
-			ml::DSPVector amount;
-			ml::DSPVector spread;
-			ml::DSPVector scale_snap_amount;
-		} harmonics;
-
-		ml::DSPVector width;
-		ml::DSPVector mix;
-	} params;
-
-	params.pitch = data.envelopes.pitch.search_vec(block_positions());
-	params.feedback = data.envelopes.feedback.search_vec(block_positions());
-	params.damper = data.envelopes.damper.search_vec(block_positions());
-	params.fm.amount = data.envelopes.fm_amount.search_vec(block_positions());
-	params.fm.ratio = data.envelopes.fm_ratio.search_vec(block_positions());
-	params.harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions());
-	params.harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions());
-	params.harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions());
-	params.harmonics.scale_snap_amount = data.envelopes.harmonics_scale_snap_amount.search_vec(block_positions());
-	params.width = data.envelopes.width.search_vec(block_positions());
-	params.mix = data.envelopes.mix.search_vec(block_positions());
+	Params params(data, block_positions());
 
 	const auto damper_mix = ml::repeatRows<2>(params.damper);
 	const auto damper_freq = ml::repeatRows<2>(math::convert::linear_to_filter_hz<5, 30000>(1.0f - math::ease::quadratic::in(params.damper)));
-
 	const auto base_pitch = params.pitch + 60.0f;
 	const auto base_frequency = math::convert::pitch_to_frequency(base_pitch);
-
 	const auto fm_amount_curve = [](const ml::DSPVector& x) { return x*x*x*x*x*x; };
-
 	const auto fm_amount = fm_amount_curve(params.fm.amount);
 	const auto fm_ratio = convert::linear_to_ratio(params.fm.ratio);
 	const auto fm_freq = base_frequency * fm_ratio;
-	const auto fm = sine_(fm_freq / SR_vec_);
+	const auto fm = fm_source_(fm_freq / SR_vec_);
 	const auto pitch = base_pitch + (fm * fm_amount * 60.0f);
-	const auto frequency = math::convert::pitch_to_frequency(pitch);
+	const auto frequency = ml::repeatRows<2>(math::convert::pitch_to_frequency(pitch));
 	const auto feedback = math::ease::exponential::out(ml::repeatRows<2>(params.feedback));
 
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec;
 
-	const auto dampener = [this, &damper_mix, &damper_freq](const ml::DSPVectorArray<2>& x)
+	const auto run_resonator = [this](
+		Resonator* resonator,
+		const ml::DSPVectorArray<2>& freq,
+		const ml::DSPVectorArray<2>& feedback,
+		const ml::DSPVectorArray<2>& damper_freq,
+		const ml::DSPVectorArray<2>& damper_mix,
+		const ml::DSPVectorArray<2>& dry)
 	{
-		filter_(x, SR(), damper_freq);
+		const auto dampener = [this, resonator, &damper_mix, &damper_freq](const ml::DSPVectorArray<2>& dry)
+		{
+			return resonator->dampener(dry, SR(), damper_freq, damper_mix);
+		};
 
-		return ml::lerp(x, filter_.lp(), damper_mix);
+		auto delay_samples = ml::repeatRows<2>(SR_vec_) / freq;
+
+		return resonator->delay(dry, delay_samples, feedback, dampener);
 	};
 	
 	const auto clamp01 = [](const ml::DSPVector& x)
@@ -126,26 +146,13 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		return out;
 	};
 
-	const auto get_harmonic_pan_vector = [](int index = -1)
+	const auto get_harmonic_pan = [clamp01, params](int index)
 	{
-		switch (index)
-		{
-			default: return -0.5f;
-			case 0: return 0.5f;
-			case 1: return -1.0f;
-			case 2: return 1.0f;
-		}
+		return PAN_VECTORS[index] * params.width * clamp01(params.harmonics.amount);
 	};
 
-	const auto get_harmonic_pan = [clamp01, get_harmonic_pan_vector, params](int index = -1)
-	{
-		return get_harmonic_pan_vector(index) * params.width * clamp01(params.harmonics.amount);
-	};
-
-	auto delay_samples = ml::repeatRows<2>(SR_vec_ / frequency);
-
-	out_vec = delay_(in_vec, delay_samples, feedback, dampener);
-	out_vec = pan_harmonic(out_vec, get_harmonic_pan());
+	out_vec = run_resonator(&fundamental_, frequency, feedback, damper_freq, damper_mix, in_vec);
+	out_vec = pan_harmonic(out_vec, get_harmonic_pan(0));
 
 	const auto get_harmonic_ratio = [&params](int harmonic)
 	{
@@ -167,20 +174,13 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		{
 			auto& filter = harmonics_[i].filter;
 
-			const auto dampener = [this, &filter, &damper_mix, &damper_freq](const ml::DSPVectorArray<2>& x)
-			{
-				filter(x, SR(), damper_freq);
-
-				return ml::lerp(x, filter.lp(), damper_mix);
-			};
-
 			const auto harmonic_amp = ml::repeatRows<2>(harmonic_amp_v);
 			const auto ratio = get_harmonic_ratio(i);
-			const auto harmonic_frequency = frequency * ratio;
-			const auto harmonic_delay_samples = ml::repeatRows<2>(SR_vec_ / harmonic_frequency);
-			auto harmonic_out = harmonics_[i].delay(in_vec, harmonic_delay_samples, feedback, dampener);
+			const auto harmonic_frequency = frequency * ml::repeatRows<2>(ratio);
 
-			harmonic_out = pan_harmonic(harmonic_out, get_harmonic_pan(i));
+			auto harmonic_out = run_resonator(&harmonics_[i], harmonic_frequency, feedback, damper_freq, damper_mix, in_vec);
+
+			harmonic_out = pan_harmonic(harmonic_out, get_harmonic_pan(i + 1));
 
 			out_vec += harmonic_out * harmonic_amp;
 			amp += harmonic_amp;
@@ -204,14 +204,15 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 void Audio::reset()
 {
-	sine_.clear();
-	delay_.clear();
-	filter_ = snd::audio::filter::Filter_1Pole<2>{};
+	fm_source_.clear();
+
+	fundamental_.delay.clear();
+	fundamental_.filter = {};
 
 	for (auto& harmonic: harmonics_)
 	{
 		harmonic.delay.clear();
-		harmonic.filter = snd::audio::filter::Filter_1Pole<2>{};
+		harmonic.filter = {};
 	}
 }
 
