@@ -290,6 +290,18 @@ EnvelopeSpec harmonics_scale_snap_amount()
 	return out;
 }
 
+EnvelopeSpec width()
+{
+	auto out = std_params::envelopes::generic::percentage();
+
+	out.name = "Width";
+	out.uuid = "2f95dc68-9ae3-4e12-8ef1-81c36201b995";
+
+	out.default_value = 0.5f;
+
+	return out;
+}
+
 } // envelopes
 
 namespace chords {
@@ -335,6 +347,7 @@ Parameters::Parameters(blink::Plugin* plugin)
 		env.harmonics.scale_snap_amount->set_group_index(group_harmonics);
 	}
 
+	env.width = plugin->add_parameter(parameters::envelopes::width());
 	env.mix = plugin->add_parameter(std_params::envelopes::mix());
 }
 

@@ -61,6 +61,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 			ml::DSPVector scale_snap_amount;
 		} harmonics;
 
+		ml::DSPVector width;
 		ml::DSPVector mix;
 	} params;
 
@@ -73,6 +74,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	params.harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions());
 	params.harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions());
 	params.harmonics.scale_snap_amount = data.envelopes.harmonics_scale_snap_amount.search_vec(block_positions());
+	params.width = data.envelopes.width.search_vec(block_positions());
 	params.mix = data.envelopes.mix.search_vec(block_positions());
 
 	const auto damper_mix = ml::repeatRows<2>(params.damper);
@@ -101,9 +103,49 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		return ml::lerp(x, filter_.lp(), damper_mix);
 	};
 	
+	const auto clamp01 = [](const ml::DSPVector& x)
+	{
+		static const ml::DSPVector ZERO { 0.0f };
+		static const ml::DSPVector ONE { 1.0f };
+
+		return ml::clamp(x, ZERO, ONE);
+	};
+
+	const auto pan_harmonic = [clamp01](const ml::DSPVectorArray<2>& dry, const ml::DSPVector& pan)
+	{
+		const auto LL = clamp01(ml::DSPVector{1.0f} - pan); // Amount of L to contribute to L
+		const auto LR = clamp01(ml::DSPVector{0.0f} - pan); // Amount of R to contribute to L
+		const auto RL = clamp01(pan);          // Amount of L to contribute to R
+		const auto RR = clamp01(pan + 1.0f);   // Amount of R to contribute to R
+
+		ml::DSPVectorArray<2> out;
+
+		out.row(0) = LL * dry.constRow(0) + LR * dry.constRow(1);
+		out.row(1) = RL * dry.constRow(0) + RR * dry.constRow(1);
+
+		return out;
+	};
+
+	const auto get_harmonic_pan_vector = [](int index = -1)
+	{
+		switch (index)
+		{
+			default: return -0.5f;
+			case 0: return 0.5f;
+			case 1: return -1.0f;
+			case 2: return 1.0f;
+		}
+	};
+
+	const auto get_harmonic_pan = [clamp01, get_harmonic_pan_vector, params](int index = -1)
+	{
+		return get_harmonic_pan_vector(index) * params.width * clamp01(params.harmonics.amount);
+	};
+
 	auto delay_samples = ml::repeatRows<2>(SR_vec_ / frequency);
 
 	out_vec = delay_(in_vec, delay_samples, feedback, dampener);
+	out_vec = pan_harmonic(out_vec, get_harmonic_pan());
 
 	const auto get_harmonic_ratio = [&params](int harmonic)
 	{
@@ -136,7 +178,9 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 			const auto ratio = get_harmonic_ratio(i);
 			const auto harmonic_frequency = frequency * ratio;
 			const auto harmonic_delay_samples = ml::repeatRows<2>(SR_vec_ / harmonic_frequency);
-			const auto harmonic_out = harmonics_[i].delay(in_vec, harmonic_delay_samples, feedback, dampener);
+			auto harmonic_out = harmonics_[i].delay(in_vec, harmonic_delay_samples, feedback, dampener);
+
+			harmonic_out = pan_harmonic(harmonic_out, get_harmonic_pan(i));
 
 			out_vec += harmonic_out * harmonic_amp;
 			amp += harmonic_amp;

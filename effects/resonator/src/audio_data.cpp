@@ -11,6 +11,7 @@ AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* 
 	, harmonics_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.amount.get())
 	, harmonics_spread(plugin, buffer->parameter_data, plugin->params().env.harmonics.spread.get())
 	, harmonics_scale_snap_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.scale_snap_amount.get())
+	, width(plugin, buffer->parameter_data, plugin->params().env.width.get())
 	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
 {
 }

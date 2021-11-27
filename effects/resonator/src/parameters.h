@@ -20,6 +20,7 @@ struct Parameters
 		Env_HarmonicsAmount,
 		Env_HarmonicsSpread,
 		Env_HarmonicsScaleSnapAmount,
+		Env_Width,
 		Env_Mix,
 	};
 
@@ -42,6 +43,7 @@ struct Parameters
 			std::shared_ptr<blink::EnvelopeParameter> scale_snap_amount;
 		} harmonics;
 
+		std::shared_ptr<blink::EnvelopeParameter> width;
 		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;
 
