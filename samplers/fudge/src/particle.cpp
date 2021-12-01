@@ -141,6 +141,17 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 			break;
 		}
 
+		case blink_ChannelMode_StereoSwap:
+		{
+			const auto pos_L = grain.pos[0] + grain.frame;
+			const auto pos_R = grain.pos[1] + grain.frame;
+
+			R = pos_L < 0.f ? 0.f : data.read_frame_interp(0, pos_L);
+			L = pos_R < 0.f ? 0.f : data.read_frame_interp(1, pos_R);
+
+			break;
+		}
+
 		case blink_ChannelMode_Left:
 		{
 			const auto pos = grain.pos[0] + grain.frame;

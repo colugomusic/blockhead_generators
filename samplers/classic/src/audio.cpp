@@ -119,6 +119,11 @@ ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data
 			return sample_data.read_frames_interp<2>(sample_pos, loop);
 		}
 
+		case blink_ChannelMode_StereoSwap:
+		{
+			return ml::rotateRows(sample_data.read_frames_interp<2>(sample_pos, loop), 1);
+		}
+
 		case blink_ChannelMode_Left:
 		{
 			return ml::repeatRows<2>(sample_data.read_frames_interp(0, sample_pos, loop));
