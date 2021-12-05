@@ -14,6 +14,7 @@ blink_PluginInfo blink_get_plugin_info()
 {
 	blink_PluginInfo out = blink_PluginInfo();
 
+	// https://www.uuidgenerator.net/
 	out.uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 	out.name = "Template";
 	out.category = "example category";

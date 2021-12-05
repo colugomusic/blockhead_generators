@@ -10,8 +10,9 @@ EnvelopeSpec example()
 {
 	auto out = std_params::envelopes::generic::percentage();
 
+	// https://www.uuidgenerator.net/
+	out.uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 	out.name = "Example Envelope";
-	out.uuid = "4bbded86-953f-4a0d-98e6-99a5b7f6c7c2";
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 

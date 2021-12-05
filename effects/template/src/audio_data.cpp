@@ -4,6 +4,7 @@ namespace template {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
 	: example(plugin, buffer->parameter_data, plugin->params().env.example.get())
+	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
 {
 }
 
