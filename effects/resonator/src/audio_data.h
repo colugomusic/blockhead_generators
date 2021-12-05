@@ -20,7 +20,7 @@ struct AudioData
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsAmount)> harmonics_amount;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsSpread)> harmonics_spread;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsScaleSnapAmount)> harmonics_scale_snap_amount;
-		blink::EnvelopeData<int(resonator::Parameters::Index::Env_Width)> width;
+		blink::EnvelopeData<int(resonator::Parameters::Index::Env_HarmonicsWidth)> width;
 		blink::EnvelopeData<int(resonator::Parameters::Index::Env_Mix)> mix;
 
 		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);
@@ -32,6 +32,13 @@ struct AudioData
 
 		Chords(const Plugin* plugin, const blink_EffectBuffer* buffer);
 	} chords;
+
+	struct Sliders
+	{
+		Sliders(const Plugin* plugin, const blink_EffectBuffer* buffer);
+
+		float pitch;
+	} sliders;
 
 	AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer);
 };

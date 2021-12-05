@@ -83,7 +83,8 @@ EnvelopeSpec fm_amount()
 {
 	auto out = std_params::envelopes::generic::percentage();
 
-	out.name = "Amount";
+	out.name = "FM Amount";
+	out.short_name = "Amount";
 	out.uuid = "d1b4d493-35f9-408b-982c-4474517a968c";
 
 	out.default_value = 0.0f;
@@ -96,7 +97,8 @@ EnvelopeSpec fm_ratio()
 {
 	EnvelopeSpec out;
 
-	out.name = "Ratio";
+	out.name = "FM Ratio";
+	out.short_name = "Ratio";
 	out.uuid = "25aac401-9251-4f88-af77-14dddba78151";
 
 	struct Tweak
@@ -234,7 +236,8 @@ blink::EnvelopeSpec harmonics_amount()
 	EnvelopeSpec out;
 
 	out.uuid = "67180600-d95c-49d2-87cb-2d403904781c";
-	out.name = "Amount";
+	out.name = "Harmonics Amount";
+	out.short_name = "Amount";
 
 	out.get_gridline = [](int index) -> float
 	{
@@ -262,7 +265,8 @@ blink::EnvelopeSpec harmonics_spread()
 	EnvelopeSpec out = std_params::envelopes::generic::percentage();
 
 	out.uuid = "a213c98b-a772-4db2-acd4-a5518dd48fd1";
-	out.name = "Spread";
+	out.name = "Harmonics Spread";
+	out.short_name = "Spread";
 
 	out.default_value = 1.0f;
 	out.get_gridline = [](int index) { return float(index) / 4.0f; };
@@ -281,7 +285,8 @@ EnvelopeSpec harmonics_scale_snap_amount()
 {
 	auto out = std_params::envelopes::generic::percentage();
 
-	out.name = "Snap Amount";
+	out.name = "Harmonics Scale Snap Amount";
+	out.short_name = "Snap Amount";
 	out.long_desc = "Controls the amount of scale snapping for the harmonics";
 	out.uuid = "de8c7343-360a-41fd-9788-ae2398d0a872";
 
@@ -290,11 +295,12 @@ EnvelopeSpec harmonics_scale_snap_amount()
 	return out;
 }
 
-EnvelopeSpec width()
+EnvelopeSpec harmonics_width()
 {
 	auto out = std_params::envelopes::generic::percentage();
 
-	out.name = "Width";
+	out.name = "Harmonics Width";
+	out.short_name = "Width";
 	out.uuid = "2f95dc68-9ae3-4e12-8ef1-81c36201b995";
 
 	out.default_value = 0.5f;
@@ -340,6 +346,7 @@ Parameters::Parameters(blink::Plugin* plugin)
 		env.harmonics.amount = plugin->add_parameter(parameters::envelopes::harmonics_amount());
 		env.harmonics.spread = plugin->add_parameter(parameters::envelopes::harmonics_spread());
 		env.harmonics.scale_snap_amount = plugin->add_parameter(parameters::envelopes::harmonics_scale_snap_amount());
+		env.harmonics.width = plugin->add_parameter(parameters::envelopes::harmonics_width());
 
 		chords.harmonics.scale->set_group_index(group_harmonics);
 		env.harmonics.amount->set_group_index(group_harmonics);
@@ -347,8 +354,9 @@ Parameters::Parameters(blink::Plugin* plugin)
 		env.harmonics.scale_snap_amount->set_group_index(group_harmonics);
 	}
 
-	env.width = plugin->add_parameter(parameters::envelopes::width());
 	env.mix = plugin->add_parameter(std_params::envelopes::mix());
+
+	sliders.pitch = plugin->add_parameter(std_params::sliders::parameters::pitch());
 }
 
 } // resonator

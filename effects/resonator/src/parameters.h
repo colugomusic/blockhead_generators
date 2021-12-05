@@ -2,6 +2,7 @@
 
 #include <blink/chord_spec.hpp>
 #include <blink/envelope_spec.hpp>
+#include <blink/slider_parameter_spec.hpp>
 #include <blink/option_spec.hpp>
 #include <blink/plugin.hpp>
 
@@ -20,8 +21,9 @@ struct Parameters
 		Env_HarmonicsAmount,
 		Env_HarmonicsSpread,
 		Env_HarmonicsScaleSnapAmount,
-		Env_Width,
+		Env_HarmonicsWidth,
 		Env_Mix,
+		Slider_Pitch,
 	};
 
 	struct Envelopes
@@ -41,9 +43,9 @@ struct Parameters
 			std::shared_ptr<blink::EnvelopeParameter> amount;
 			std::shared_ptr<blink::EnvelopeParameter> spread;
 			std::shared_ptr<blink::EnvelopeParameter> scale_snap_amount;
+			std::shared_ptr<blink::EnvelopeParameter> width;
 		} harmonics;
 
-		std::shared_ptr<blink::EnvelopeParameter> width;
 		std::shared_ptr<blink::EnvelopeParameter> mix;
 	} env;
 
@@ -54,6 +56,11 @@ struct Parameters
 			std::shared_ptr<blink::ChordParameter> scale;
 		} harmonics;
 	} chords;
+
+	struct Sliders
+	{
+		std::shared_ptr<blink::SliderParameter<float>> pitch;
+	} sliders;
 	
 	Parameters(blink::Plugin* plugin);
 };

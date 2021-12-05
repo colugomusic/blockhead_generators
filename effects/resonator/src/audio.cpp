@@ -47,39 +47,39 @@ struct Params
 {
 	Params(const AudioData& data, const BlockPositions& block_positions)
 	{
-		pitch = data.envelopes.pitch.search_vec(block_positions);
-		feedback = data.envelopes.feedback.search_vec(block_positions);
-		damper = data.envelopes.damper.search_vec(block_positions);
-		fm.amount = data.envelopes.fm_amount.search_vec(block_positions);
-		fm.ratio = data.envelopes.fm_ratio.search_vec(block_positions);
-		harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions);
-		harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions);
-		harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions);
-		harmonics.scale_snap_amount = data.envelopes.harmonics_scale_snap_amount.search_vec(block_positions);
-		width = data.envelopes.width.search_vec(block_positions);
-		mix = data.envelopes.mix.search_vec(block_positions);
+		env.pitch = data.envelopes.pitch.search_vec(block_positions);
+		env.feedback = data.envelopes.feedback.search_vec(block_positions);
+		env.damper = data.envelopes.damper.search_vec(block_positions);
+		env.fm.amount = data.envelopes.fm_amount.search_vec(block_positions);
+		env.fm.ratio = data.envelopes.fm_ratio.search_vec(block_positions);
+		env.harmonics.amount = data.envelopes.harmonics_amount.search_vec(block_positions);
+		env.harmonics.spread = data.envelopes.harmonics_spread.search_vec(block_positions);
+		env.harmonics.scale_snap_amount = data.envelopes.harmonics_scale_snap_amount.search_vec(block_positions);
+		env.width = data.envelopes.width.search_vec(block_positions);
+		env.mix = data.envelopes.mix.search_vec(block_positions);
+
+		chord.harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions);
+
+		slider.pitch = data.sliders.pitch;
 	}
 
-	ml::DSPVector pitch;
-	ml::DSPVector feedback;
-	ml::DSPVector damper;
+	struct
+	{
+		ml::DSPVector pitch, feedback, damper, width, mix;
+
+		struct { ml::DSPVector amount, ratio; } fm;
+		struct { ml::DSPVector amount, spread, scale_snap_amount, width; } harmonics;
+	} env;
 
 	struct
 	{
-		ml::DSPVector amount;
-		ml::DSPVector ratio;
-	} fm;
+		struct { ml::DSPVectorInt scale; } harmonics;
+	} chord;
 
 	struct
 	{
-		ml::DSPVectorInt scale;
-		ml::DSPVector amount;
-		ml::DSPVector spread;
-		ml::DSPVector scale_snap_amount;
-	} harmonics;
-
-	ml::DSPVector width;
-	ml::DSPVector mix;
+		float pitch;
+	} slider;
 };
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
@@ -89,18 +89,18 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	AudioData data(plugin_, buffer);
 	Params params(data, block_positions());
 
-	const auto damper_mix = ml::repeatRows<2>(params.damper);
-	const auto damper_freq = ml::repeatRows<2>(math::convert::linear_to_filter_hz<5, 30000>(1.0f - math::ease::quadratic::in(params.damper)));
-	const auto base_pitch = params.pitch + 60.0f;
+	const auto damper_mix = ml::repeatRows<2>(params.env.damper);
+	const auto damper_freq = ml::repeatRows<2>(math::convert::linear_to_filter_hz<5, 30000>(1.0f - math::ease::quadratic::in(params.env.damper)));
+	const auto base_pitch = params.env.pitch + params.slider.pitch + 60.0f;
 	const auto base_frequency = math::convert::pitch_to_frequency(base_pitch);
 	const auto fm_amount_curve = [](const ml::DSPVector& x) { return x*x*x*x*x*x; };
-	const auto fm_amount = fm_amount_curve(params.fm.amount);
-	const auto fm_ratio = convert::linear_to_ratio(params.fm.ratio);
+	const auto fm_amount = fm_amount_curve(params.env.fm.amount);
+	const auto fm_ratio = convert::linear_to_ratio(params.env.fm.ratio);
 	const auto fm_freq = base_frequency * fm_ratio;
 	const auto fm = fm_source_(fm_freq / SR_vec_);
 	const auto pitch = base_pitch + (fm * fm_amount * 60.0f);
 	const auto frequency = ml::repeatRows<2>(math::convert::pitch_to_frequency(pitch));
-	const auto feedback = math::ease::exponential::out(ml::repeatRows<2>(params.feedback));
+	const auto feedback = math::ease::exponential::out(ml::repeatRows<2>(params.env.feedback));
 
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec;
@@ -148,7 +148,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	const auto get_harmonic_pan = [clamp01, params](int index)
 	{
-		return PAN_VECTORS[index] * params.width * clamp01(params.harmonics.amount);
+		return PAN_VECTORS[index] * params.env.width * clamp01(params.env.harmonics.amount);
 	};
 
 	out_vec = run_resonator(&fundamental_, frequency, feedback, damper_freq, damper_mix, in_vec);
@@ -156,10 +156,10 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	const auto get_harmonic_ratio = [&params](int harmonic)
 	{
-		const auto ff = 1.0f + (float(harmonic + 1) * params.harmonics.spread);
+		const auto ff = 1.0f + (float(harmonic + 1) * params.env.harmonics.spread);
 		const auto harmonic_pitch = blink::math::convert::ff_to_p(ff);
-		const auto snapped_pitch = blink::ChordParameter::snap_pitch_to_scale(harmonic_pitch, params.harmonics.scale);
-		const auto pitch = ml::lerp(harmonic_pitch, snapped_pitch, params.harmonics.scale_snap_amount);
+		const auto snapped_pitch = blink::ChordParameter::snap_pitch_to_scale(harmonic_pitch, params.chord.harmonics.scale);
+		const auto pitch = ml::lerp(harmonic_pitch, snapped_pitch, params.env.harmonics.scale_snap_amount);
 
 		return blink::math::convert::p_to_ff(pitch);
 	};
@@ -168,7 +168,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	for (int i = 0; i < harmonics_.size(); i++)
 	{
-		const auto harmonic_amp_v = ml::clamp(params.harmonics.amount - float(i), {0.0f}, {1.0f});
+		const auto harmonic_amp_v = ml::clamp(params.env.harmonics.amount - float(i), {0.0f}, {1.0f});
 
 		if (ml::max(harmonic_amp_v) > EPSILON)
 		{
@@ -194,7 +194,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	out_vec /= amp;
 
- 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(params.mix));
+ 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(params.env.mix));
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
