@@ -29,8 +29,6 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		record_ = false;
 	}
 
-	block_traverser_.generate(block_positions());
-
 	AudioData data;
 
 	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
