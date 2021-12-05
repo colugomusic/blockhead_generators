@@ -166,7 +166,8 @@ EnvelopeSpec grain_size()
 	EnvelopeSpec out;
 
 	out.uuid = "2a9c7ec6-68b4-40c1-aad9-b3c010cd9717";
-	out.name = "Size";
+	out.name = "Grain Size";
+	out.short_name = "Size";
 
 	out.default_value = 0.5f;
 	out.search_binary = std_params::envelopes::generic_search_binary;
@@ -191,7 +192,8 @@ EnvelopeSpec grain_transpose()
 	EnvelopeSpec out = std_params::envelopes::pitch();
 
 	out.uuid = "fe64baa2-9d35-4eef-bc8b-1799916e8bda";
-	out.name = "Transpose";
+	out.name = "Grain Transpose";
+	out.short_name = "Transpose";
 
 	return out;
 }
@@ -201,7 +203,8 @@ EnvelopeSpec uniformity()
 	EnvelopeSpec out = std_params::envelopes::generic::percentage();
 
 	out.uuid = "83c352fb-35b5-4cb0-a6f7-05d082b56a16";
-	out.name = "Uniformity";
+	out.name = "Grain Uniformity";
+	out.short_name = "Uniformity";
 
 	return out;
 }
@@ -211,7 +214,8 @@ blink::EnvelopeSpec harmonics_amount()
 	EnvelopeSpec out;
 
 	out.uuid = "a8a6e4fa-6713-48bb-a888-65ac437384b7";
-	out.name = "Amount";
+	out.name = "Harmonics Amount";
+	out.short_name = "Amount";
 
 	out.get_gridline = [](int index) -> float
 	{
@@ -239,7 +243,8 @@ blink::EnvelopeSpec harmonics_spread()
 	EnvelopeSpec out = std_params::envelopes::generic::percentage();
 
 	out.uuid = "f04c18fd-0341-4398-a02b-f3e253f658c1";
-	out.name = "Spread";
+	out.name = "Harmonics Spread";
+	out.short_name = "Spread";
 
 	out.default_value = 1.0f;
 	out.get_gridline = [](int index) { return float(index) / 4.0f; };
