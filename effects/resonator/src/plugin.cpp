@@ -16,7 +16,7 @@ blink_PluginInfo blink_get_plugin_info()
 
 	out.uuid = "1e3f8aab-7f5c-40cc-9dc5-557d72256f43";
 	out.name = "Resonator";
-	out.category = BLINK_STD_CATEGORY_FILTERS"|Special";
+	out.category = BLINK_STD_CATEGORY_TONAL;
 	out.version = PLUGIN_VERSION;
 	out.has_icon = true;
 
