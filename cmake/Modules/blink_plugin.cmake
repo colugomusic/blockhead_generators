@@ -16,6 +16,16 @@ CPMAddPackage(
 	DOWNLOAD_ONLY YES
 )
 
+if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
+	CPMAddPackage(
+		NAME sse2neon
+		GITHUB_REPOSITORY DLTcollab/sse2neon
+		GIT_TAG master
+		DOWNLOAD_ONLY YES
+	)
+	list(APPEND extra_include_dirs ${sse2neon_SOURCE_DIR})
+endif()
+
 if (NOT TARGET blink_plugin)
 	add_subdirectory(${blink_SOURCE_DIR}/plugin/blink blink_plugin)
 endif()
@@ -38,6 +48,7 @@ function(blink_plugin_add name type src resources)
 
 	add_library(${target_name} SHARED ${src})
 	target_link_libraries(${target_name} PRIVATE blink_plugin ${target_name}::rc)
+	target_include_directories(${target_name} PRIVATE ${extra_include_dirs})
 
 	set_target_properties(${target_name} PROPERTIES
 		OUTPUT_NAME ${output_name}
