@@ -3,12 +3,12 @@
 namespace compressor {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: attack(plugin, buffer->parameter_data, plugin->params().env.attack.get())
-	, release(plugin, buffer->parameter_data, plugin->params().env.release.get())
-	, threshold(plugin, buffer->parameter_data, plugin->params().env.threshold.get())
-	, ratio(plugin, buffer->parameter_data, plugin->params().env.ratio.get())
-	, knee(plugin, buffer->parameter_data, plugin->params().env.knee.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: attack(plugin, plugin->params().env.attack->envelope(), buffer->parameter_data)
+	, release(plugin, plugin->params().env.release->envelope(), buffer->parameter_data)
+	, threshold(plugin, plugin->params().env.threshold->envelope(), buffer->parameter_data)
+	, ratio(plugin, plugin->params().env.ratio->envelope(), buffer->parameter_data)
+	, knee(plugin, plugin->params().env.knee->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

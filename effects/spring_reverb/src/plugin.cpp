@@ -3,7 +3,7 @@
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 namespace spring_reverb { Plugin* g_plugin = nullptr; }
 

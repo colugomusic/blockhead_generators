@@ -3,7 +3,7 @@
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
 
@@ -11,9 +11,9 @@ namespace lowpass {
 
 Plugin::Plugin()
 {
-	auto spec_env_freq = std_params::envelopes::filter_frequency();
-	auto spec_env_res = std_params::envelopes::resonance();
-	auto spec_env_mix = std_params::envelopes::mix();
+	auto spec_env_freq = std_params::filter_frequency::envelope_parameter();
+	auto spec_env_res = std_params::resonance::envelope_parameter();
+	auto spec_env_mix = std_params::mix::envelope_parameter();
 
 	spec_env_freq.flags |= blink_EnvelopeFlags_DefaultActive;
 	spec_env_res.flags |= blink_EnvelopeFlags_DefaultActive;

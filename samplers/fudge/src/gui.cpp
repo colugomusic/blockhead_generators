@@ -134,7 +134,7 @@ static void calculate_amp(const Plugin* plugin, const Data& data, const blink::B
 
 	if (data.envelopes.amp)
 	{
-		plugin->env_amp().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
+		plugin->env_amp().envelope().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
 	}
 
 	if (data.sliders.amp)

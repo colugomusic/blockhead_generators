@@ -23,10 +23,11 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		const blink_EnvelopeData* env_fm0;
 		const blink_EnvelopeData* env_fm1;
 		const blink_OptionData* option_noise_mode;
-		const blink_EnvelopeData* env_noise_amount;
-		const blink_EnvelopeData* env_noise_color;
 		const blink_SliderData* slider_noise_width;
 	} data;
+
+	EnvelopeData<int(Plugin::ParameterIndex::Env_NoiseAmount)> env_noise_amount(plugin_, plugin_->env_noise_amount().envelope(), buffer->parameter_data);
+	EnvelopeData<int(Plugin::ParameterIndex::Env_NoiseColor)> env_noise_color(plugin_, plugin_->env_noise_color().envelope(), buffer->parameter_data);
 
 	data.env_amp = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
 	data.env_wave = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Wave));
@@ -35,16 +36,14 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 	data.env_fm0 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_FM0));
 	data.env_fm1 = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_FM1));
 	data.option_noise_mode = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
-	data.env_noise_amount = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseColor));
 	data.slider_noise_width = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_NoiseWidth));
 
-	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions());
- 	const auto wave = plugin_->env_wave().search_vec(data.env_wave, block_positions());
-	const auto p0 = plugin_->env_p0().search_vec(data.env_p0, block_positions()) + 60.0f;
-	const auto p1 = plugin_->env_p1().search_vec(data.env_p1, block_positions()) + 60.0f;
-	const auto fm0 = plugin_->env_fm0().search_vec(data.env_fm0, block_positions());
-	const auto fm1 = plugin_->env_fm1().search_vec(data.env_fm1, block_positions());
+	const auto amp = plugin_->env_amp().envelope().search_vec(data.env_amp, block_positions());
+ 	const auto wave = plugin_->env_wave().envelope().search_vec(data.env_wave, block_positions());
+	const auto p0 = plugin_->env_p0().envelope().search_vec(data.env_p0, block_positions()) + 60.0f;
+	const auto p1 = plugin_->env_p1().envelope().search_vec(data.env_p1, block_positions()) + 60.0f;
+	const auto fm0 = plugin_->env_fm0().envelope().search_vec(data.env_fm0, block_positions());
+	const auto fm1 = plugin_->env_fm1().envelope().search_vec(data.env_fm1, block_positions());
 	
 	const auto freq0 = blink::math::convert::pitch_to_frequency(p0);
 	const auto freq1 = blink::math::convert::pitch_to_frequency(p1);
@@ -67,10 +66,8 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 		noise_gen_(
 			out_vec,
 			data.option_noise_mode->index,
-			plugin_->env_noise_amount(),
-			plugin_->env_noise_color(),
-			*data.env_noise_amount,
-			*data.env_noise_color,
+			env_noise_amount,
+			env_noise_color,
 			*data.slider_noise_width,
 			block_positions());
 

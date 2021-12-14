@@ -3,9 +3,9 @@
 namespace lofi {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: BR(plugin, buffer->parameter_data, plugin->params().env.br.get())
-	, SR(plugin, buffer->parameter_data, plugin->params().env.sr.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: BR(plugin, plugin->params().env.br->envelope(), buffer->parameter_data)
+	, SR(plugin, plugin->params().env.sr->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

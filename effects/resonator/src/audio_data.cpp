@@ -3,16 +3,16 @@
 namespace resonator {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: pitch(plugin, buffer->parameter_data, plugin->params().env.pitch.get())
-	, feedback(plugin, buffer->parameter_data, plugin->params().env.feedback.get())
-	, damper(plugin, buffer->parameter_data, plugin->params().env.damper.get())
-	, fm_amount(plugin, buffer->parameter_data, plugin->params().env.fm.amount.get())
-	, fm_ratio(plugin, buffer->parameter_data, plugin->params().env.fm.ratio.get())
-	, harmonics_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.amount.get())
-	, harmonics_spread(plugin, buffer->parameter_data, plugin->params().env.harmonics.spread.get())
-	, harmonics_scale_snap_amount(plugin, buffer->parameter_data, plugin->params().env.harmonics.scale_snap_amount.get())
-	, width(plugin, buffer->parameter_data, plugin->params().env.harmonics.width.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: pitch(plugin, plugin->params().env.pitch->envelope(), buffer->parameter_data)
+	, feedback(plugin, plugin->params().env.feedback->envelope(), buffer->parameter_data)
+	, damper(plugin, plugin->params().env.damper->envelope(), buffer->parameter_data)
+	, fm_amount(plugin, plugin->params().env.fm.amount->envelope(), buffer->parameter_data)
+	, fm_ratio(plugin, plugin->params().env.fm.ratio->envelope(), buffer->parameter_data)
+	, harmonics_amount(plugin, plugin->params().env.harmonics.amount->envelope(), buffer->parameter_data)
+	, harmonics_spread(plugin, plugin->params().env.harmonics.spread->envelope(), buffer->parameter_data)
+	, harmonics_scale_snap_amount(plugin, plugin->params().env.harmonics.scale_snap_amount->envelope(), buffer->parameter_data)
+	, width(plugin, plugin->params().env.harmonics.width->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

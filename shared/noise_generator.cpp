@@ -34,21 +34,19 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in
 ml::DSPVectorArray<2> NoiseGenerator::operator()(
 	const ml::DSPVectorArray<2>& in,
 	int mode,
-	const blink::EnvelopeParameter& env_amount,
-	const blink::EnvelopeParameter& env_color,
-	const blink_EnvelopeData& data_env_amount,
-	const blink_EnvelopeData& data_env_color,
+	const blink::EnvelopeIndexData& env_amount,
+	const blink::EnvelopeIndexData& env_color,
 	const blink_SliderData& data_sld_width,
 	const blink::BlockPositions& block_positions)
 {
 	constexpr auto MIN_AMOUNT = 0.0001f;
 
-	if (data_env_amount.points.count < 1)
+	if (env_amount.data().points.count < 1)
 	{
 		return in;
 	}
 
-	const auto amount = env_amount.search_vec(&data_env_amount, block_positions);
+	const auto amount = env_amount.search_vec(block_positions);
 
 	if (ml::sum(amount) < MIN_AMOUNT)
 	{
@@ -57,7 +55,7 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(
 
 	float color;
 
-	env_color.search_vec(&data_env_color, block_positions, 1, &color);
+	env_color.search_vec(block_positions, 1, &color);
 
 	return operator()(in, Mode(mode), amount, color, data_sld_width.value);
 }

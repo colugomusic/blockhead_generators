@@ -1,5 +1,5 @@
 #include "parameters.h"
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 #include "plugin.h"
 #include "shared/tract_parameters.h"
 
@@ -28,7 +28,7 @@ Parameters::Parameters(blink::Plugin* plugin)
 	}
 
 	env.quality = plugin->add_parameter(tract_parameters::quality());
-	env.mix = plugin->add_parameter(std_params::envelopes::mix());
+	env.mix = plugin->add_parameter(std_params::mix::envelope_parameter());
 }
 
 } // tract

@@ -1,5 +1,5 @@
 #include "parameters.h"
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 #include "plugin.h"
 #include "shared/tract_parameters.h"
 
@@ -10,33 +10,33 @@ namespace parameters {
 
 namespace envelopes {
 
-blink::EnvelopeSpec amp()
+auto amp()
 {
-	auto out = std_params::envelopes::amp();
+	auto out = std_params::amp::envelope_parameter();
 
-	out.default_value = 0.5f;
+	out.envelope.default_value = 0.5f;
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-blink::EnvelopeSpec pan()
+auto pan()
 {
-	return std_params::envelopes::pan();
+	return std_params::pan::envelope_parameter();
 }
 
-blink::EnvelopeSpec pitch()
+auto pitch()
 {
-	auto out = std_params::envelopes::pitch();
+	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-blink::EnvelopeSpec buzz()
+auto buzz()
 {
-	auto out = std_params::envelopes::formant();
+	auto out = std_params::formant::envelope_parameter();
 
 	out.uuid = "a62d1f52-d493-4902-b92d-c09f5a92e8d2";
 	out.name = "Buzz";

@@ -3,7 +3,7 @@
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 #include "instance.h"
 #include "parameters.h"
@@ -14,7 +14,7 @@ namespace fudge {
 
 Plugin::Plugin()
 {
-	option_noise_mode_ = add_parameter(std_params::options::noise_mode());
+	option_noise_mode_ = add_parameter(std_params::noise_mode::option());
 	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
 
 	env_amp_ = add_parameter(parameters::envelopes::amp());
@@ -46,8 +46,8 @@ Plugin::Plugin()
 
 	auto group_noise = add_group("Noise");
 	{
-		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
-		auto spec_env_noise_color = std_params::envelopes::noise_color();
+		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
+		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
 
 		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
@@ -61,13 +61,13 @@ Plugin::Plugin()
 		env_noise_color_->set_group_index(group_noise);
 	}
 
-	sld_amp_ = add_parameter(std_params::sliders::parameters::amp());
-	sld_pan_ = add_parameter(std_params::sliders::parameters::pan());
-	sld_pitch_ = add_parameter(std_params::sliders::parameters::pitch());
-	sld_speed_ = add_parameter(std_params::sliders::parameters::speed());
-	sld_sample_offset_ = add_parameter(std_params::sliders::parameters::sample_offset());
-	tog_loop_ = add_parameter(std_params::toggles::loop());
-	tog_revers_ = add_parameter(std_params::toggles::reverse());
+	sld_amp_ = add_parameter(std_params::amp::slider_parameter());
+	sld_pan_ = add_parameter(std_params::pan::slider_parameter());
+	sld_pitch_ = add_parameter(std_params::pitch::slider_parameter());
+	sld_speed_ = add_parameter(std_params::speed::slider_parameter());
+	sld_sample_offset_ = add_parameter(std_params::sample_offset::slider_parameter());
+	tog_loop_ = add_parameter(std_params::loop::toggle());
+	tog_revers_ = add_parameter(std_params::reverse::toggle());
 }
 
 GUI& Plugin::gui()

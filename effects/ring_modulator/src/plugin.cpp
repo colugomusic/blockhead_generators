@@ -3,7 +3,7 @@
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
 
@@ -11,8 +11,8 @@ namespace ring_modulator {
 
 Plugin::Plugin()
 {
-	auto spec_env_pitch = std_params::envelopes::pitch();
-	auto spec_env_mix = std_params::envelopes::mix();
+	auto spec_env_pitch = std_params::pitch::envelope_parameter();
+	auto spec_env_mix = std_params::mix::envelope_parameter();
 
 	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
 

@@ -67,7 +67,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		out_vec.row(1)[i] = LR.R;
 	}
 
-	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
+	const auto mix = plugin_->env_mix().envelope().search_vec(data.env_mix, block_positions());
 
 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix));
 

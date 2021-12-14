@@ -3,12 +3,12 @@
 namespace tract {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: index(plugin, buffer->parameter_data, plugin->params().env.index.get())
-	, diameter(plugin, buffer->parameter_data, plugin->params().env.diameter.get())
-	, tongue_index(plugin, buffer->parameter_data, plugin->params().env.tongue_index.get())
-	, tongue_diameter(plugin, buffer->parameter_data, plugin->params().env.tongue_diameter.get())
-	, quality(plugin, buffer->parameter_data, plugin->params().env.quality.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: index(plugin, plugin->params().env.index->envelope(), buffer->parameter_data)
+	, diameter(plugin, plugin->params().env.diameter->envelope(), buffer->parameter_data)
+	, tongue_index(plugin, plugin->params().env.tongue_index->envelope(), buffer->parameter_data)
+	, tongue_diameter(plugin, plugin->params().env.tongue_diameter->envelope(), buffer->parameter_data)
+	, quality(plugin, plugin->params().env.quality->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

@@ -1,21 +1,21 @@
 #pragma once
 
 #include <blink/chord_spec.hpp>
-#include <blink/envelope_spec.hpp>
+#include <blink/envelope_parameter_spec.hpp>
 #include <blink/slider_parameter_spec.hpp>
 
 namespace parameters {
 namespace envelopes {
 
-extern blink::EnvelopeSpec amp();
-extern blink::EnvelopeSpec pan();
-extern blink::EnvelopeSpec pitch();
-extern blink::EnvelopeSpec speed();
-extern blink::EnvelopeSpec grain_size();
-extern blink::EnvelopeSpec grain_transpose();
-extern blink::EnvelopeSpec uniformity();
-extern blink::EnvelopeSpec harmonics_amount();
-extern blink::EnvelopeSpec harmonics_spread();
+extern blink::EnvelopeParameterSpec amp();
+extern blink::EnvelopeParameterSpec pan();
+extern blink::EnvelopeParameterSpec pitch();
+extern blink::EnvelopeParameterSpec speed();
+extern blink::EnvelopeParameterSpec grain_size();
+extern blink::EnvelopeParameterSpec grain_transpose();
+extern blink::EnvelopeParameterSpec uniformity();
+extern blink::EnvelopeParameterSpec harmonics_amount();
+extern blink::EnvelopeParameterSpec harmonics_spread();
 
 } // envelopes
 

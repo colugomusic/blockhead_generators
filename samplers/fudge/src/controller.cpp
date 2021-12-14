@@ -54,18 +54,18 @@ void Controller::process(
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();
 
-	const auto transpose = plugin_->env_grain_transpose().search_vec(data.env_grain_transpose, *block_positions_);
-	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, *block_positions_) + data.slider_pitch->value;
+	const auto transpose = plugin_->env_grain_transpose().envelope().search_vec(data.env_grain_transpose, *block_positions_);
+	const auto pitch = plugin_->env_pitch().envelope().search_vec(data.env_pitch, *block_positions_) + data.slider_pitch->value;
 
 	ff_ = blink::math::convert::p_to_ff(pitch);
 
-	const auto size_in_ms = convert::linear_to_ms(plugin_->env_grain_size().search_vec(data.env_grain_size, *block_positions_));
+	const auto size_in_ms = convert::linear_to_ms(plugin_->env_grain_size().envelope().search_vec(data.env_grain_size, *block_positions_));
 	const auto size_in_samples = convert::ms_to_samples(size_in_ms, buffer_->sample_info->SR);
 
 	size_ = blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose);
-	uniformity_ = plugin_->env_uniformity().search_vec(data.env_uniformity, *block_positions_);
+	uniformity_ = plugin_->env_uniformity().envelope().search_vec(data.env_uniformity, *block_positions_);
 	scale_ = plugin_->chord_harmonics_scale().search_vec(data.chord_harmonics_scale, *block_positions_);
-	spread_ = plugin_->env_harmonics_spread().search_vec(data.env_harmonics_spread, *block_positions_);
+	spread_ = plugin_->env_harmonics_spread().envelope().search_vec(data.env_harmonics_spread, *block_positions_);
 }
 
 float Controller::get_harmonic_ratio(int index, int harmonic) const

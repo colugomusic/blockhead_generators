@@ -3,9 +3,9 @@
 namespace spring_reverb {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: size(plugin, buffer->parameter_data, plugin->params().env.size.get())
-	, decay(plugin, buffer->parameter_data, plugin->params().env.decay.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: size(plugin, plugin->params().env.size->envelope(), buffer->parameter_data)
+	, decay(plugin, plugin->params().env.decay->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

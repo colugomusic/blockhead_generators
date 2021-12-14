@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "instance.h"
 #include "audio_data.h"
+#include <blink/dsp.hpp>
 
 using namespace blink;
 
@@ -25,8 +26,6 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	data.option_noise_mode     = plugin_->get_option_data(buffer->parameter_data, int(Plugin::ParameterIndex::Option_NoiseMode));
 	data.chord_harmonics_scale = plugin_->get_chord_data(buffer->parameter_data, int(Plugin::ParameterIndex::Chord_Harmonics_Scale));
-	data.env_amp               = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
-	data.env_pan               = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pan));
 	data.env_pitch             = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
 	data.env_speed             = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Speed));
 	data.env_grain_size        = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_GrainSize));
@@ -34,8 +33,6 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.env_uniformity        = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Uniformity));
 	data.env_harmonics_amount  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Harmonics_Amount));
 	data.env_harmonics_spread  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Harmonics_Spread));
-	data.env_noise_amount      = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseAmount));
-	data.env_noise_color       = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_NoiseColor));
 	data.slider_amp            = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Amp));
 	data.slider_pan            = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pan));
 	data.slider_pitch          = plugin_->get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Pitch));
@@ -46,13 +43,18 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	data.toggle_reverse        = plugin_->get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
 	data.warp_points           = buffer->warp_points;
 
+	EnvelopeData<int(Plugin::ParameterIndex::Env_Amp)> env_amp(plugin_, plugin_->env_amp().envelope(), buffer->parameter_data);
+	EnvelopeData<int(Plugin::ParameterIndex::Env_Pan)> env_pan(plugin_, plugin_->env_pan().envelope(), buffer->parameter_data);
+	EnvelopeData<int(Plugin::ParameterIndex::Env_NoiseAmount)> env_noise_amount(plugin_, plugin_->env_noise_amount().envelope(), buffer->parameter_data);
+	EnvelopeData<int(Plugin::ParameterIndex::Env_NoiseColor)> env_noise_color(plugin_, plugin_->env_noise_color().envelope(), buffer->parameter_data);
+
 	traverser_resetter_.check(data.env_speed, &block_traverser_);
 
 	const auto analysis_data = buffer->analysis_ready ? plugin_->get_analysis_data(buffer->sample_info->id) : nullptr;
 
 	controller_.process(data, *buffer, analysis_data, block_traverser_, block_positions(), SR());
 
-	const auto harmonic_amount = plugin_->env_harmonics_amount().search_vec(data.env_harmonics_amount, block_positions());
+	const auto harmonic_amount = plugin_->env_harmonics_amount().envelope().search_vec(data.env_harmonics_amount, block_positions());
 
 	ml::DSPVector total_amp;
 
@@ -81,16 +83,14 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 		noise_gen_(
 			out_vec,
 			data.option_noise_mode->index,
-			plugin_->env_noise_amount(),
-			plugin_->env_noise_color(),
-			*data.env_noise_amount,
-			*data.env_noise_color,
+			env_noise_amount,
+			env_noise_color,
 			*data.slider_noise_width,
 			block_positions());
 
-	out_vec = stereo_pan(out_vec, data.slider_pan->value, plugin_->env_pan(), data.env_pan, block_positions());
+	out_vec = stereo_pan(out_vec, data.slider_pan->value, env_pan, block_positions());
 
-	const auto amp = plugin_->env_amp().search_vec(data.env_amp, block_positions()) * data.slider_amp->value;
+	const auto amp = env_amp.search_vec(block_positions()) * data.slider_amp->value;
 
 	out_vec *= ml::repeatRows<2>(amp);
 

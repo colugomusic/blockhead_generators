@@ -1,6 +1,6 @@
 #include "parameters.h"
 #include "convert.h"
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
 
@@ -129,67 +129,67 @@ SliderSpec<float> harmonic_amount()
 
 namespace envelopes {
 
-EnvelopeSpec amp()
+EnvelopeParameterSpec amp()
 {
-	auto out = std_params::envelopes::amp();
+	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-EnvelopeSpec pan()
+EnvelopeParameterSpec pan()
 {
-	return std_params::envelopes::pan();
+	return std_params::pan::envelope_parameter();
 }
 
-EnvelopeSpec pitch()
+EnvelopeParameterSpec pitch()
 {
-	auto out = std_params::envelopes::pitch();
+	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-EnvelopeSpec speed()
+EnvelopeParameterSpec speed()
 {
-	auto out = std_params::envelopes::speed();
+	auto out = std_params::speed::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-EnvelopeSpec grain_size()
+EnvelopeParameterSpec grain_size()
 {
-	EnvelopeSpec out;
+	EnvelopeParameterSpec out;
 
 	out.uuid = "2a9c7ec6-68b4-40c1-aad9-b3c010cd9717";
 	out.name = "Grain Size";
 	out.short_name = "Size";
 
-	out.default_value = 0.5f;
-	out.search_binary = std_params::envelopes::generic_search_binary;
-	out.search_forward = std_params::envelopes::generic_search_forward;
-	out.stepify = grain_size::stepify;
+	out.envelope.default_value = 0.5f;
+	out.envelope.search_binary = std_params::search::envelope_binary;
+	out.envelope.search_forward = std_params::search::envelope_forward;
+	out.envelope.stepify = grain_size::stepify;
 
-	out.value_slider = sliders::grain_size();
+	out.envelope.value_slider = sliders::grain_size();
 
-	out.range.min.default_value = 0.0f;
-	out.range.min.to_string = grain_size::display;
-	out.range.max.default_value = 1.0f;
-	out.range.max.to_string = grain_size::display;
-	out.to_string = grain_size::display;
+	out.envelope.range.min.default_value = 0.0f;
+	out.envelope.range.min.to_string = grain_size::display;
+	out.envelope.range.max.default_value = 1.0f;
+	out.envelope.range.max.to_string = grain_size::display;
+	out.envelope.to_string = grain_size::display;
 
 	out.flags = blink_EnvelopeFlags_DefaultActive | blink_EnvelopeFlags_NoGridLabels;
 
 	return out;
 }
 
-EnvelopeSpec grain_transpose()
+EnvelopeParameterSpec grain_transpose()
 {
-	EnvelopeSpec out = std_params::envelopes::pitch();
+	EnvelopeParameterSpec out = std_params::pitch::envelope_parameter();
 
 	out.uuid = "fe64baa2-9d35-4eef-bc8b-1799916e8bda";
 	out.name = "Grain Transpose";
@@ -198,68 +198,70 @@ EnvelopeSpec grain_transpose()
 	return out;
 }
 
-EnvelopeSpec uniformity()
+EnvelopeParameterSpec uniformity()
 {
-	EnvelopeSpec out = std_params::envelopes::generic::percentage();
+	EnvelopeParameterSpec out;
 
 	out.uuid = "83c352fb-35b5-4cb0-a6f7-05d082b56a16";
 	out.name = "Grain Uniformity";
 	out.short_name = "Uniformity";
+	out.envelope = std_params::percentage::envelope();
 
 	return out;
 }
 
-blink::EnvelopeSpec harmonics_amount()
+blink::EnvelopeParameterSpec harmonics_amount()
 {
-	EnvelopeSpec out;
+	EnvelopeParameterSpec out;
 
 	out.uuid = "a8a6e4fa-6713-48bb-a888-65ac437384b7";
 	out.name = "Harmonics Amount";
 	out.short_name = "Amount";
 
-	out.get_gridline = [](int index) -> float
+	out.envelope.get_gridline = [](int index) -> float
 	{
 		return float(index);
 	};
 
-	out.default_value = 0.0f;
-	out.search_binary = std_params::envelopes::generic_search_binary;
-	out.search_forward = std_params::envelopes::generic_search_forward;
-    out.stepify = tweak::math::stepify<100, float>;
+	out.envelope.default_value = 0.0f;
+	out.envelope.search_binary = std_params::search::envelope_binary;
+	out.envelope.search_forward = std_params::search::envelope_forward;
+    out.envelope.stepify = tweak::math::stepify<100, float>;
 
-	out.value_slider = sliders::harmonic_amount();
+	out.envelope.value_slider = sliders::harmonic_amount();
 
-	out.range.min.default_value = 0.0f;
-    out.range.min.to_string = [](float v) { return std::to_string(int(v)); };
-	out.range.max.default_value = 3.0f;
-    out.range.max.to_string = [](float v) { return std::to_string(int(v)); };
-    out.to_string = [](float v) { return std::to_string(int(v)); };
+	out.envelope.range.min.default_value = 0.0f;
+    out.envelope.range.min.to_string = [](float v) { return std::to_string(int(v)); };
+	out.envelope.range.max.default_value = 3.0f;
+    out.envelope.range.max.to_string = [](float v) { return std::to_string(int(v)); };
+    out.envelope.to_string = [](float v) { return std::to_string(int(v)); };
 
 	return out;
 }
 
-blink::EnvelopeSpec harmonics_spread()
+EnvelopeParameterSpec harmonics_spread()
 {
-	EnvelopeSpec out = std_params::envelopes::generic::percentage();
+	EnvelopeParameterSpec out;
 
 	out.uuid = "f04c18fd-0341-4398-a02b-f3e253f658c1";
 	out.name = "Harmonics Spread";
 	out.short_name = "Spread";
 
-	out.default_value = 1.0f;
-	out.get_gridline = [](int index) { return float(index) / 4.0f; };
-    out.stepify = tweak::math::stepify<100, float>;
+	out.envelope = std_params::percentage::envelope();
+	out.envelope.default_value = 1.0f;
+	out.envelope.get_gridline = [](int index) { return float(index) / 4.0f; };
+    out.envelope.stepify = tweak::math::stepify<100, float>;
 
-	out.value_slider.constrain = harmonics_spread::constrain;
-	out.value_slider.stepify = harmonics_spread::stepify;
-	out.value_slider.decrement = harmonics_spread::decrement;
-	out.value_slider.increment = harmonics_spread::increment;
-	out.value_slider.drag = harmonics_spread::drag;
-	out.value_slider.from_string = tweak::std::percentage::from_string;
-	out.value_slider.to_string = tweak::std::percentage::to_string;
+	out.envelope.value_slider.constrain = harmonics_spread::constrain;
+	out.envelope.value_slider.stepify = harmonics_spread::stepify;
+	out.envelope.value_slider.decrement = harmonics_spread::decrement;
+	out.envelope.value_slider.increment = harmonics_spread::increment;
+	out.envelope.value_slider.drag = harmonics_spread::drag;
+	out.envelope.value_slider.from_string = tweak::std::percentage::from_string;
+	out.envelope.value_slider.to_string = tweak::std::percentage::to_string;
 
-	out.range.max = out.value_slider;
-	out.range.max.default_value = 2.0f;
+	out.envelope.range.max = out.envelope.value_slider;
+	out.envelope.range.max.default_value = 2.0f;
 
 	return out;
 }
@@ -270,7 +272,7 @@ namespace sliders {
 
 blink::SliderParameterSpec<float> noise_width()
 {
-	auto out = std_params::sliders::parameters::noise_width();
+	auto out = std_params::noise_width::slider_parameter();
 
 	out.flags = blink_SliderFlags_NonGlobal;
 
@@ -281,7 +283,7 @@ blink::SliderParameterSpec<float> noise_width()
 
 extern blink::ChordSpec harmonics_scale()
 {
-	auto out = std_params::chords::scale();
+	auto out = std_params::scale::chord();
 
 	out.flags |= blink_ChordFlags_IconOnly;
 	out.flags |= blink_ChordFlags_AlwaysShowButtonWhenGroupIsVisible;

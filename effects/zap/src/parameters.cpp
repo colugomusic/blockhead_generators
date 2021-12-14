@@ -1,36 +1,36 @@
 #include "parameters.h"
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
 
 namespace parameters {
 namespace envelopes {
 
-EnvelopeSpec frequency()
+EnvelopeParameterSpec frequency()
 {
-	auto out = std_params::envelopes::filter_frequency();
+	auto out = std_params::filter_frequency::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-EnvelopeSpec resonance()
+EnvelopeParameterSpec resonance()
 {
-	auto out = std_params::envelopes::resonance();
+	auto out = std_params::resonance::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }
 
-EnvelopeSpec spread()
+EnvelopeParameterSpec spread()
 {
-	auto out = std_params::envelopes::generic::percentage_bipolar();
+	EnvelopeParameterSpec out;
 
 	out.name = "Spread";
 	out.uuid = "7112fe4a-7d61-4b48-acd3-0c8f8fa34fa5";
-
+	out.envelope = std_params::percentage::bipolar::envelope();
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 
 	return out;
@@ -46,7 +46,7 @@ Parameters::Parameters(blink::Plugin* plugin)
 	env.freq = plugin->add_parameter(parameters::envelopes::frequency());
 	env.res = plugin->add_parameter(parameters::envelopes::resonance());
 	env.spread = plugin->add_parameter(parameters::envelopes::spread());
-	env.mix = plugin->add_parameter(std_params::envelopes::mix());
+	env.mix = plugin->add_parameter(std_params::mix::envelope_parameter());
 }
 
 } // zap

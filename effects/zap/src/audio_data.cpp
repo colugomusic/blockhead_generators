@@ -3,10 +3,10 @@
 namespace zap {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: frequency(plugin, buffer->parameter_data, plugin->params().env.freq.get())
-	, resonance(plugin, buffer->parameter_data, plugin->params().env.res.get())
-	, spread(plugin, buffer->parameter_data, plugin->params().env.spread.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: frequency(plugin, plugin->params().env.freq->envelope(), buffer->parameter_data)
+	, resonance(plugin, plugin->params().env.res->envelope(), buffer->parameter_data)
+	, spread(plugin, plugin->params().env.spread->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 

@@ -28,8 +28,8 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	float freq;
 	float res;
 
-	plugin_->env_freq().search_vec(data.env_freq, block_positions(), 1, &freq);
-	plugin_->env_res().search_vec(data.env_res, block_positions(), 1, &res);
+	plugin_->env_freq().envelope().search_vec(data.env_freq, block_positions(), 1, &freq);
+	plugin_->env_res().envelope().search_vec(data.env_res, block_positions(), 1, &res);
 
 	res = ml::lerp(1.0f, 0.1f, res);
 
@@ -46,7 +46,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	auto out_vec = ml::concatRows(L, R);
 
-	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
+	const auto mix = plugin_->env_mix().envelope().search_vec(data.env_mix, block_positions());
 
 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix));
 

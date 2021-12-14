@@ -4,7 +4,7 @@
 
 #include <blink/bind.hpp>
 #include <blink/errors.hpp>
-#include <blink/standard_parameters.hpp>
+#include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
 
@@ -12,14 +12,14 @@ namespace test {
 
 Plugin::Plugin()
 {
-	auto spec_env_amp = std_params::envelopes::amp();
-	auto spec_env_wave = std_params::envelopes::resonance();
-	auto spec_env_p0 = std_params::envelopes::pitch();
-	auto spec_env_p1 = std_params::envelopes::pitch();
-	auto spec_env_fm0 = std_params::envelopes::resonance();
-	auto spec_env_fm1 = std_params::envelopes::resonance();
+	auto spec_env_amp = std_params::amp::envelope_parameter();
+	auto spec_env_wave = std_params::resonance::envelope_parameter();
+	auto spec_env_p0 = std_params::pitch::envelope_parameter();
+	auto spec_env_p1 = std_params::pitch::envelope_parameter();
+	auto spec_env_fm0 = std_params::resonance::envelope_parameter();
+	auto spec_env_fm1 = std_params::resonance::envelope_parameter();
 	
-	spec_env_amp.default_value = 0.5f;
+	spec_env_amp.envelope.default_value = 0.5f;
 	spec_env_wave.name = "wave";
 	spec_env_p0.name = "p0";
 	spec_env_p1.name = "p1";
@@ -47,19 +47,19 @@ Plugin::Plugin()
 
 	auto group_noise = add_group("Noise");
 	{
-		auto spec_sld_noise_width = std_params::sliders::parameters::noise_width();
+		auto spec_sld_noise_width = std_params::noise_width::slider_parameter();
 
 		spec_sld_noise_width.flags = blink_SliderFlags_NonGlobal;
 
-		auto spec_env_noise_amount = std_params::envelopes::noise_amount();
-		auto spec_env_noise_color = std_params::envelopes::noise_color();
+		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
+		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
 
 		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
 		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
 
-		option_noise_mode_ = add_parameter(std_params::options::noise_mode());
+		option_noise_mode_ = add_parameter(std_params::noise_mode::option());
 		env_noise_amount_ = add_parameter(spec_env_noise_amount);
 		env_noise_color_ = add_parameter(spec_env_noise_color);
 		sld_noise_width_ = add_parameter(spec_sld_noise_width);

@@ -23,8 +23,8 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	data.env_pitch = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Pitch));
 	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
 
-	const auto pitch = plugin_->env_pitch().search_vec(data.env_pitch, block_positions()) + 60.0f;
-	const auto mix = plugin_->env_mix().search_vec(data.env_mix, block_positions());
+	const auto pitch = plugin_->env_pitch().envelope().search_vec(data.env_pitch, block_positions()) + 60.0f;
+	const auto mix = plugin_->env_mix().envelope().search_vec(data.env_mix, block_positions());
 
 	const auto omega = math::convert::pitch_to_frequency(pitch) / float(SR());
 	const auto sine = sine_(omega);

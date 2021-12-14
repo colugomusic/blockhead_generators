@@ -3,12 +3,12 @@
 namespace wavebender {
 
 AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: tilt(plugin, buffer->parameter_data, plugin->params().env.tilt.get())
-	, xfade_size(plugin, buffer->parameter_data, plugin->params().env.xfade_size.get())
-	, pitch(plugin, buffer->parameter_data, plugin->params().env.pitch.get())
-	, bubble(plugin, buffer->parameter_data, plugin->params().env.bubble.get())
-	, smoother(plugin, buffer->parameter_data, plugin->params().env.smoother.get())
-	, mix(plugin, buffer->parameter_data, plugin->params().env.mix.get())
+	: tilt(plugin, plugin->params().env.tilt->envelope(), buffer->parameter_data)
+	, xfade_size(plugin, plugin->params().env.xfade_size->envelope(), buffer->parameter_data)
+	, pitch(plugin, plugin->params().env.pitch->envelope(), buffer->parameter_data)
+	, bubble(plugin, plugin->params().env.bubble->envelope(), buffer->parameter_data)
+	, smoother(plugin, plugin->params().env.smoother->envelope(), buffer->parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
 {
 }
 
