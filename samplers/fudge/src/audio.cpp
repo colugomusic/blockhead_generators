@@ -85,7 +85,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 			data.option_noise_mode->index,
 			env_noise_amount,
 			env_noise_color,
-			*data.slider_noise_width,
+			data.slider_noise_width->value,
 			block_positions());
 
 	out_vec = stereo_pan(out_vec, data.slider_pan->value, env_pan, block_positions());

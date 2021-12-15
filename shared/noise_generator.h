@@ -31,7 +31,7 @@ public:
 		int mode,
 		const blink::EnvelopeIndexData& env_amount,
 		const blink::EnvelopeIndexData& env_color,
-		const blink_SliderData& data_sld_width,
+		float width,
 		const blink::BlockPositions& block_positions);
 
 private:

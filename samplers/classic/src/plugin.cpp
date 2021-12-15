@@ -10,64 +10,6 @@ using namespace blink;
 
 namespace classic {
 
-Plugin::Plugin()
-{
-	auto spec_sld_noise_width = std_params::noise_width::slider_parameter();
-
-	spec_sld_noise_width.flags = blink_SliderFlags_NonGlobal;
-
-	option_noise_mode_ = add_parameter(std_params::noise_mode::option());
-	sld_noise_width_ = add_parameter(spec_sld_noise_width);
-
-	auto spec_env_amp = std_params::amp::envelope_parameter();
-	auto spec_env_pan = std_params::pan::envelope_parameter();
-	auto spec_env_pitch = std_params::pitch::envelope_parameter();
-
-	spec_env_amp.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_amp_ = add_parameter(spec_env_amp);
-	env_pan_ = add_parameter(spec_env_pan);
-	env_pitch_ = add_parameter(spec_env_pitch);
-
-	auto group_noise = add_group("Noise");
-	{
-		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
-		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
-
-		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-
-		env_noise_amount_ = add_parameter(spec_env_noise_amount);
-		env_noise_color_ = add_parameter(spec_env_noise_color);
-
-		env_noise_amount_->set_group_index(group_noise);
-		env_noise_color_->set_group_index(group_noise);
-	}
-
-	sld_amp_ = add_parameter(std_params::amp::slider_parameter());
-	sld_pan_ = add_parameter(std_params::pan::slider_parameter());
-	sld_pitch_ = add_parameter(std_params::pitch::slider_parameter());
-	sld_sample_offset_ = add_parameter(std_params::sample_offset::slider_parameter());
-
-	tog_loop_ = add_parameter(std_params::loop::toggle());
-	tog_revers_ = add_parameter(std_params::reverse::toggle());
-}
-
-GUI& Plugin::gui()
-{
-	return gui_;
-}
-
-enum class Error
-{
-	AlreadyInitialized,
-	NotInitialized,
-	NotImplemented,
-};
-
 Plugin* g_plugin = nullptr;
 
 } // classic
@@ -166,6 +108,16 @@ blink_Parameter blink_get_parameter(blink_Index index)
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
 	return bind::parameter(classic::g_plugin->get_parameter_by_uuid(uuid));
+}
+
+blink_ManipulatorTarget blink_get_manipulator_target(blink_Index index)
+{
+	return bind::manipulator_target(classic::g_plugin->get_manipulator_target(index));
+}
+
+blink_ManipulatorTarget blink_get_manipulator_target_by_uuid(blink_UUID uuid)
+{
+	return bind::manipulator_target(classic::g_plugin->get_manipulator_target_by_uuid(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)

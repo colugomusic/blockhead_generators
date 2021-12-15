@@ -1,7 +1,7 @@
 #pragma once
 
 #include <blink/envelope_data.hpp>
-#include <blink/option_data.hpp>
+#include <blink/parameters/option_data.hpp>
 #include <blink/effect_unit.hpp>
 #include "plugin.h"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <blink/chord_spec.hpp>
-#include <blink/envelope_parameter_spec.hpp>
-#include <blink/slider_parameter_spec.hpp>
+#include <blink/parameters/chord_spec.hpp>
+#include <blink/parameters/envelope_parameter_spec.hpp>
+#include <blink/parameters/slider_parameter_spec.hpp>
 
 namespace parameters {
 namespace envelopes {

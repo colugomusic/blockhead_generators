@@ -36,7 +36,7 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(
 	int mode,
 	const blink::EnvelopeIndexData& env_amount,
 	const blink::EnvelopeIndexData& env_color,
-	const blink_SliderData& data_sld_width,
+	float width,
 	const blink::BlockPositions& block_positions)
 {
 	constexpr auto MIN_AMOUNT = 0.0001f;
@@ -57,5 +57,5 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(
 
 	env_color.search_vec(block_positions, 1, &color);
 
-	return operator()(in, Mode(mode), amount, color, data_sld_width.value);
+	return operator()(in, Mode(mode), amount, color, width);
 }

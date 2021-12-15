@@ -1,9 +1,9 @@
 #pragma once
 
-#include <blink/chord_spec.hpp>
+#include <blink/parameters/chord_spec.hpp>
 #include <blink/envelope_spec.hpp>
-#include <blink/slider_parameter_spec.hpp>
-#include <blink/option_spec.hpp>
+#include <blink/parameters/slider_parameter_spec.hpp>
+#include <blink/parameters/option_spec.hpp>
 #include <blink/plugin.hpp>
 
 namespace resonator {

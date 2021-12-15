@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "plugin.h"
+#include <blink/sample_data.hpp>
 
 using namespace blink;
 
@@ -33,13 +34,13 @@ static Data get_data(const blink_SamplerBuffer* buffer)
 {
 	Data out;
 
-	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_Amp));
-	out.sliders.pitch = Plugin::get_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_Pitch));
-	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Sld_SampleOffset));
-	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Tog_Loop));
-	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Tog_Reverse));
-	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Amp));
-	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Plugin::ParameterIndex::Env_Pitch));
+	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(classic::Parameters::Index::Sld_Amp));
+	out.sliders.pitch = Plugin::get_slider_data(buffer->parameter_data, int(classic::Parameters::Index::Sld_Pitch));
+	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(classic::Parameters::Index::Sld_SampleOffset));
+	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Parameters::Index::Tog_Loop));
+	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(classic::Parameters::Index::Tog_Reverse));
+	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Parameters::Index::Env_Amp));
+	out.envelopes.pitch = Plugin::get_envelope_data(buffer->parameter_data, int(classic::Parameters::Index::Env_Pitch));
 	out.warp_points = buffer->warp_points;
 
 	return out;
@@ -134,7 +135,7 @@ static void calculate_amp(const classic::Plugin* plugin, const Data& data, const
 
 	if (data.envelopes.amp)
 	{
-		plugin->env_amp().envelope().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
+		plugin->params().env.amp->envelope().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
 	}
 
 	if (data.sliders.amp)

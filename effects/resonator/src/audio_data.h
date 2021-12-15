@@ -1,8 +1,8 @@
 #pragma once
 
-#include <blink/chord_data.hpp>
 #include <blink/envelope_data.hpp>
-#include <blink/option_data.hpp>
+#include <blink/parameters/chord_data.hpp>
+#include <blink/parameters/option_data.hpp>
 #include <blink/effect_unit.hpp>
 #include "plugin.h"
 

@@ -9,10 +9,14 @@ include(blink_plugin)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio.cpp
+    ./src/audio_data.h
+    ./src/audio_data.cpp
     ./src/gui.h
     ./src/gui.cpp
     ./src/instance.h
     ./src/instance.cpp
+    ./src/parameters.h
+    ./src/parameters.cpp
     ./src/plugin.h
     ./src/plugin.cpp
 	../../shared/noise_generator.h

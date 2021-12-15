@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "plugin.h"
+#include <blink/sample_data.hpp>
 
 using namespace blink;
 

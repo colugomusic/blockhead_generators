@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink/envelope_parameter_spec.hpp>
+#include <blink/parameters/envelope_parameter_spec.hpp>
 
 namespace tract_parameters {
 

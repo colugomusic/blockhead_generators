@@ -68,7 +68,7 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
 			data.option_noise_mode->index,
 			env_noise_amount,
 			env_noise_color,
-			*data.slider_noise_width,
+			data.slider_noise_width->value,
 			block_positions());
 
 	out_vec *= ml::repeatRows<2>(amp);

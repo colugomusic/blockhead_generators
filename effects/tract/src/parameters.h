@@ -1,7 +1,7 @@
 #pragma once
 
 #include <blink/envelope_spec.hpp>
-#include <blink/option_spec.hpp>
+#include <blink/parameters/option_spec.hpp>
 #include <blink/plugin.hpp>
 
 namespace tract {
