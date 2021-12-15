@@ -15,6 +15,8 @@ list(APPEND SRC
     ./src/gui.cpp
     ./src/instance.h
     ./src/instance.cpp
+    ./src/manipulator_targets.h
+    ./src/manipulator_targets.cpp
     ./src/parameters.h
     ./src/parameters.cpp
     ./src/plugin.h

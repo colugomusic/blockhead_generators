@@ -3,6 +3,7 @@
 #include "instance.h"
 #include "audio_data.h"
 #include "convert.h"
+#include <blink/dsp.hpp>
 
 using namespace blink;
 
@@ -158,7 +159,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 	{
 		const auto ff = 1.0f + (float(harmonic + 1) * params.env.harmonics.spread);
 		const auto harmonic_pitch = blink::math::convert::ff_to_p(ff);
-		const auto snapped_pitch = blink::ChordParameter::snap_pitch_to_scale(harmonic_pitch, params.chord.harmonics.scale);
+		const auto snapped_pitch = blink::snap_pitch_to_scale(harmonic_pitch, params.chord.harmonics.scale);
 		const auto pitch = ml::lerp(harmonic_pitch, snapped_pitch, params.env.harmonics.scale_snap_amount);
 
 		return blink::math::convert::p_to_ff(pitch);

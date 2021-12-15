@@ -43,7 +43,9 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
-	const auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp;
+	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp;
+
+	amp = data.manipulators.amp(amp);
 
 	if (data.toggles.reverse)
 	{

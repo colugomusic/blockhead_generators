@@ -31,11 +31,19 @@ AudioData::Toggles::Toggles(const Plugin* plugin, const blink_SamplerBuffer* buf
 {
 }
 
+AudioData::Manipulators::Manipulators(const Plugin* plugin, const blink_SamplerBuffer* buffer)
+	: amp(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Amp)])
+	, pan(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Pan)])
+	, pitch(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Pitch)])
+{
+}
+
 AudioData::AudioData(const Plugin* plugin, const blink_SamplerBuffer* buffer)
 	: envelopes(plugin, buffer)
 	, sliders(plugin, buffer)
 	, options(plugin, buffer)
 	, toggles(plugin, buffer)
+	, manipulators(plugin, buffer)
 {
 }
 

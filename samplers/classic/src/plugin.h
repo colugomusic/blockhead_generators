@@ -4,6 +4,7 @@
 
 #include "gui.h"
 #include "instance.h"
+#include "manipulator_targets.h"
 #include "parameters.h"
 
 namespace classic {
@@ -12,8 +13,9 @@ class Plugin : public blink::SamplerPlugin
 {
 public:
 
-	Plugin() : params_(this) {}
+	Plugin() : manipulator_targets_(this), params_(this) {}
 
+	const auto& manipulator_targets() const { return manipulator_targets_; }
 	const auto& params() const { return params_; }
 
 	GUI& gui() { return gui_; }
@@ -24,6 +26,7 @@ private:
 
 	GUI gui_;
 
+	ManipulatorTargets manipulator_targets_;
 	Parameters params_;
 };
 

@@ -2,7 +2,7 @@
 #include "audio_data.h"
 #include "plugin.h"
 #include "convert.h"
-#include <blink/bits.hpp>
+#include <blink/dsp.hpp>
 
 namespace fudge {
 
@@ -81,7 +81,7 @@ float Controller::snap_ratio_to_scale(int index, float ff) const
 
 	const auto pitch = blink::math::convert::ff_to_p(ff);
 
-	return blink::math::convert::p_to_ff(blink::ChordParameter::snap_pitch_to_scale(pitch, scale));
+	return blink::math::convert::p_to_ff(blink::snap_pitch_to_scale(pitch, scale));
 }
 
 }
