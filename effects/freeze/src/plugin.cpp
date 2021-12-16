@@ -9,23 +9,6 @@ using namespace blink;
 
 namespace freeze {
 
-Plugin::Plugin()
-{
-	auto spec_env_pitch = std_params::pitch::envelope_parameter();
-	auto spec_env_formant = std_params::formant::envelope_parameter();
-	auto spec_env_mix = std_params::mix::envelope_parameter();
-	auto spec_sld_pitch = std_params::pitch::slider_parameter();
-
-	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_formant.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_pitch_ = add_parameter(spec_env_pitch);
-	env_formant_ = add_parameter(spec_env_formant);
-	env_mix_ = add_parameter(spec_env_mix);
-
-	add_parameter(spec_sld_pitch);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // freeze

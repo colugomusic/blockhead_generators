@@ -9,6 +9,7 @@ include(blink_plugin)
 list(APPEND SRC
     ./src/audio.h
     ./src/audio_data.h
+    ./src/audio_data.cpp
     ./src/audio.cpp
     ./src/buffer.h
     ./src/controller.h
@@ -16,6 +17,8 @@ list(APPEND SRC
     ./src/grain.h
     ./src/instance.h
     ./src/instance.cpp
+    ./src/parameters.h
+    ./src/parameters.cpp
     ./src/particle.h
     ./src/particle.cpp
     ./src/plugin.h
