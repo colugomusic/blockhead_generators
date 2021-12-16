@@ -9,20 +9,6 @@ using namespace blink;
 
 namespace highpass {
 
-Plugin::Plugin()
-{
-	auto spec_env_freq = std_params::filter_frequency::envelope_parameter();
-	auto spec_env_res = std_params::resonance::envelope_parameter();
-	auto spec_env_mix = std_params::mix::envelope_parameter();
-
-	spec_env_freq.flags |= blink_EnvelopeFlags_DefaultActive;
-	spec_env_res.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_freq_ = add_parameter(spec_env_freq);
-	env_res_ = add_parameter(spec_env_res);
-	env_mix_ = add_parameter(spec_env_mix);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // highpasss

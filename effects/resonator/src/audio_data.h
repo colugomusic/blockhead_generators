@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/envelope_data.hpp>
+#include <blink/slider_data.hpp>
 #include <blink/parameters/chord_data.hpp>
 #include <blink/parameters/option_data.hpp>
 #include <blink/effect_unit.hpp>
@@ -37,7 +38,7 @@ struct AudioData
 	{
 		Sliders(const Plugin* plugin, const blink_EffectBuffer* buffer);
 
-		float pitch;
+		blink::SliderData<int(resonator::Parameters::Index::Slider_Pitch)> pitch;
 	} sliders;
 
 	AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer);

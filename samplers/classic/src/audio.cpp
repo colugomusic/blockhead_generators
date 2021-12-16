@@ -29,7 +29,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 	snd::transport::DSPVectorFramePosition sample_pos;
 
 	position_traverser_.get_positions(
-		data.sliders.pitch,
+		data.sliders.pitch.value(),
 		&data.envelopes.pitch.data(),
 		warp_points,
 		block_traverser_,
@@ -43,9 +43,7 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 
 	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
 
-	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp;
-
-	amp = data.manipulators.amp(amp);
+	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value();
 
 	if (data.toggles.reverse)
 	{
@@ -67,10 +65,10 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
 			data.options.noise_mode,
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
-			data.sliders.noise_width,
+			data.sliders.noise_width.value(),
 			block_positions());
 	
-	out_vec = stereo_pan(out_vec, data.sliders.pan, data.envelopes.pan, block_positions());
+	out_vec = stereo_pan(out_vec, data.sliders.pan.value(), data.envelopes.pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);

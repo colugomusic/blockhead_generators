@@ -1,11 +1,10 @@
 #pragma once
 
 #include <blink/envelope_data.hpp>
+#include <blink/slider_data.hpp>
 #include <blink/parameters/option_data.hpp>
-#include <blink/manipulators/manipulator_target_data.hpp>
 #include "plugin.h"
 #include "parameters.h"
-#include "manipulator_targets.h"
 
 namespace classic {
 
@@ -26,11 +25,12 @@ struct AudioData
 	{
 		Sliders(const Plugin* plugin, const blink_SamplerBuffer* buffer);
 
-		float amp;
-		float pan;
-		float pitch;
+		blink::SliderData<int(classic::Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(classic::Parameters::Index::Sld_Pan)> pan;
+		blink::SliderData<int(classic::Parameters::Index::Sld_Pitch)> pitch;
+		blink::SliderData<int(classic::Parameters::Index::Sld_NoiseWidth)> noise_width;
+
 		int sample_offset;
-		float noise_width;
 	} sliders;
 
 	struct Options
@@ -47,15 +47,6 @@ struct AudioData
 		bool loop;
 		bool reverse;
 	} toggles;
-
-	struct Manipulators
-	{
-		Manipulators(const Plugin* plugin, const blink_SamplerBuffer* buffer);
-
-		blink::ManipulatorSliderTargetData amp;
-		blink::ManipulatorSliderTargetData pan;
-		blink::ManipulatorSliderTargetData pitch;
-	} manipulators;
 
 	AudioData(const Plugin* plugin, const blink_SamplerBuffer* buffer);
 };

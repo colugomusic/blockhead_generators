@@ -9,17 +9,6 @@ using namespace blink;
 
 namespace ring_modulator {
 
-Plugin::Plugin()
-{
-	auto spec_env_pitch = std_params::pitch::envelope_parameter();
-	auto spec_env_mix = std_params::mix::envelope_parameter();
-
-	spec_env_pitch.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	env_pitch_ = add_parameter(spec_env_pitch);
-	env_mix_ = add_parameter(spec_env_mix);
-}
-
 Plugin* g_plugin = nullptr;
 
 } // ring_modulator

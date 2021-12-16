@@ -22,7 +22,7 @@ AudioData::Chords::Chords(const Plugin* plugin, const blink_EffectBuffer* buffer
 }
 
 AudioData::Sliders::Sliders(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: pitch(plugin->get_slider_data(buffer->parameter_data, int(Parameters::Index::Slider_Pitch))->value)
+	: pitch(plugin, plugin->params().sliders.pitch->slider(), buffer->parameter_data)
 {
 }
 

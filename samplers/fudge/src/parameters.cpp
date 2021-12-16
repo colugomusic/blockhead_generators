@@ -170,8 +170,8 @@ EnvelopeParameterSpec grain_size()
 	out.short_name = "Size";
 
 	out.envelope.default_value = 0.5f;
-	out.envelope.search_binary = std_params::search::envelope_binary;
-	out.envelope.search_forward = std_params::search::envelope_forward;
+	out.envelope.searcher.binary = std_params::search::float_points_binary;
+	out.envelope.searcher.forward = std_params::search::float_points_forward;
 	out.envelope.stepify = grain_size::stepify;
 
 	out.envelope.value_slider = sliders::grain_size();
@@ -224,8 +224,8 @@ blink::EnvelopeParameterSpec harmonics_amount()
 	};
 
 	out.envelope.default_value = 0.0f;
-	out.envelope.search_binary = std_params::search::envelope_binary;
-	out.envelope.search_forward = std_params::search::envelope_forward;
+	out.envelope.searcher.binary = std_params::search::float_points_binary;
+	out.envelope.searcher.forward = std_params::search::float_points_forward;
     out.envelope.stepify = tweak::math::stepify<100, float>;
 
 	out.envelope.value_slider = sliders::harmonic_amount();

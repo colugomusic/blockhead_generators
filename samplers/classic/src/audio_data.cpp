@@ -12,29 +12,22 @@ AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_SamplerBuffer*
 }
 
 AudioData::Sliders::Sliders(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-	: amp(plugin->get_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_Amp))->value)
-	, pan(plugin->get_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_Pan))->value)
-	, pitch(plugin->get_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_Pitch))->value)
+	: amp(plugin, plugin->params().sliders.amp->slider(), buffer->parameter_data)
+	, pan(plugin, plugin->params().sliders.pan->slider(), buffer->parameter_data)
+	, pitch(plugin, plugin->params().sliders.pitch->slider(), buffer->parameter_data)
+	, noise_width(plugin, plugin->params().sliders.noise_width->slider(), buffer->parameter_data)
 	, sample_offset(plugin->get_int_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_SampleOffset))->value)
-	, noise_width(plugin->get_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_NoiseWidth))->value)
 {
 }
 
 AudioData::Options::Options(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-	: noise_mode(plugin->get_option_data(buffer->parameter_data, int(Parameters::Index::Option_NoiseMode))->index)
+	: noise_mode(plugin->get_option_data(buffer->parameter_data, int(Parameters::Index::Option_NoiseMode))->data.points[0].y)
 {
 }
 
 AudioData::Toggles::Toggles(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-	: loop(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Loop))->value)
-	, reverse(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Reverse))->value)
-{
-}
-
-AudioData::Manipulators::Manipulators(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-	: amp(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Amp)])
-	, pan(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Pan)])
-	, pitch(buffer->manipulator_target_data[int(ManipulatorTargets::Index::Slider_Pitch)])
+	: loop(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
+	, reverse(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
 {
 }
 
@@ -43,7 +36,6 @@ AudioData::AudioData(const Plugin* plugin, const blink_SamplerBuffer* buffer)
 	, sliders(plugin, buffer)
 	, options(plugin, buffer)
 	, toggles(plugin, buffer)
-	, manipulators(plugin, buffer)
 {
 }
 

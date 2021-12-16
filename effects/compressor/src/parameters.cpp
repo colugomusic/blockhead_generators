@@ -45,8 +45,8 @@ EnvelopeParameterSpec threshold()
 	};
 
 	out.envelope.default_value = tweak::convert::db_to_linear(-20.0f);
-	out.envelope.search_binary = std_params::search::envelope_binary;
-	out.envelope.search_forward = std_params::search::envelope_forward;
+	out.envelope.searcher.binary = std_params::search::float_points_binary;
+	out.envelope.searcher.forward = std_params::search::float_points_forward;
 	out.envelope.to_string = std_params::amp::display;
 	out.envelope.stepify = std_params::amp::stepify;
 
@@ -97,8 +97,8 @@ EnvelopeParameterSpec ratio()
 			default: return std::optional<float>();
 		}
 	};
-	out.envelope.search_binary = std_params::search::envelope_binary;
-	out.envelope.search_forward = std_params::search::envelope_forward;
+	out.envelope.searcher.binary = std_params::search::float_points_binary;
+	out.envelope.searcher.forward = std_params::search::float_points_forward;
 	out.envelope.stepify = [](float v)
 	{
 		return tweak::convert::ratio_to_linear(tweak::math::stepify<1000>(tweak::convert::linear_to_ratio(v)));

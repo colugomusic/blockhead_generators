@@ -1,6 +1,7 @@
 #include "audio.h"
 #include "plugin.h"
 #include "instance.h"
+#include "audio_data.h"
 
 using namespace blink;
 
@@ -14,22 +15,10 @@ Audio::Audio(Instance* instance)
 
 blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
 {
-	struct Data
-	{
-		const blink_EnvelopeData* env_freq;
-		const blink_EnvelopeData* env_res;
-		const blink_EnvelopeData* env_mix;
-	} data;
+	AudioData data(plugin_, buffer);
 
-	data.env_freq = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Freq));
-	data.env_res  = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Res));
-	data.env_mix = plugin_->get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Mix));
-
-	float freq;
-	float res;
-
-	plugin_->env_freq().envelope().search_vec(data.env_freq, block_positions(), 1, &freq);
-	plugin_->env_res().envelope().search_vec(data.env_res, block_positions(), 1, &res);
+	const auto freq = data.envelopes.freq.search(block_positions());
+	auto res = data.envelopes.res.search(block_positions());
 
 	res = ml::lerp(1.0f, 0.1f, res);
 
@@ -46,7 +35,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 
 	auto out_vec = ml::concatRows(L, R);
 
-	const auto mix = plugin_->env_mix().envelope().search_vec(data.env_mix, block_positions());
+	const auto mix = data.envelopes.mix.search_vec(block_positions());
 
 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix));
 

@@ -110,16 +110,6 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 	return bind::parameter(classic::g_plugin->get_parameter_by_uuid(uuid));
 }
 
-blink_ManipulatorTarget blink_get_manipulator_target(blink_Index index)
-{
-	return bind::manipulator_target(classic::g_plugin->get_manipulator_target(index));
-}
-
-blink_ManipulatorTarget blink_get_manipulator_target_by_uuid(blink_UUID uuid)
-{
-	return bind::manipulator_target(classic::g_plugin->get_manipulator_target_by_uuid(uuid));
-}
-
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
