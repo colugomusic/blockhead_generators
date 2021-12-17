@@ -11,10 +11,10 @@
 #pragma warning(pop)
 
 struct SampleAnalysis;
-struct AudioData;
 
 namespace fudge {
 
+struct AudioData;
 class Plugin;
 
 class Controller

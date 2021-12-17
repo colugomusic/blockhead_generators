@@ -1,30 +1,96 @@
 #pragma once
 
-#include <blink/parameters/chord_spec.hpp>
-#include <blink/parameters/envelope_parameter_spec.hpp>
-#include <blink/parameters/slider_parameter_spec.hpp>
+#include <blink/parameters/chord_parameter.hpp>
+#include <blink/parameters/envelope_parameter.hpp>
+#include <blink/parameters/slider_parameter.hpp>
+#include <blink/plugin.hpp>
 
-namespace parameters {
-namespace envelopes {
+namespace fudge {
 
-extern blink::EnvelopeParameterSpec amp();
-extern blink::EnvelopeParameterSpec pan();
-extern blink::EnvelopeParameterSpec pitch();
-extern blink::EnvelopeParameterSpec speed();
-extern blink::EnvelopeParameterSpec grain_size();
-extern blink::EnvelopeParameterSpec grain_transpose();
-extern blink::EnvelopeParameterSpec uniformity();
-extern blink::EnvelopeParameterSpec harmonics_amount();
-extern blink::EnvelopeParameterSpec harmonics_spread();
+struct Parameters
+{
+	enum class Index
+	{
+		Option_NoiseMode,
+		Sld_NoiseWidth,
 
-} // envelopes
+		Env_Amp,
+		Env_Pan,
+		Env_Pitch,
+		Env_Speed,
+		Env_GrainSize,
+		Env_GrainTranspose,
+		Env_Uniformity,
+		Chord_Harmonics_Scale,
+		Env_Harmonics_Amount,
+		Env_Harmonics_Spread,
+		Env_NoiseAmount,
+		Env_NoiseColor,
 
-namespace sliders {
+		Sld_Amp,
+		Sld_Pan,
+		Sld_Pitch,
+		Sld_Speed,
+		Sld_SampleOffset,
 
-extern blink::SliderParameterSpec<float> noise_width();
+		Tog_Loop,
+		Tog_Reverse,
+	};
 
-} // sliders
+	struct Envelopes
+	{
+		std::shared_ptr<blink::EnvelopeParameter> amp;
+		std::shared_ptr<blink::EnvelopeParameter> pan;
+		std::shared_ptr<blink::EnvelopeParameter> pitch;
+		std::shared_ptr<blink::EnvelopeParameter> speed;
+		
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> size;
+			std::shared_ptr<blink::EnvelopeParameter> transpose;
+			std::shared_ptr<blink::EnvelopeParameter> uniformity;
+		} grain;
 
-extern blink::ChordSpec harmonics_scale();
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> amount;
+			std::shared_ptr<blink::EnvelopeParameter> spread;
+		} harmonics;
 
-} // parameters
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> amount;
+			std::shared_ptr<blink::EnvelopeParameter> color;
+		} noise;
+	} env;
+
+	struct Sliders
+	{
+		std::shared_ptr<blink::SliderParameter<float>> amp;
+		std::shared_ptr<blink::SliderParameter<float>> pan;
+		std::shared_ptr<blink::SliderParameter<float>> pitch;
+		std::shared_ptr<blink::SliderParameter<float>> speed;
+		std::shared_ptr<blink::SliderParameter<int>> sample_offset;
+		std::shared_ptr<blink::SliderParameter<float>> noise_width;
+	} sliders;
+
+	struct Chords
+	{
+		std::shared_ptr<blink::ChordParameter> scale;
+	} chords;
+
+	struct Options
+	{
+		std::shared_ptr<blink::OptionParameter> noise_mode;
+	} options;
+
+	struct Toggles
+	{
+		std::shared_ptr<blink::ToggleParameter> loop;
+		std::shared_ptr<blink::ToggleParameter> reverse;
+	} toggles;
+	
+	Parameters(blink::Plugin* plugin);
+};
+
+} // fudge

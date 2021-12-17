@@ -1,6 +1,8 @@
 #include "gui.h"
 #include "plugin.h"
+#include <blink/envelope_data.hpp>
 #include <blink/sample_data.hpp>
+#include <blink/slider_data.hpp>
 
 using namespace blink;
 
@@ -10,41 +12,53 @@ struct Data
 {
 	struct Sliders
 	{
-		const blink_SliderData* amp;
-		const blink_SliderData* speed;
-		const blink_IntSliderData* sample_offset;
+		Sliders(const Plugin* plugin, const blink_SamplerBuffer* buffer)
+			: amp(plugin, plugin->params().sliders.amp->slider(), buffer->parameter_data)
+			, speed(plugin, plugin->params().sliders.speed->slider(), buffer->parameter_data)
+			, sample_offset(plugin->get_int_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_SampleOffset))->value)
+		{
+		}
+
+		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(Parameters::Index::Sld_Speed)> speed;
+
+		int sample_offset;
 	} sliders;
 
 	struct Toggles
 	{
-		const blink_ToggleData* loop;
-		const blink_ToggleData* reverse;
+		Toggles(const Plugin* plugin, const blink_SamplerBuffer* buffer)
+			: loop(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
+			, reverse(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
+		{
+		}
+
+		bool loop;
+		bool reverse;
 	} toggles;
 
 	struct Envelopes
 	{
-		const blink_EnvelopeData* amp;
-		const blink_EnvelopeData* speed;
+		Envelopes(const Plugin* plugin, const blink_SamplerBuffer* buffer)
+			: amp(plugin, plugin->params().env.amp->envelope(), buffer->parameter_data)
+			, speed(plugin, plugin->params().env.speed->envelope(), buffer->parameter_data)
+		{
+		}
+
+		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
+		blink::EnvelopeData<int(Parameters::Index::Env_Speed)> speed;
 	} envelopes;
 
 	const blink_WarpPoints* warp_points;
+
+	Data(const Plugin* plugin, const blink_SamplerBuffer* buffer)
+		: sliders(plugin, buffer)
+		, toggles(plugin, buffer)
+		, envelopes(plugin, buffer)
+		, warp_points(buffer->warp_points)
+	{
+	}
 };
-
-static Data get_data(const blink_SamplerBuffer* buffer)
-{
-	Data out;
-
-	out.sliders.amp = Plugin::get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Amp));
-	out.sliders.speed = Plugin::get_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_Speed));
-	out.sliders.sample_offset = Plugin::get_int_slider_data(buffer->parameter_data, int(Plugin::ParameterIndex::Sld_SampleOffset));
-	out.toggles.loop = Plugin::get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Loop));
-	out.toggles.reverse = Plugin::get_toggle_data(buffer->parameter_data, int(Plugin::ParameterIndex::Tog_Reverse));
-	out.envelopes.amp = Plugin::get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Amp));
-	out.envelopes.speed = Plugin::get_envelope_data(buffer->parameter_data, int(Plugin::ParameterIndex::Env_Speed));
-	out.warp_points = buffer->warp_points;
-
-	return out;
-}
 
 static void calculate_positions(
 	const Data& data,
@@ -61,11 +75,11 @@ static void calculate_positions(
 	ml::DSPVector derivatives;
 
 	fudge_traverser->get_positions(
-		data.sliders.speed ? data.sliders.speed->value : 1,
-		data.envelopes.speed,
+		data.sliders.speed.value(),
+		&data.envelopes.speed.data(),
 		data.warp_points,
 		block_traverser,
-		data.sliders.sample_offset ? data.sliders.sample_offset->value : 0,
+		data.sliders.sample_offset,
 		count,
 		&sculpted_block_positions,
 		&warped_block_positions,
@@ -75,7 +89,7 @@ static void calculate_positions(
 	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_data.get_SR());
 	auto final_sample_positions = warped_sample_positions;
 
-	if (data.toggles.loop && data.toggles.loop->value)
+	if (data.toggles.loop)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -83,7 +97,7 @@ static void calculate_positions(
 		}
 	}
 
-	if (data.toggles.reverse && data.toggles.reverse->value)
+	if (data.toggles.reverse)
 	{
 		final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
 	}
@@ -129,19 +143,9 @@ static void calculate_positions(
 	}
 }
 
-static void calculate_amp(const Plugin* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
+static void calculate_amp(const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
-	ml::DSPVector amp(1.0f);
-
-	if (data.envelopes.amp)
-	{
-		plugin->env_amp().envelope().search_vec(data.envelopes.amp, block_positions, amp.getBuffer());
-	}
-
-	if (data.sliders.amp)
-	{
-		amp *= data.sliders.amp->value;
-	}
+	auto amp = data.envelopes.amp.search_vec(block_positions) * data.sliders.amp.value();
 
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
@@ -150,7 +154,8 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, b
 {
 	block_traverser_.set_reset(0);
 
-	const auto data = get_data(buffer);
+	Data data(plugin, buffer);
+
 	const auto sample_data { SampleData { buffer->sample_info, buffer->channel_mode } };
 
 	auto frames_remaining = n;
@@ -166,7 +171,7 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, b
 
 		block_traverser_.generate(block_positions, count);
 
-		traverser_resetter_.check(data.envelopes.speed, &block_traverser_);
+		traverser_resetter_.check(&data.envelopes.speed.data(), &block_traverser_);
 
 		calculate_positions(
 			data,
@@ -180,7 +185,7 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, b
 
 		if (out->amp)
 		{
-			calculate_amp(plugin, data, block_positions, out->amp + index);
+			calculate_amp(data, block_positions, out->amp + index);
 		}
 
 		frames_remaining -= kFloatsPerDSPVector;

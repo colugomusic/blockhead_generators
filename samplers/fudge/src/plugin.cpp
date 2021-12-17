@@ -12,64 +12,6 @@ using namespace blink;
 
 namespace fudge {
 
-Plugin::Plugin()
-{
-	option_noise_mode_ = add_parameter(std_params::noise_mode::option());
-	sld_noise_width_ = add_parameter(parameters::sliders::noise_width());
-
-	env_amp_ = add_parameter(parameters::envelopes::amp());
-	env_pan_ = add_parameter(parameters::envelopes::pan());
-	env_pitch_ = add_parameter(parameters::envelopes::pitch());
-	env_speed_ = add_parameter(parameters::envelopes::speed());
-
-	auto group_geometry = add_group("Geometry");
-	{
-		env_grain_size_ = add_parameter(parameters::envelopes::grain_size());
-		env_grain_transpose_ = add_parameter(parameters::envelopes::grain_transpose());
-		env_uniformity_ = add_parameter(parameters::envelopes::uniformity());
-
-		env_grain_size_->set_group_index(group_geometry);
-		env_grain_transpose_->set_group_index(group_geometry);
-		env_uniformity_->set_group_index(group_geometry);
-	}
-
-	auto group_harmonics = add_group("Harmonics");
-	{
-		chord_harmonics_scale_ = add_parameter(parameters::harmonics_scale());
-		env_harmonics_amount_ = add_parameter(parameters::envelopes::harmonics_amount());
-		env_harmonics_spread_ = add_parameter(parameters::envelopes::harmonics_spread());
-
-		chord_harmonics_scale_->set_group_index(group_harmonics);
-		env_harmonics_amount_->set_group_index(group_harmonics);
-		env_harmonics_spread_->set_group_index(group_harmonics);
-	}
-
-	auto group_noise = add_group("Noise");
-	{
-		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
-		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
-
-		spec_env_noise_amount.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-		spec_env_noise_color.sliders.push_back(blink_Index(ParameterIndex::Sld_NoiseWidth));
-		spec_env_noise_amount.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-		spec_env_noise_color.options.push_back(blink_Index(ParameterIndex::Option_NoiseMode));
-
-		env_noise_amount_ = add_parameter(spec_env_noise_amount);
-		env_noise_color_ = add_parameter(spec_env_noise_color);
-
-		env_noise_amount_->set_group_index(group_noise);
-		env_noise_color_->set_group_index(group_noise);
-	}
-
-	sld_amp_ = add_parameter(std_params::amp::slider_parameter());
-	sld_pan_ = add_parameter(std_params::pan::slider_parameter());
-	sld_pitch_ = add_parameter(std_params::pitch::slider_parameter());
-	sld_speed_ = add_parameter(std_params::speed::slider_parameter());
-	sld_sample_offset_ = add_parameter(std_params::sample_offset::slider_parameter());
-	tog_loop_ = add_parameter(std_params::loop::toggle());
-	tog_revers_ = add_parameter(std_params::reverse::toggle());
-}
-
 GUI& Plugin::gui()
 {
 	return gui_;

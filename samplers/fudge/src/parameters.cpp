@@ -4,8 +4,6 @@
 
 using namespace blink;
 
-namespace parameters {
-
 namespace grain_size {
 
 auto stepify(float v) -> float
@@ -291,4 +289,64 @@ extern blink::ChordSpec harmonics_scale()
 	return out;
 }
 
-} // parameters
+namespace fudge {
+
+Parameters::Parameters(Plugin* plugin)
+{
+	options.noise_mode = plugin->add_parameter(std_params::noise_mode::option());
+	sliders.noise_width = plugin->add_parameter(sliders::noise_width());
+
+	env.amp = plugin->add_parameter(envelopes::amp());
+	env.pan = plugin->add_parameter(envelopes::pan());
+	env.pitch = plugin->add_parameter(envelopes::pitch());
+	env.speed = plugin->add_parameter(envelopes::speed());
+
+	auto group_geometry = plugin->add_group("Geometry");
+	{
+		env.grain.size = plugin->add_parameter(envelopes::grain_size());
+		env.grain.transpose = plugin->add_parameter(envelopes::grain_transpose());
+		env.grain.uniformity = plugin->add_parameter(envelopes::uniformity());
+
+		env.grain.size->set_group_index(group_geometry);
+		env.grain.transpose->set_group_index(group_geometry);
+		env.grain.uniformity->set_group_index(group_geometry);
+	}
+
+	auto group_harmonics = plugin->add_group("Harmonics");
+	{
+		chords.scale = plugin->add_parameter(harmonics_scale());
+		env.harmonics.amount = plugin->add_parameter(envelopes::harmonics_amount());
+		env.harmonics.spread = plugin->add_parameter(envelopes::harmonics_spread());
+
+		chords.scale->set_group_index(group_harmonics);
+		env.harmonics.amount->set_group_index(group_harmonics);
+		env.harmonics.spread->set_group_index(group_harmonics);
+	}
+
+	auto group_noise = plugin->add_group("Noise");
+	{
+		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
+		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
+
+		spec_env_noise_amount.sliders.push_back(blink_Index(Index::Sld_NoiseWidth));
+		spec_env_noise_color.sliders.push_back(blink_Index(Index::Sld_NoiseWidth));
+		spec_env_noise_amount.options.push_back(blink_Index(Index::Option_NoiseMode));
+		spec_env_noise_color.options.push_back(blink_Index(Index::Option_NoiseMode));
+
+		env.noise.amount = plugin->add_parameter(spec_env_noise_amount);
+		env.noise.color = plugin->add_parameter(spec_env_noise_color);
+
+		env.noise.amount->set_group_index(group_noise);
+		env.noise.color->set_group_index(group_noise);
+	}
+
+	sliders.amp = plugin->add_parameter(std_params::amp::slider_parameter());
+	sliders.pan = plugin->add_parameter(std_params::pan::slider_parameter());
+	sliders.pitch = plugin->add_parameter(std_params::pitch::slider_parameter());
+	sliders.speed = plugin->add_parameter(std_params::speed::slider_parameter());
+	sliders.sample_offset = plugin->add_parameter(std_params::sample_offset::slider_parameter());
+	toggles.loop = plugin->add_parameter(std_params::loop::toggle());
+	toggles.reverse = plugin->add_parameter(std_params::reverse::toggle());
+}
+
+} // fudge

@@ -3,6 +3,7 @@
 #include <blink/envelope_data.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/slider_data.hpp>
+#include <blink/parameters/toggle_data.hpp>
 
 using namespace blink;
 
@@ -19,8 +20,8 @@ struct Data
 		{
 		}
 
-		blink::SliderData<int(classic::Parameters::Index::Sld_Amp)> amp;
-		blink::SliderData<int(classic::Parameters::Index::Sld_Pitch)> pitch;
+		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(Parameters::Index::Sld_Pitch)> pitch;
 
 		int sample_offset;
 	} sliders;
@@ -28,13 +29,13 @@ struct Data
 	struct Toggles
 	{
 		Toggles(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-			: loop(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
-			, reverse(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
+			: loop(plugin, *plugin->params().toggles.loop.get(), buffer->parameter_data)
+			, reverse(plugin, *plugin->params().toggles.reverse.get(), buffer->parameter_data)
 		{
 		}
 
-		bool loop;
-		bool reverse;
+		blink::ToggleData<int(Parameters::Index::Tog_Loop)> loop;
+		blink::ToggleData<int(Parameters::Index::Tog_Reverse)> reverse;
 	} toggles;
 
 	struct Envelopes
@@ -45,8 +46,8 @@ struct Data
 		{
 		}
 
-		blink::EnvelopeData<int(classic::Parameters::Index::Env_Amp)> amp;
-		blink::EnvelopeData<int(classic::Parameters::Index::Env_Pitch)> pitch;
+		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
+		blink::EnvelopeData<int(Parameters::Index::Env_Pitch)> pitch;
 	} envelopes;
 
 	const blink_WarpPoints* warp_points;
@@ -89,7 +90,7 @@ static void calculate_positions(
 	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_data.get_SR());
 	auto final_sample_positions = warped_sample_positions;
 
-	if (data.toggles.loop && data.toggles.loop)
+	if (data.toggles.loop.value())
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -97,7 +98,7 @@ static void calculate_positions(
 		}
 	}
 
-	if (data.toggles.reverse && data.toggles.reverse)
+	if (data.toggles.reverse.value())
 	{
 		final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
 	}
@@ -143,7 +144,7 @@ static void calculate_positions(
 	}
 }
 
-static void calculate_amp(const classic::Plugin* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
+static void calculate_amp(const Plugin* plugin, const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
 	auto amp = data.envelopes.amp.search_vec(block_positions);
 
@@ -152,7 +153,7 @@ static void calculate_amp(const classic::Plugin* plugin, const Data& data, const
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::draw(const classic::Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 

@@ -1,25 +1,71 @@
 #pragma once
 
-#include <blink.h>
+#include <blink/envelope_data.hpp>
+#include <blink/slider_data.hpp>
+#include <blink/parameters/chord_data.hpp>
+#include <blink/parameters/option_data.hpp>
+#include "plugin.h"
+#include "parameters.h"
+
+namespace fudge {
 
 struct AudioData
 {
-	const blink_OptionData* option_noise_mode;
-	const blink_ChordData* chord_harmonics_scale;
-	const blink_EnvelopeData* env_harmonics_amount;
-	const blink_EnvelopeData* env_harmonics_spread;
-	const blink_EnvelopeData* env_pitch;
-	const blink_EnvelopeData* env_speed;
-	const blink_EnvelopeData* env_grain_size;
-	const blink_EnvelopeData* env_grain_transpose;
-	const blink_EnvelopeData* env_uniformity;
-	const blink_SliderData* slider_amp;
-	const blink_SliderData* slider_pan;
-	const blink_SliderData* slider_pitch;
-	const blink_SliderData* slider_speed;
-	const blink_IntSliderData* slider_sample_offset;
-	const blink_SliderData* slider_noise_width;
-	const blink_ToggleData* toggle_loop;
-	const blink_ToggleData* toggle_reverse;
+	struct Envelopes
+	{
+		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
+		blink::EnvelopeData<int(Parameters::Index::Env_Pan)> pan;
+		blink::EnvelopeData<int(Parameters::Index::Env_Pitch)> pitch;
+		blink::EnvelopeData<int(Parameters::Index::Env_Speed)> speed;
+		blink::EnvelopeData<int(Parameters::Index::Env_GrainSize)> grain_size;
+		blink::EnvelopeData<int(Parameters::Index::Env_GrainTranspose)> grain_transpose;
+		blink::EnvelopeData<int(Parameters::Index::Env_Uniformity)> grain_uniformity;
+		blink::EnvelopeData<int(Parameters::Index::Env_Harmonics_Amount)> harmonics_amount;
+		blink::EnvelopeData<int(Parameters::Index::Env_Harmonics_Spread)> harmonics_spread;
+		blink::EnvelopeData<int(Parameters::Index::Env_NoiseAmount)> noise_amount;
+		blink::EnvelopeData<int(Parameters::Index::Env_NoiseColor)> noise_color;
+
+		Envelopes(const Plugin* plugin, const blink_SamplerBuffer* buffer);
+	} envelopes;
+
+	struct Sliders
+	{
+		Sliders(const Plugin* plugin, const blink_SamplerBuffer* buffer);
+
+		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(Parameters::Index::Sld_Pan)> pan;
+		blink::SliderData<int(Parameters::Index::Sld_Pitch)> pitch;
+		blink::SliderData<int(Parameters::Index::Sld_Speed)> speed;
+		blink::SliderData<int(Parameters::Index::Sld_NoiseWidth)> noise_width;
+
+		int sample_offset;
+	} sliders;
+
+	struct Chords
+	{
+		Chords(const Plugin* plugin, const blink_SamplerBuffer* buffer);
+
+		blink::ChordData<int(Parameters::Index::Chord_Harmonics_Scale)> scale;
+	} chords;
+
+	struct Options
+	{
+		Options(const Plugin* plugin, const blink_SamplerBuffer* buffer);
+
+		int noise_mode;
+	} options;
+
+	struct Toggles
+	{
+		Toggles(const Plugin* plugin, const blink_SamplerBuffer* buffer);
+
+		bool loop;
+		bool reverse;
+	} toggles;
+
 	const blink_WarpPoints* warp_points;
+
+	AudioData(const Plugin* plugin, const blink_SamplerBuffer* buffer);
 };
+
+} // fudge
