@@ -12,6 +12,7 @@ auto amp()
 	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_AllowManipulators;
 
 	return out;
 }
@@ -26,6 +27,7 @@ auto pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_AllowManipulators;
 
 	return out;
 }
@@ -39,6 +41,15 @@ auto noise_width()
 	auto out = std_params::noise_width::slider_parameter();
 
 	out.flags = blink_SliderFlags_NonGlobal;
+
+	return out;
+}
+
+auto pitch()
+{
+	auto out = std_params::pitch::slider_parameter();
+
+	out.flags |= blink_SliderFlags_AllowManipulators;
 
 	return out;
 }
@@ -73,11 +84,14 @@ Parameters::Parameters(Plugin* plugin)
 
 	sliders.amp = plugin->add_parameter(std_params::amp::slider_parameter());
 	sliders.pan = plugin->add_parameter(std_params::pan::slider_parameter());
-	sliders.pitch = plugin->add_parameter(std_params::pitch::slider_parameter());
+	sliders.pitch = plugin->add_parameter(sliders::pitch());
 	sliders.sample_offset = plugin->add_parameter(std_params::sample_offset::slider_parameter());
 
 	toggles.loop = plugin->add_parameter(std_params::loop::toggle());
 	toggles.reverse = plugin->add_parameter(std_params::reverse::toggle());
+
+	env.amp->add_manipulator_target(std_params::amp::manipulator_envelope_target());
+	env.pitch->add_manipulator_target(std_params::pitch::manipulator_envelope_target());
 }
 
 } // classic
