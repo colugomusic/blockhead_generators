@@ -56,6 +56,19 @@ auto pitch()
 
 } // sliders
 
+namespace toggles {
+
+auto reverse()
+{
+	auto out = std_params::reverse::toggle();
+
+	out.flags |= blink_ToggleFlags_AllowManipulators;
+
+	return out;
+}
+
+} // toggles
+
 Parameters::Parameters(Plugin* plugin)
 {
 	options.noise_mode = plugin->add_parameter(std_params::noise_mode::option());
@@ -88,7 +101,7 @@ Parameters::Parameters(Plugin* plugin)
 	sliders.sample_offset = plugin->add_parameter(std_params::sample_offset::slider_parameter());
 
 	toggles.loop = plugin->add_parameter(std_params::loop::toggle());
-	toggles.reverse = plugin->add_parameter(std_params::reverse::toggle());
+	toggles.reverse = plugin->add_parameter(toggles::reverse());
 
 	env.amp->add_manipulator_target(std_params::amp::manipulator_envelope_target());
 	env.pitch->add_manipulator_target(std_params::pitch::manipulator_envelope_target());
