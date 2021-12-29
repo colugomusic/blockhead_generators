@@ -14,15 +14,15 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
+blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
 
-	const auto warp_points = buffer->warp_points;
+	const auto warp_points = unit_state.warp_points;
 
 	traverser_resetter_.check(&data.envelopes.pitch.data(), &block_traverser_);
 
@@ -39,18 +39,18 @@ blink_Error Audio::process(const blink_SamplerBuffer* buffer, const blink_Parame
 		&sample_pos,
 		nullptr);
 
-	sample_pos /= float(buffer->song_rate) / buffer->sample_info->SR;
+	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
 
-	SampleData sample_data(buffer->sample_info, buffer->channel_mode);
+	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
 
 	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value();
 
 	if (data.toggles.reverse)
 	{
-		sample_pos = std::int32_t(buffer->sample_info->num_frames - 1) - sample_pos;
+		sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
 	}
 
-	if (buffer->sample_info->num_channels > 1)
+	if (buffer.sample_info->num_channels > 1)
 	{
 		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggles.loop);
 	}

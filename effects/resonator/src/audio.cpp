@@ -83,11 +83,11 @@ struct Params
 	} slider;
 };
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
 	static constexpr auto EPSILON { 0.0000001f };
 
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 	Params params(data, block_positions());
 
 	const auto damper_mix = ml::repeatRows<2>(params.env.damper);

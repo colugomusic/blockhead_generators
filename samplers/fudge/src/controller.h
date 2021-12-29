@@ -26,6 +26,7 @@ public:
 	void process(
 		const AudioData& data,
 		const blink_SamplerBuffer& buffer,
+		const blink_SamplerUnitState& unit_state,
 		const SampleAnalysis* analysis_data,
 		const blink::Traverser& block_traverser,
 		const blink::BlockPositions& block_positions,

@@ -16,9 +16,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SynthBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
+blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out)
 {
-	berk::AudioData data(plugin_, parameter_data);
+	berk::AudioData data(*plugin_, unit_state.parameter_data);
 	
 	const auto amp = data.envelopes.amp.search(block_positions());
 	const auto pitch = data.envelopes.pitch.search(block_positions());
@@ -43,7 +43,7 @@ blink_Error Audio::process(const blink_SynthBuffer* buffer, const blink_Paramete
 	static const ml::DSPVector MAX_TONGUE_DIAMETER(3.5f);
 
 	const auto min_position = ml::min(ml::intToFloat(block_positions().positions.pos));
-	const auto gate = min_position >= -buffer->data_offset;
+	const auto gate = min_position >= -unit_state.data_offset;
 
 	const auto model_SR = int(std::pow(2.0f, quality - 1.0f) * 44100.0f);
 	const auto speed = float(model_SR) / SR();

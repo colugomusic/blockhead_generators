@@ -15,17 +15,17 @@ struct AudioData
 		blink::EnvelopeData<int(freeze::Parameters::Index::Env_Formant)> formant;
 		blink::EnvelopeData<int(freeze::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Sliders
 	{
 		blink::SliderData<int(freeze::Parameters::Index::Slider_Pitch)> pitch;
 
-		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} sliders;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // freeze

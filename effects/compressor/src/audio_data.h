@@ -18,17 +18,17 @@ struct AudioData
 		blink::EnvelopeData<int(compressor::Parameters::Index::Env_Knee)> knee;
 		blink::EnvelopeData<int(compressor::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Options
 	{
 		blink::OptionData<int(compressor::Parameters::Index::Opt_Stereo)> stereo;
 
-		Options(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} options;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // compressor

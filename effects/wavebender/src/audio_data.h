@@ -18,17 +18,17 @@ struct AudioData
 		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Smoother)> smoother;
 		blink::EnvelopeData<int(wavebender::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Options
 	{
 		blink::OptionData<int(wavebender::Parameters::Index::Opt_XFadeMode)> xfade_mode;
 
-		Options(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} options;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // wavebender

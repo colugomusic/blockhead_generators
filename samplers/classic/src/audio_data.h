@@ -18,12 +18,12 @@ struct AudioData
 		blink::EnvelopeData<int(classic::Parameters::Index::Env_NoiseAmount)> noise_amount;
 		blink::EnvelopeData<int(classic::Parameters::Index::Env_NoiseColor)> noise_color;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Sliders
 	{
-		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::SliderData<int(classic::Parameters::Index::Sld_Amp)> amp;
 		blink::SliderData<int(classic::Parameters::Index::Sld_Pan)> pan;
@@ -35,20 +35,20 @@ struct AudioData
 
 	struct Options
 	{
-		Options(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		int noise_mode;
 	} options;
 
 	struct Toggles
 	{
-		Toggles(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		bool loop;
 		bool reverse;
 	} toggles;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // classic

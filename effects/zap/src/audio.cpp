@@ -13,9 +13,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 
 	auto base_freq = data.envelopes.frequency.search_vec(block_positions());
 	const auto res = data.envelopes.resonance.search_vec(block_positions());

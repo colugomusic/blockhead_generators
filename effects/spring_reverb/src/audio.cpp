@@ -38,9 +38,9 @@ Audio::Audio(Instance* instance)
 constexpr float kDecayLo = 0.01f, kDecayHi = 20.f;
 ml::Projection unityToDecay(ml::projections::intervalMap({ 0, 1 }, { kDecayLo, kDecayHi }, ml::projections::log({ kDecayLo, kDecayHi })));
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 
 	glide_size_.setGlideTimeInSamples(0.1f * SR());
 	glide_decay_.setGlideTimeInSamples(0.1f * SR());

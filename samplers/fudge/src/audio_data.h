@@ -25,12 +25,12 @@ struct AudioData
 		blink::EnvelopeData<int(Parameters::Index::Env_NoiseAmount)> noise_amount;
 		blink::EnvelopeData<int(Parameters::Index::Env_NoiseColor)> noise_color;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Sliders
 	{
-		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
 		blink::SliderData<int(Parameters::Index::Sld_Pan)> pan;
@@ -43,21 +43,21 @@ struct AudioData
 
 	struct Chords
 	{
-		Chords(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Chords(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::ChordData<int(Parameters::Index::Chord_Harmonics_Scale)> scale;
 	} chords;
 
 	struct Options
 	{
-		Options(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		int noise_mode;
 	} options;
 
 	struct Toggles
 	{
-		Toggles(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		bool loop;
 		bool reverse;
@@ -65,7 +65,7 @@ struct AudioData
 
 	const blink_WarpPoints* warp_points;
 
-	AudioData(const Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_SamplerUnitState& unit_state);
 };
 
 } // fudge

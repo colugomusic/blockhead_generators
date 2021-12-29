@@ -14,10 +14,10 @@ struct AudioData
 		blink::EnvelopeData<int(spring_reverb::Parameters::Index::Env_Decay)> decay;
 		blink::EnvelopeData<int(spring_reverb::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // spring_reverb

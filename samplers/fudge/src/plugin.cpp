@@ -162,11 +162,11 @@ const char* blink_get_error_string(blink_Error error)
 	return blink::get_std_error_string(blink_StdError(error));
 }
 
-blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
 
-    fudge::g_plugin->gui().draw(fudge::g_plugin, buffer, parameter_data, n, out);
+    fudge::g_plugin->gui().draw(*fudge::g_plugin, *buffer, *unit_state, n, out);
 
 	return BLINK_OK;
 }

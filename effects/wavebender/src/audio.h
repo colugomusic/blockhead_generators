@@ -20,7 +20,7 @@ public:
 
 	Audio(Instance* instance);
 
-	blink_Error process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out) override;
+	blink_Error process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) override;
 	void reset() override;
 
 private:

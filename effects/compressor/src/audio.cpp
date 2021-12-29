@@ -33,9 +33,9 @@ static ml::DSPVectorArray<ROWS> db_to_linear(ml::DSPVectorArray<ROWS> x)
 	return ml::map([](float v) { return tweak::convert::db_to_linear(v); }, x);
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 
 	const auto attack = data.envelopes.attack.search(block_positions());
 	const auto release = data.envelopes.release.search(block_positions());

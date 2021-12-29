@@ -14,10 +14,10 @@ struct AudioData
 		blink::EnvelopeData<int(Parameters::Index::Env_Pitch)> pitch;
 		blink::EnvelopeData<int(Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
+	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);
 };
 
 } // ring_modulator

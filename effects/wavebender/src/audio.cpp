@@ -240,9 +240,9 @@ float Audio::Channel::operator()(const FrameWriteParams& write_params, const Fra
 	return do_read(read_params, in);
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
-	AudioData data(plugin_, parameter_data);
+	AudioData data(*plugin_, unit_state.parameter_data);
 
 	auto bubble = data.envelopes.bubble.search_vec(block_positions());
 	auto tilt = math::convert::uni_to_bi(data.envelopes.tilt.search_vec(block_positions())) * 8.0f;

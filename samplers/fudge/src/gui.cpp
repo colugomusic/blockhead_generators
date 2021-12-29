@@ -12,10 +12,10 @@ struct Data
 {
 	struct Sliders
 	{
-		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin, plugin->params().sliders.amp->slider(), parameter_data)
-			, speed(plugin, plugin->params().sliders.speed->slider(), parameter_data)
-			, sample_offset(plugin->get_int_slider_data(parameter_data, int(Parameters::Index::Sld_SampleOffset))->value)
+		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
+			: amp(plugin, plugin.params().sliders.amp->slider(), parameter_data)
+			, speed(plugin, plugin.params().sliders.speed->slider(), parameter_data)
+			, sample_offset(plugin.get_int_slider_data(parameter_data, int(Parameters::Index::Sld_SampleOffset)).value)
 		{
 		}
 
@@ -27,9 +27,9 @@ struct Data
 
 	struct Toggles
 	{
-		Toggles(const Plugin* plugin, const blink_ParameterData* parameter_data)
-			: loop(plugin->get_toggle_data(parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
-			, reverse(plugin->get_toggle_data(parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
+		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
+			: loop(plugin.get_toggle_data(parameter_data, int(Parameters::Index::Tog_Loop)).data.points[0].value == BLINK_TRUE)
+			, reverse(plugin.get_toggle_data(parameter_data, int(Parameters::Index::Tog_Reverse)).data.points[0].value == BLINK_TRUE)
 		{
 		}
 
@@ -39,9 +39,9 @@ struct Data
 
 	struct Envelopes
 	{
-		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin, plugin->params().env.amp->envelope(), parameter_data)
-			, speed(plugin, plugin->params().env.speed->envelope(), parameter_data)
+		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
+			: amp(plugin, plugin.params().env.amp->envelope(), parameter_data)
+			, speed(plugin, plugin.params().env.speed->envelope(), parameter_data)
 		{
 		}
 
@@ -51,11 +51,11 @@ struct Data
 
 	const blink_WarpPoints* warp_points;
 
-	Data(const Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data)
-		: sliders(plugin, parameter_data)
-		, toggles(plugin, parameter_data)
-		, envelopes(plugin, parameter_data)
-		, warp_points(buffer->warp_points)
+	Data(const Plugin& plugin, const blink_SamplerUnitState& unit_state)
+		: sliders(plugin, unit_state.parameter_data)
+		, toggles(plugin, unit_state.parameter_data)
+		, envelopes(plugin, unit_state.parameter_data)
+		, warp_points(unit_state.warp_points)
 	{
 	}
 };
@@ -150,24 +150,24 @@ static void calculate_amp(const Data& data, const blink::BlockPositions& block_p
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 
-	Data data(plugin, buffer, parameter_data);
+	Data data(plugin, unit_state);
 
-	const auto sample_data { SampleData { buffer->sample_info, buffer->channel_mode } };
+	const auto sample_data { SampleData { buffer.sample_info, unit_state.channel_mode } };
 
 	auto frames_remaining = n;
 	int index = 0;
 
 	BlockPositions block_positions;
 
-	while (frames_remaining > 0 && frames_remaining <= buffer->sample_info->num_frames)
+	while (frames_remaining > 0 && frames_remaining <= buffer.sample_info->num_frames)
 	{
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
 
-		block_positions(buffer->positions + index, buffer->data_offset, count);
+		block_positions(buffer.positions + index, unit_state.data_offset, count);
 
 		block_traverser_.generate(block_positions, count);
 
@@ -176,7 +176,7 @@ blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, c
 		calculate_positions(
 			data,
 			sample_data,
-			buffer->song_rate,
+			buffer.song_rate,
 			block_traverser_,
 			&position_traverser_,
 			index,

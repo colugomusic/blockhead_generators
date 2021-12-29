@@ -17,19 +17,19 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
+blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
-	AudioData data(plugin_, buffer, parameter_data);
+	AudioData data(*plugin_, unit_state);
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
 
 	traverser_resetter_.check(&data.envelopes.speed.data(), &block_traverser_);
 
-	const auto analysis_data = buffer->analysis_ready ? plugin_->get_analysis_data(buffer->sample_info->id) : nullptr;
+	const auto analysis_data = buffer.analysis_ready ? plugin_->get_analysis_data(buffer.sample_info->id) : nullptr;
 
-	controller_.process(data, *buffer, analysis_data, block_traverser_, block_positions(), SR());
+	controller_.process(data, buffer, unit_state, analysis_data, block_traverser_, block_positions(), SR());
 
 	const auto harmonic_amount = data.envelopes.harmonics_amount.search_vec(block_positions());
 
