@@ -17,10 +17,10 @@ struct AudioData
 		blink::EnvelopeData<int(tract::Parameters::Index::Env_Quality)> quality;
 		blink::EnvelopeData<int(tract::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
 };
 
 } // tract

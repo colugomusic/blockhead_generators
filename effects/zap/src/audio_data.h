@@ -15,10 +15,10 @@ struct AudioData
 		blink::EnvelopeData<int(zap::Parameters::Index::Env_Spread)> spread;
 		blink::EnvelopeData<int(zap::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
 };
 
 } // zap

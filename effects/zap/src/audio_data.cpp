@@ -2,16 +2,16 @@
 
 namespace zap {
 
-AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: frequency(plugin, plugin->params().env.freq->envelope(), buffer->parameter_data)
-	, resonance(plugin, plugin->params().env.res->envelope(), buffer->parameter_data)
-	, spread(plugin, plugin->params().env.spread->envelope(), buffer->parameter_data)
-	, mix(plugin, plugin->params().env.mix->envelope(), buffer->parameter_data)
+AudioData::Envelopes::Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data)
+	: frequency(plugin, plugin->params().env.freq->envelope(), parameter_data)
+	, resonance(plugin, plugin->params().env.res->envelope(), parameter_data)
+	, spread(plugin, plugin->params().env.spread->envelope(), parameter_data)
+	, mix(plugin, plugin->params().env.mix->envelope(), parameter_data)
 {
 }
 
-AudioData::AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer)
-	: envelopes(plugin, buffer)
+AudioData::AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data)
+	: envelopes(plugin, parameter_data)
 {
 }
 

@@ -13,9 +13,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
 {
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	const auto freq = data.envelopes.freq.search(block_positions());
 	auto res = data.envelopes.res.search(block_positions());

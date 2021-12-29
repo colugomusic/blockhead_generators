@@ -19,10 +19,10 @@ struct AudioData
 		blink::EnvelopeData<int(berk::Parameters::Index::Env_FricativeIntensity)> fricative_intensity;
 		blink::EnvelopeData<int(berk::Parameters::Index::Env_Quality)> quality;
 
-		Envelopes(const Plugin* plugin, const blink_SynthBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_SynthBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
 };
 
 } // berk

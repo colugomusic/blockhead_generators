@@ -11,7 +11,7 @@ struct AudioData
 {
 	struct Envelopes
 	{
-		Envelopes(const Plugin* plugin, const blink_SynthBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
 
 		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
 		blink::EnvelopeData<int(Parameters::Index::Env_Wave)> wave;
@@ -27,17 +27,17 @@ struct AudioData
 	{
 		blink::SliderData<int(Parameters::Index::Sld_NoiseWidth)> noise_width;
 
-		Sliders(const Plugin* plugin, const blink_SynthBuffer* buffer);
+		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data);
 	} sliders;
 
 	struct Options
 	{
-		Options(const Plugin* plugin, const blink_SynthBuffer* buffer);
+		Options(const Plugin* plugin, const blink_ParameterData* parameter_data);
 
 		int noise_mode;
 	} options;
 
-	AudioData(const Plugin* plugin, const blink_SynthBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
 };
 
 } // test

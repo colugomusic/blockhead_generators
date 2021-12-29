@@ -21,7 +21,7 @@ void Audio::reset()
 	particle_.queue_reset();
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
 {
 	if (!instance_->master_unit)
 	{
@@ -29,7 +29,7 @@ blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, fl
 		record_ = false;
 	}
 
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec(in);

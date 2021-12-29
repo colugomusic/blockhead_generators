@@ -16,9 +16,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
+blink_Error Audio::process(const blink_SynthBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
 {
-	berk::AudioData data(plugin_, buffer);
+	berk::AudioData data(plugin_, parameter_data);
 	
 	const auto amp = data.envelopes.amp.search(block_positions());
 	const auto pitch = data.envelopes.pitch.search(block_positions());

@@ -21,9 +21,9 @@ void Audio::stream_init()
 	input_buffer_.resize(buffer_size);
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
 {
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	const auto index = data.envelopes.index.search_vec(block_positions());
 	const auto diameter = data.envelopes.diameter.search_vec(block_positions());

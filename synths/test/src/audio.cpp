@@ -13,9 +13,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SynthBuffer* buffer, float* out)
+blink_Error Audio::process(const blink_SynthBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
 {
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	const auto amp = data.envelopes.amp.search_vec(block_positions());
  	const auto wave = data.envelopes.wave.search_vec(block_positions());

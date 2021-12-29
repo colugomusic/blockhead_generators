@@ -25,7 +25,7 @@ public:
 
 	Audio(Instance* instance);
 
-	blink_Error process(const blink_SamplerBuffer* buffer, float* out) override;
+	blink_Error process(const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, float* out) override;
 
 private:
 

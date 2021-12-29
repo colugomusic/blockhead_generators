@@ -13,9 +13,9 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
 {
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	const auto pitch = data.envelopes.pitch.search_vec(block_positions()) + 60.0f;
 	const auto mix = data.envelopes.mix.search_vec(block_positions());

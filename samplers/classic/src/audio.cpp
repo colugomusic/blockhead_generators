@@ -14,11 +14,11 @@ Audio::Audio(Instance* instance)
 {
 }
 
-blink_Error Audio::process(const blink_SamplerBuffer* buffer, float* out)
+blink_Error Audio::process(const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, float* out)
 {
 	ml::DSPVectorArray<2> out_vec;
 
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
 

@@ -17,7 +17,7 @@ public:
 
 	Audio(Instance* instance);
 
-	blink_Error process(const blink_SynthBuffer* buffer, float* out) override;
+	blink_Error process(const blink_SynthBuffer* buffer, const blink_ParameterData* parameter_data, float* out) override;
 	void reset() override;
 
 private:

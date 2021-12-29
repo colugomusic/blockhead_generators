@@ -11,7 +11,7 @@ class GUI
 {
 public:
 
-	blink_Error draw(const classic::Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out);
+	blink_Error draw(const classic::Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, blink_FrameCount n, blink_SamplerDrawInfo* out);
 
 private:
 

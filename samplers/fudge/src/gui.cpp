@@ -12,10 +12,10 @@ struct Data
 {
 	struct Sliders
 	{
-		Sliders(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-			: amp(plugin, plugin->params().sliders.amp->slider(), buffer->parameter_data)
-			, speed(plugin, plugin->params().sliders.speed->slider(), buffer->parameter_data)
-			, sample_offset(plugin->get_int_slider_data(buffer->parameter_data, int(Parameters::Index::Sld_SampleOffset))->value)
+		Sliders(const Plugin* plugin, const blink_ParameterData* parameter_data)
+			: amp(plugin, plugin->params().sliders.amp->slider(), parameter_data)
+			, speed(plugin, plugin->params().sliders.speed->slider(), parameter_data)
+			, sample_offset(plugin->get_int_slider_data(parameter_data, int(Parameters::Index::Sld_SampleOffset))->value)
 		{
 		}
 
@@ -27,9 +27,9 @@ struct Data
 
 	struct Toggles
 	{
-		Toggles(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-			: loop(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
-			, reverse(plugin->get_toggle_data(buffer->parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
+		Toggles(const Plugin* plugin, const blink_ParameterData* parameter_data)
+			: loop(plugin->get_toggle_data(parameter_data, int(Parameters::Index::Tog_Loop))->data.points[0].value == BLINK_TRUE)
+			, reverse(plugin->get_toggle_data(parameter_data, int(Parameters::Index::Tog_Reverse))->data.points[0].value == BLINK_TRUE)
 		{
 		}
 
@@ -39,9 +39,9 @@ struct Data
 
 	struct Envelopes
 	{
-		Envelopes(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-			: amp(plugin, plugin->params().env.amp->envelope(), buffer->parameter_data)
-			, speed(plugin, plugin->params().env.speed->envelope(), buffer->parameter_data)
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data)
+			: amp(plugin, plugin->params().env.amp->envelope(), parameter_data)
+			, speed(plugin, plugin->params().env.speed->envelope(), parameter_data)
 		{
 		}
 
@@ -51,10 +51,10 @@ struct Data
 
 	const blink_WarpPoints* warp_points;
 
-	Data(const Plugin* plugin, const blink_SamplerBuffer* buffer)
-		: sliders(plugin, buffer)
-		, toggles(plugin, buffer)
-		, envelopes(plugin, buffer)
+	Data(const Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data)
+		: sliders(plugin, parameter_data)
+		, toggles(plugin, parameter_data)
+		, envelopes(plugin, parameter_data)
 		, warp_points(buffer->warp_points)
 	{
 	}
@@ -150,11 +150,11 @@ static void calculate_amp(const Data& data, const blink::BlockPositions& block_p
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
 
-blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, blink_FrameCount n, blink_SamplerDrawInfo* out)
+blink_Error GUI::draw(const Plugin* plugin, const blink_SamplerBuffer* buffer, const blink_ParameterData* parameter_data, blink_FrameCount n, blink_SamplerDrawInfo* out)
 {
 	block_traverser_.set_reset(0);
 
-	Data data(plugin, buffer);
+	Data data(plugin, buffer, parameter_data);
 
 	const auto sample_data { SampleData { buffer->sample_info, buffer->channel_mode } };
 

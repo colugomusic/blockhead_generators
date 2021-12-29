@@ -14,10 +14,10 @@ struct AudioData
 		blink::EnvelopeData<int(lofi::Parameters::Index::Env_SR)> SR;
 		blink::EnvelopeData<int(lofi::Parameters::Index::Env_Mix)> mix;
 
-		Envelopes(const Plugin* plugin, const blink_EffectBuffer* buffer);
+		Envelopes(const Plugin* plugin, const blink_ParameterData* parameter_data);
 	} envelopes;
 
-	AudioData(const Plugin* plugin, const blink_EffectBuffer* buffer);
+	AudioData(const Plugin* plugin, const blink_ParameterData* parameter_data);
 };
 
 } // lofi

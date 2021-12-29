@@ -14,9 +14,9 @@ Audio::Audio(Instance* instance)
 	reset();
 }
 
-blink_Error Audio::process(const blink_EffectBuffer* buffer, const float* in, float* out)
+blink_Error Audio::process(const blink_EffectBuffer* buffer, const blink_ParameterData* parameter_data, const float* in, float* out)
 {
-	AudioData data(plugin_, buffer);
+	AudioData data(plugin_, parameter_data);
 
 	const auto sr = data.envelopes.SR.search_vec(block_positions());
 	const auto br = data.envelopes.BR.search_vec(block_positions());
