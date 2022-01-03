@@ -13,9 +13,9 @@ struct Data
 	struct Sliders
 	{
 		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin, plugin.params().sliders.amp->slider(), parameter_data)
-			, speed(plugin, plugin.params().sliders.speed->slider(), parameter_data)
-			, sample_offset(plugin.get_int_slider_data(parameter_data, int(Parameters::Index::Sld_SampleOffset)).value)
+			: amp(plugin.params().sliders.amp->slider(), parameter_data)
+			, speed(plugin.params().sliders.speed->slider(), parameter_data)
+			, sample_offset(parameter_data[int(Parameters::Index::Sld_SampleOffset)].int_slider.value)
 		{
 		}
 
@@ -28,8 +28,8 @@ struct Data
 	struct Toggles
 	{
 		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: loop(plugin.get_toggle_data(parameter_data, int(Parameters::Index::Tog_Loop)).data.points[0].value == BLINK_TRUE)
-			, reverse(plugin.get_toggle_data(parameter_data, int(Parameters::Index::Tog_Reverse)).data.points[0].value == BLINK_TRUE)
+			: loop(parameter_data[int(Parameters::Index::Tog_Loop)].toggle.data.points[0].value == BLINK_TRUE)
+			, reverse(parameter_data[int(Parameters::Index::Tog_Reverse)].toggle.data.points[0].value == BLINK_TRUE)
 		{
 		}
 
@@ -40,8 +40,8 @@ struct Data
 	struct Envelopes
 	{
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin, plugin.params().env.amp->envelope(), parameter_data)
-			, speed(plugin, plugin.params().env.speed->envelope(), parameter_data)
+			: amp(plugin.params().env.amp->envelope(), parameter_data)
+			, speed(plugin.params().env.speed->envelope(), parameter_data)
 		{
 		}
 

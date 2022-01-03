@@ -103,8 +103,8 @@ Parameters::Parameters(Plugin* plugin)
 	toggles.loop = plugin->add_parameter(std_params::loop::toggle());
 	toggles.reverse = plugin->add_parameter(toggles::reverse());
 
-	env.amp->add_manipulator_target(std_params::amp::manipulator_envelope_target());
-	env.pitch->add_manipulator_target(std_params::pitch::manipulator_envelope_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_AMP, std_params::amp::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_PITCH, std_params::pitch::envelope_manipulator_target());
 }
 
 } // classic

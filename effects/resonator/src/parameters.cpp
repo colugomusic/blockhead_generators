@@ -75,6 +75,7 @@ EnvelopeParameterSpec pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_AllowManipulators;
 
 	return out;
 }
@@ -358,6 +359,8 @@ Parameters::Parameters(Plugin* plugin)
 	env.mix = plugin->add_parameter(std_params::mix::envelope_parameter());
 
 	sliders.pitch = plugin->add_parameter(std_params::pitch::slider_parameter());
+
+	plugin->add_manipulator_target(BLINK_STD_UUID_PITCH, std_params::pitch::envelope_manipulator_target());
 }
 
 } // resonator

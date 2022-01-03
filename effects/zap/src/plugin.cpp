@@ -85,7 +85,7 @@ blink_Parameter blink_get_parameter(blink_Index index)
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(g_plugin->get_parameter(uuid));
 }
 
 const char* blink_get_error_string(blink_Error error)

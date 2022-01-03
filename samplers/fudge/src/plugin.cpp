@@ -154,7 +154,20 @@ blink_Parameter blink_get_parameter(blink_Index index)
 
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
-	return bind::parameter(fudge::g_plugin->get_parameter_by_uuid(uuid));
+	return bind::parameter(fudge::g_plugin->get_parameter(uuid));
+}
+
+blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_EnvelopeManipulatorTarget* out)
+{
+	if (!fudge::g_plugin) return blink_StdError_NotInitialized;
+
+	const auto target { fudge::g_plugin->get_envelope_manipulator_target(uuid) };
+
+	if (!target) return blink_StdError_ManipulatorTargetDoesNotExist;
+
+	*out = bind::envelope_manipulator_target(**target);
+
+	return BLINK_OK;
 }
 
 const char* blink_get_error_string(blink_Error error)

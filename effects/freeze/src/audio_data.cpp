@@ -3,14 +3,14 @@
 namespace freeze {
 
 AudioData::Envelopes::Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: pitch(plugin, plugin.params().env.pitch->envelope(), parameter_data)
-	, formant(plugin, plugin.params().env.formant->envelope(), parameter_data)
-	, mix(plugin, plugin.params().env.mix->envelope(), parameter_data)
+	: pitch(plugin.params().env.pitch->envelope(), parameter_data)
+	, formant(plugin.params().env.formant->envelope(), parameter_data)
+	, mix(plugin.params().env.mix->envelope(), parameter_data)
 {
 }
 
 AudioData::Sliders::Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: pitch(plugin, plugin.params().sliders.pitch->slider(), parameter_data)
+	: pitch(plugin.params().sliders.pitch->slider(), parameter_data)
 {
 }
 

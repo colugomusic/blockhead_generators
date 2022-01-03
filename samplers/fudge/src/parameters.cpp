@@ -132,6 +132,7 @@ EnvelopeParameterSpec amp()
 	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_AllowManipulators;
 
 	return out;
 }
@@ -146,6 +147,7 @@ EnvelopeParameterSpec pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_AllowManipulators;
 
 	return out;
 }
@@ -347,6 +349,9 @@ Parameters::Parameters(Plugin* plugin)
 	sliders.sample_offset = plugin->add_parameter(std_params::sample_offset::slider_parameter());
 	toggles.loop = plugin->add_parameter(std_params::loop::toggle());
 	toggles.reverse = plugin->add_parameter(std_params::reverse::toggle());
+
+	plugin->add_manipulator_target(BLINK_STD_UUID_AMP, std_params::amp::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_PITCH, std_params::pitch::envelope_manipulator_target());
 }
 
 } // fudge
