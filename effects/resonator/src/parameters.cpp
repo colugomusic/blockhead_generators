@@ -75,7 +75,8 @@ EnvelopeParameterSpec pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_AllowManipulators;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }

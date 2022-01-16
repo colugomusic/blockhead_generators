@@ -132,7 +132,8 @@ EnvelopeParameterSpec amp()
 	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_AllowManipulators;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
@@ -147,7 +148,8 @@ EnvelopeParameterSpec pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_AllowManipulators;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
@@ -169,6 +171,7 @@ EnvelopeParameterSpec grain_size()
 	out.name = "Grain Size";
 	out.short_name = "Size";
 
+	out.envelope.show_grid_labels = false;
 	out.envelope.default_value = 0.5f;
 	out.envelope.searcher.binary = std_params::search::float_points_binary;
 	out.envelope.searcher.forward = std_params::search::float_points_forward;
@@ -182,7 +185,7 @@ EnvelopeParameterSpec grain_size()
 	out.envelope.range.max.to_string = grain_size::display;
 	out.envelope.to_string = grain_size::display;
 
-	out.flags = blink_EnvelopeFlags_DefaultActive | blink_EnvelopeFlags_NoGridLabels;
+	out.flags = blink_EnvelopeFlags_DefaultActive;
 
 	return out;
 }

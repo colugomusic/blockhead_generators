@@ -12,7 +12,8 @@ auto amp()
 	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_AllowManipulators;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
@@ -27,7 +28,8 @@ auto pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_AllowManipulators;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
@@ -49,7 +51,7 @@ auto pitch()
 {
 	auto out = std_params::pitch::slider_parameter();
 
-	out.flags |= blink_SliderFlags_AllowManipulators;
+	out.flags |= blink_SliderFlags_CanManipulate;
 
 	return out;
 }
@@ -62,7 +64,8 @@ auto reverse()
 {
 	auto out = std_params::reverse::toggle();
 
-	out.flags |= blink_ToggleFlags_AllowManipulators;
+	out.flags |= blink_ToggleFlags_CanManipulate;
+	out.flags |= blink_ToggleFlags_IsManipulatorTarget;
 
 	return out;
 }
