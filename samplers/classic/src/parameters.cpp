@@ -12,15 +12,15 @@ auto amp()
 	auto out = std_params::amp::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
 
 auto pan()
 {
-	return std_params::pan::envelope_parameter();
+	auto out = std_params::pan::envelope_parameter();
+
+	return out;
 }
 
 auto pitch()
@@ -28,8 +28,26 @@ auto pitch()
 	auto out = std_params::pitch::envelope_parameter();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
+
+	return out;
+}
+
+auto noise_amount()
+{
+	auto out { std_params::noise_amount::envelope_parameter() };
+
+	out.sliders.push_back(blink_Index(Parameters::Index::Sld_NoiseWidth));
+	out.options.push_back(blink_Index(Parameters::Index::Option_NoiseMode));
+
+	return out;
+}
+
+auto noise_color()
+{
+	auto out { std_params::noise_color::envelope_parameter() };
+
+	out.sliders.push_back(blink_Index(Parameters::Index::Sld_NoiseWidth));
+	out.options.push_back(blink_Index(Parameters::Index::Option_NoiseMode));
 
 	return out;
 }
@@ -40,7 +58,7 @@ namespace sliders {
 
 auto noise_width()
 {
-	auto out = std_params::noise_width::slider_parameter();
+	auto out { std_params::noise_width::slider_parameter() };
 
 	out.flags = blink_SliderFlags_NonGlobal;
 
@@ -49,7 +67,7 @@ auto noise_width()
 
 auto pitch()
 {
-	auto out = std_params::pitch::slider_parameter();
+	auto out { std_params::pitch::slider_parameter() };
 
 	out.flags |= blink_SliderFlags_CanManipulate;
 
@@ -62,7 +80,7 @@ namespace toggles {
 
 auto reverse()
 {
-	auto out = std_params::reverse::toggle();
+	auto out { std_params::reverse::toggle() };
 
 	out.flags |= blink_ToggleFlags_CanManipulate;
 	out.flags |= blink_ToggleFlags_IsManipulatorTarget;
@@ -83,16 +101,8 @@ Parameters::Parameters(Plugin* plugin)
 
 	auto group_noise = plugin->add_group("Noise");
 	{
-		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
-		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();
-
-		spec_env_noise_amount.sliders.push_back(blink_Index(Index::Sld_NoiseWidth));
-		spec_env_noise_color.sliders.push_back(blink_Index(Index::Sld_NoiseWidth));
-		spec_env_noise_amount.options.push_back(blink_Index(Index::Option_NoiseMode));
-		spec_env_noise_color.options.push_back(blink_Index(Index::Option_NoiseMode));
-
-		env.noise.amount = plugin->add_parameter(spec_env_noise_amount);
-		env.noise.color = plugin->add_parameter(spec_env_noise_color);
+		env.noise.amount = plugin->add_parameter(envelopes::noise_amount());
+		env.noise.color = plugin->add_parameter(envelopes::noise_color());
 
 		env.noise.amount->set_group_index(group_noise);
 		env.noise.color->set_group_index(group_noise);
@@ -107,7 +117,10 @@ Parameters::Parameters(Plugin* plugin)
 	toggles.reverse = plugin->add_parameter(toggles::reverse());
 
 	plugin->add_manipulator_target(BLINK_STD_UUID_AMP, std_params::amp::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_PAN, std_params::pan::envelope_manipulator_target());
 	plugin->add_manipulator_target(BLINK_STD_UUID_PITCH, std_params::pitch::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_NOISE_AMOUNT, std_params::noise_amount::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_NOISE_COLOR, std_params::noise_color::envelope_manipulator_target());
 }
 
 } // classic
