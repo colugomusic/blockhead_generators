@@ -245,7 +245,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 	AudioData data(*plugin_, unit_state.parameter_data);
 
 	auto bubble = data.envelopes.bubble.search_vec(block_positions());
-	auto tilt = math::convert::uni_to_bi(data.envelopes.tilt.search_vec(block_positions())) * 8.0f;
+	auto tilt = data.envelopes.tilt.search_vec(block_positions()) * 8.0f;
 	auto pitch = math::convert::p_to_ff(data.envelopes.pitch.search_vec(block_positions()));
 	auto crossfade_size = data.envelopes.xfade_size.search_vec(block_positions());
 	auto smoother = math::convert::linear_to_filter_hz(1.0f - data.envelopes.smoother.search(block_positions())) / SR();

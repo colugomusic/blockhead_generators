@@ -20,7 +20,7 @@ void Controller::process(
 	const auto pitch = data.envelopes.pitch.search_vec(traverser_->block_positions()) + data.sliders.pitch.search_vec(traverser_->block_positions()) + 60.0f;
 	const auto formant = data.envelopes.formant.search_vec(traverser_->block_positions());
 
-	ff_ = blink::math::convert::p_to_ff(blink::math::convert::uni_to_bi(formant) * 24.0f);
+	ff_ = blink::math::convert::p_to_ff(formant * 24.0f);
 	size_ = float(SR) / blink::math::convert::p_to_ff(pitch);
 }
 

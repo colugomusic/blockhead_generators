@@ -24,8 +24,6 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 
 	const auto transform_spread = [](ml::DSPVector x)
 	{
-		x = math::convert::uni_to_bi(x);
-
 		return x * x * ml::signBit(x);
 	};
 
