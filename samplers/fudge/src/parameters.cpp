@@ -355,6 +355,7 @@ Parameters::Parameters(Plugin* plugin)
 
 	plugin->add_manipulator_target(BLINK_STD_UUID_AMP, std_params::amp::envelope_manipulator_target());
 	plugin->add_manipulator_target(BLINK_STD_UUID_PITCH, std_params::pitch::envelope_manipulator_target());
+	plugin->add_manipulator_target(BLINK_STD_UUID_SPEED, std_params::speed::envelope_manipulator_target());
 }
 
 } // fudge
