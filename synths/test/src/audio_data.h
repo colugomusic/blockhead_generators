@@ -14,11 +14,11 @@ struct AudioData
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
-		blink::EnvelopeData<int(Parameters::Index::Env_Wave)> wave;
-		blink::EnvelopeData<int(Parameters::Index::Env_Pitch0)> p0;
-		blink::EnvelopeData<int(Parameters::Index::Env_Pitch1)> p1;
-		blink::EnvelopeData<int(Parameters::Index::Env_FM0)> fm0;
-		blink::EnvelopeData<int(Parameters::Index::Env_FM1)> fm1;
+		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_Wave)> wave;
+		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_Pitch)> p0;
+		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_FM)> fm0;
+		blink::EnvelopeData<int(Parameters::Index::Env_Modulator_Pitch)> p1;
+		blink::EnvelopeData<int(Parameters::Index::Env_Modulator_FM)> fm1;
 		blink::EnvelopeData<int(Parameters::Index::Env_NoiseAmount)> noise_amount;
 		blink::EnvelopeData<int(Parameters::Index::Env_NoiseColor)> noise_color;
 	} envelopes;

@@ -9,11 +9,11 @@ struct Parameters
 	enum class Index
 	{
 		Env_Amp,
-		Env_Wave,
-		Env_Pitch0,
-		Env_Pitch1,
-		Env_FM0,
-		Env_FM1,
+		Env_Carrier_Wave,
+		Env_Carrier_Pitch,
+		Env_Carrier_FM,
+		Env_Modulator_Pitch,
+		Env_Modulator_FM,
 		Option_NoiseMode,
 		Env_NoiseAmount,
 		Env_NoiseColor,
@@ -23,11 +23,20 @@ struct Parameters
 	struct Envelopes
 	{
 		std::shared_ptr<blink::EnvelopeParameter> amp;
-		std::shared_ptr<blink::EnvelopeParameter> wave;
-		std::shared_ptr<blink::EnvelopeParameter> p0;
-		std::shared_ptr<blink::EnvelopeParameter> p1;
-		std::shared_ptr<blink::EnvelopeParameter> fm0;
-		std::shared_ptr<blink::EnvelopeParameter> fm1;
+
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> wave;
+			std::shared_ptr<blink::EnvelopeParameter> pitch;
+			std::shared_ptr<blink::EnvelopeParameter> fm;
+		} carrier;
+
+		struct
+		{
+			std::shared_ptr<blink::EnvelopeParameter> pitch;
+			std::shared_ptr<blink::EnvelopeParameter> fm;
+		} modulator;
+
 		std::shared_ptr<blink::EnvelopeParameter> noise_amount;
 		std::shared_ptr<blink::EnvelopeParameter> noise_color;
 		std::shared_ptr<blink::EnvelopeParameter> mix;
