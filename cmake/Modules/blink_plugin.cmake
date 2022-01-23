@@ -80,3 +80,7 @@ endfunction()
 function(blink_plugin_add_synth name src resources)
 	blink_plugin_add(${name} "synth" "${src}" "${resources}")
 endfunction()
+
+source_group(src REGULAR_EXPRESSION "/src/.*\\.(h|cpp)")
+source_group(src/parameters REGULAR_EXPRESSION "/src/parameters/.*\\.(h|cpp)")
+source_group(shared REGULAR_EXPRESSION "/shared/.*")

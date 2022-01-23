@@ -17,6 +17,16 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/amp.hpp
+    ./src/parameters/loop.hpp
+    ./src/parameters/noise_amount.hpp
+    ./src/parameters/noise_color.hpp
+    ./src/parameters/noise_mode.hpp
+    ./src/parameters/noise_width.hpp
+    ./src/parameters/pan.hpp
+    ./src/parameters/pitch.hpp
+    ./src/parameters/reverse.hpp
+    ./src/parameters/sample_offset.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 	../../shared/noise_generator.h

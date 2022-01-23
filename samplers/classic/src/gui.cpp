@@ -14,8 +14,8 @@ struct Data
 	struct Sliders
 	{
 		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().sliders.amp->slider(), parameter_data)
-			, pitch(plugin.params().sliders.pitch->slider(), parameter_data)
+			: amp(plugin.params().sliders.amp->slider, parameter_data)
+			, pitch(plugin.params().sliders.pitch->slider, parameter_data)
 			, sample_offset(parameter_data[int(Parameters::Index::Sld_SampleOffset)].int_slider.value)
 		{
 		}
@@ -41,8 +41,8 @@ struct Data
 	struct Envelopes
 	{
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().env.amp->envelope(), parameter_data)
-			, pitch(plugin.params().env.pitch->envelope(), parameter_data)
+			: amp(plugin.params().env.amp->envelope, parameter_data)
+			, pitch(plugin.params().env.pitch->envelope, parameter_data)
 		{
 		}
 
