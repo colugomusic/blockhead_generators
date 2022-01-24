@@ -14,23 +14,22 @@ struct Data
 	struct Sliders
 	{
 		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().sliders.amp->slider, parameter_data)
-			, pitch(plugin.params().sliders.pitch->slider, parameter_data)
-			, sample_offset(parameter_data[int(Parameters::Index::Sld_SampleOffset)].int_slider.value)
+			: amp(plugin.params.sliders.amp->slider, parameter_data)
+			, pitch(plugin.params.sliders.pitch->slider, parameter_data)
+			, sample_offset(plugin.params.sliders.sample_offset->slider, parameter_data)
 		{
 		}
 
 		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
 		blink::SliderData<int(Parameters::Index::Sld_Pitch)> pitch;
-
-		int sample_offset;
+		blink::IntSliderData<int(Parameters::Index::Sld_SampleOffset)> sample_offset;
 	} sliders;
 
 	struct Toggles
 	{
 		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: loop(*plugin.params().toggles.loop.get(), parameter_data)
-			, reverse(*plugin.params().toggles.reverse.get(), parameter_data)
+			: loop(*plugin.params.toggles.loop.get(), parameter_data)
+			, reverse(*plugin.params.toggles.reverse.get(), parameter_data)
 		{
 		}
 
@@ -41,8 +40,8 @@ struct Data
 	struct Envelopes
 	{
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().env.amp->envelope, parameter_data)
-			, pitch(plugin.params().env.pitch->envelope, parameter_data)
+			: amp(plugin.params.env.amp->envelope, parameter_data)
+			, pitch(plugin.params.env.pitch->envelope, parameter_data)
 		{
 		}
 
@@ -76,11 +75,11 @@ static void calculate_positions(
 	ml::DSPVector derivatives;
 
 	classic_traverser->get_positions(
-		data.sliders.pitch.value(),
-		&data.envelopes.pitch.data(),
+		data.sliders.pitch.value,
+		data.envelopes.pitch,
 		data.warp_points,
 		block_traverser,
-		data.sliders.sample_offset ? data.sliders.sample_offset : 0,
+		data.sliders.sample_offset.value,
 		count,
 		&sculpted_block_positions,
 		&warped_block_positions,
@@ -90,7 +89,7 @@ static void calculate_positions(
 	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_data.get_SR());
 	auto final_sample_positions = warped_sample_positions;
 
-	if (data.toggles.loop.value())
+	if (data.toggles.loop.value)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -98,7 +97,7 @@ static void calculate_positions(
 		}
 	}
 
-	if (data.toggles.reverse.value())
+	if (data.toggles.reverse.value)
 	{
 		final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
 	}
@@ -174,7 +173,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		block_traverser_.generate(block_positions, count);
 
-		traverser_resetter_.check(&data.envelopes.pitch.data(), &block_traverser_);
+		traverser_resetter_.check(data.envelopes.pitch.data, &block_traverser_);
 
 		calculate_positions(
 			data,

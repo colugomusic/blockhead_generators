@@ -29,8 +29,7 @@ struct AudioData
 		blink::SliderData<int(classic::Parameters::Index::Sld_Pan)> pan;
 		blink::SliderData<int(classic::Parameters::Index::Sld_Pitch)> pitch;
 		blink::SliderData<int(classic::Parameters::Index::Sld_NoiseWidth)> noise_width;
-
-		int sample_offset;
+		blink::IntSliderData<int(classic::Parameters::Index::Sld_SampleOffset)> sample_offset;
 	} sliders;
 
 	struct Options

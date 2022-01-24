@@ -286,7 +286,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 			FrameReadParams read_params;
 
 			read_params.crossfade_size = crossfade_size[i];
-			read_params.crossfade_mode = CrossfadeMode(data.options.xfade_mode.get());
+			read_params.crossfade_mode = CrossfadeMode(data.options.xfade_mode.value);
 			read_params.tilt = tilt[i];
 			read_params.spike = spike[i];
 			read_params.ff = pitch[i];

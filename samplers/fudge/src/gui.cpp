@@ -13,16 +13,15 @@ struct Data
 	struct Sliders
 	{
 		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().sliders.amp->slider, parameter_data)
-			, speed(plugin.params().sliders.speed->slider, parameter_data)
-			, sample_offset(parameter_data[int(Parameters::Index::Sld_SampleOffset)].int_slider.value)
+			: amp(plugin.params.sliders.amp->slider, parameter_data)
+			, speed(plugin.params.sliders.speed->slider, parameter_data)
+			, sample_offset(plugin.params.sliders.sample_offset->slider, parameter_data)
 		{
 		}
 
 		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
 		blink::SliderData<int(Parameters::Index::Sld_Speed)> speed;
-
-		int sample_offset;
+		blink::IntSliderData<int(Parameters::Index::Sld_SampleOffset)> sample_offset;
 	} sliders;
 
 	struct Toggles
@@ -40,8 +39,8 @@ struct Data
 	struct Envelopes
 	{
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: amp(plugin.params().env.amp->envelope, parameter_data)
-			, speed(plugin.params().env.speed->envelope, parameter_data)
+			: amp(plugin.params.env.amp->envelope, parameter_data)
+			, speed(plugin.params.env.speed->envelope, parameter_data)
 		{
 		}
 
@@ -75,11 +74,11 @@ static void calculate_positions(
 	ml::DSPVector derivatives;
 
 	fudge_traverser->get_positions(
-		data.sliders.speed.value(),
-		&data.envelopes.speed.data(),
+		data.sliders.speed.value,
+		data.envelopes.speed.data,
 		data.warp_points,
 		block_traverser,
-		data.sliders.sample_offset,
+		data.sliders.sample_offset.value,
 		count,
 		&sculpted_block_positions,
 		&warped_block_positions,
@@ -145,7 +144,7 @@ static void calculate_positions(
 
 static void calculate_amp(const Data& data, const blink::BlockPositions& block_positions, float* out)
 {
-	auto amp = data.envelopes.amp.search_vec(block_positions) * data.sliders.amp.value();
+	auto amp = data.envelopes.amp.search_vec(block_positions) * data.sliders.amp.value;
 
 	std::copy(amp.getConstBuffer(), amp.getConstBuffer() + block_positions.count, out);
 }
@@ -171,7 +170,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		block_traverser_.generate(block_positions, count);
 
-		traverser_resetter_.check(&data.envelopes.speed.data(), &block_traverser_);
+		traverser_resetter_.check(data.envelopes.speed.data, &block_traverser_);
 
 		calculate_positions(
 			data,

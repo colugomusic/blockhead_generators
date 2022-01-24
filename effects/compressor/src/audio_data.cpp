@@ -13,7 +13,7 @@ AudioData::Envelopes::Envelopes(const Plugin& plugin, const blink_ParameterData*
 }
 
 AudioData::Options::Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: stereo(parameter_data, *plugin.params().options.stereo.get())
+	: stereo(*plugin.params().options.stereo.get(), parameter_data)
 {
 }
 

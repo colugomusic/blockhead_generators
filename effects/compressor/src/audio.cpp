@@ -55,7 +55,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 
 	ml::DSPVectorArray<2> reduction;
 
-	if (!data.options.stereo.get()) // mono
+	if (!data.options.stereo.value) // mono
 	{
 		mono_.env_follower_0.set_SR(SR());
 		mono_.env_follower_0.set_release(release);

@@ -37,8 +37,7 @@ struct AudioData
 		blink::SliderData<int(Parameters::Index::Sld_Pitch)> pitch;
 		blink::SliderData<int(Parameters::Index::Sld_Speed)> speed;
 		blink::SliderData<int(Parameters::Index::Sld_NoiseWidth)> noise_width;
-
-		int sample_offset;
+		blink::IntSliderData<int(Parameters::Index::Sld_SampleOffset)> sample_offset;
 	} sliders;
 
 	struct Chords

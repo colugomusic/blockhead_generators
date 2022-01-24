@@ -13,10 +13,11 @@ class Plugin : public blink::SamplerPlugin
 {
 public:
 
-	Plugin() : params_(this) {}
+	const Parameters params;
+
+	Plugin() : params(this) {}
 
 	GUI& gui();
-	const auto& params() const { return params_; }
 
 	const SampleAnalysis* get_analysis_data(blink_ID sample_id) const;
 
@@ -29,7 +30,6 @@ private:
 
 	std::map<blink_ID, std::shared_ptr<SampleAnalysis>> sample_analysis_;
 	GUI gui_;
-	Parameters params_;
 };
 
 } // fudge

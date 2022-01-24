@@ -25,13 +25,13 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
 
-	traverser_resetter_.check(&data.envelopes.speed.data(), &block_traverser_);
+	traverser_resetter_.check(data.envelopes.speed.data, &block_traverser_);
 
-	const auto analysis_data = buffer.analysis_ready ? plugin_->get_analysis_data(buffer.sample_info->id) : nullptr;
+	const auto analysis_data { buffer.analysis_ready ? plugin_->get_analysis_data(buffer.sample_info->id) : nullptr };
 
 	controller_.process(data, buffer, unit_state, analysis_data, block_traverser_, block_positions(), SR());
 
-	const auto harmonic_amount = data.envelopes.harmonics_amount.search_vec(block_positions());
+	const auto harmonic_amount { data.envelopes.harmonics_amount.search_vec(block_positions()) };
 
 	ml::DSPVector total_amp;
 
@@ -62,12 +62,12 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 			data.options.noise_mode,
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
-			data.sliders.noise_width.value(),
+			data.sliders.noise_width.value,
 			block_positions());
 
-	out_vec = stereo_pan(out_vec, data.sliders.pan.value(), data.envelopes.pan, block_positions());
+	out_vec = stereo_pan(out_vec, data.sliders.pan.value, data.envelopes.pan, block_positions());
 
-	const auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value();
+	const auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value;
 
 	out_vec *= ml::repeatRows<2>(amp);
 

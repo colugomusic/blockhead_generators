@@ -12,9 +12,9 @@ class Plugin : public blink::SamplerPlugin
 {
 public:
 
-	Plugin() : params_(this) {}
+	const Parameters params;
 
-	const auto& params() const { return params_; }
+	Plugin() : params(this) {}
 
 	GUI& gui() { return gui_; }
 
@@ -23,8 +23,6 @@ private:
 	blink::SamplerInstance* make_instance() override { return new Instance(this); }
 
 	GUI gui_;
-
-	Parameters params_;
 };
 
 } // classic

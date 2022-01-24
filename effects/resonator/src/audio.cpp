@@ -61,7 +61,7 @@ struct Params
 
 		chord.harmonics.scale = data.chords.harmonics_scale.search_vec(block_positions);
 
-		slider.pitch = data.sliders.pitch.value();
+		slider.pitch = data.sliders.pitch.value;
 	}
 
 	struct

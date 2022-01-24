@@ -17,7 +17,7 @@ AudioData::Envelopes::Envelopes(const Plugin& plugin, const blink_ParameterData*
 }
 
 AudioData::Chords::Chords(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: harmonics_scale(parameter_data, plugin.params().chords.harmonics.scale.get())
+	: harmonics_scale(*plugin.params().chords.harmonics.scale.get(), parameter_data)
 {
 }
 

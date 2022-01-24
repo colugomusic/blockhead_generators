@@ -13,7 +13,7 @@ AudioData::Envelopes::Envelopes(const Plugin& plugin, const blink_ParameterData*
 }
 
 AudioData::Options::Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: xfade_mode(parameter_data, *plugin.params().opt.xfade_mode.get())
+	: xfade_mode(*plugin.params().opt.xfade_mode, parameter_data)
 {
 }
 

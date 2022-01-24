@@ -24,16 +24,16 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	const auto warp_points = unit_state.warp_points;
 
-	traverser_resetter_.check(&data.envelopes.pitch.data(), &block_traverser_);
+	traverser_resetter_.check(data.envelopes.pitch.data, &block_traverser_);
 
 	snd::transport::DSPVectorFramePosition sample_pos;
 
 	position_traverser_.get_positions(
-		data.sliders.pitch.value(),
-		&data.envelopes.pitch.data(),
+		data.sliders.pitch.value,
+		data.envelopes.pitch,
 		warp_points,
 		block_traverser_,
-		data.sliders.sample_offset,
+		data.sliders.sample_offset.value,
 		kFloatsPerDSPVector,
 		nullptr,
 		&sample_pos,
@@ -43,7 +43,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
 
-	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value();
+	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value;
 
 	if (data.toggles.reverse)
 	{
@@ -65,10 +65,10 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 			data.options.noise_mode,
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
-			data.sliders.noise_width.value(),
+			data.sliders.noise_width.value,
 			block_positions());
 	
-	out_vec = stereo_pan(out_vec, data.sliders.pan.value(), data.envelopes.pan, block_positions());
+	out_vec = stereo_pan(out_vec, data.sliders.pan.value, data.envelopes.pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);
