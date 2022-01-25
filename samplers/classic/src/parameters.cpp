@@ -30,6 +30,7 @@ Parameters::Parameters(Plugin* plugin)
 
 		env.noise.amount->set_group_index(group_noise);
 		env.noise.color->set_group_index(group_noise);
+		sliders.noise_width->set_group_index(group_noise);
 	}
 
 	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());

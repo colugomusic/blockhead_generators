@@ -56,6 +56,7 @@ Parameters::Parameters(Plugin* plugin)
 
 		env.noise_amount->set_group_index(group_noise);
 		env.noise_color->set_group_index(group_noise);
+		sliders.noise_width->set_group_index(group_noise);
 	}
 
 	plugin->add_manipulator_target(params::amp::UUID, std_params::amp::envelope_manipulator_target());
