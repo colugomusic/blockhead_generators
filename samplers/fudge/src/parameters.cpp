@@ -277,7 +277,7 @@ blink::SliderParameterSpec<float> noise_width()
 {
 	auto out = std_params::noise_width::slider_parameter();
 
-	out.flags = blink_SliderFlags_NonGlobal;
+	out.flags |= blink_SliderFlags_NonGlobal;
 
 	return out;
 }

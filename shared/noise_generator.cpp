@@ -4,6 +4,8 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in
 {
 	ml::DSPVectorArray<2> out;
 
+	color = (color + 1.0f) * 0.5f;
+
 	filter_.mCoeffs = ml::OnePole::coeffs(0.001f + (std::pow(color, 2.0f) * 0.6f));
 
 	const auto noise_L = filter_(generator_());

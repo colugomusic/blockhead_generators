@@ -12,7 +12,7 @@ auto inline slider_parameter()
 {
 	auto out { blink::std_params::noise_width::slider_parameter() };
 
-	out.flags = blink_SliderFlags_NonGlobal;
+	out.flags |= blink_SliderFlags_NonGlobal;
 
 	return out;
 }
