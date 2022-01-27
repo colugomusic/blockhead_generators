@@ -13,7 +13,8 @@ inline auto envelope_parameter()
 	blink::EnvelopeParameterSpec out;
 
 	out.uuid = UUID;
-	out.name = "FM Amount";
+	out.name = "Modulator FM Amount";
+	out.short_name = "FM Amount";
 	out.envelope = blink::std_params::percentage::envelope();
 	out.clamp_range = { 0.0f, 2.0f };
 	out.flags |= blink_EnvelopeFlags_HostClamp;

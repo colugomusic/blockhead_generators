@@ -22,6 +22,23 @@ list(APPEND SRC
     ./src/limits.h
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/amp.hpp
+    ./src/parameters/grain_size.hpp
+    ./src/parameters/grain_transpose.hpp
+    ./src/parameters/grain_uniformity.hpp
+    ./src/parameters/harmonics_amount.hpp
+    ./src/parameters/harmonics_scale.hpp
+    ./src/parameters/harmonics_spread.hpp
+    ./src/parameters/loop.hpp
+    ./src/parameters/noise_amount.hpp
+    ./src/parameters/noise_color.hpp
+    ./src/parameters/noise_mode.hpp
+    ./src/parameters/noise_width.hpp
+    ./src/parameters/pan.hpp
+    ./src/parameters/pitch.hpp
+    ./src/parameters/reverse.hpp
+    ./src/parameters/sample_offset.hpp
+    ./src/parameters/speed.hpp
     ./src/particle.h
     ./src/particle.cpp
     ./src/plugin.h

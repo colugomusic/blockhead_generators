@@ -2,30 +2,29 @@
 
 #include <blink/standard_parameters/percentage.hpp>
 
+namespace fudge {
 namespace params {
-namespace carrier {
-namespace fm {
+namespace grain_uniformity {
 
-static constexpr auto UUID { "05ffbc42-d2aa-4746-905e-44d4373b4345" };
+static constexpr auto UUID { "83c352fb-35b5-4cb0-a6f7-05d082b56a16" };
 
 inline auto envelope_parameter()
 {
 	blink::EnvelopeParameterSpec out;
 
 	out.uuid = UUID;
-	out.name = "Carrier FM Amount";
-	out.short_name = "FM Amount";
+	out.name = "Grain Uniformity";
+	out.short_name = "Uniformity";
 	out.envelope = blink::std_params::percentage::envelope();
-	out.clamp_range = { 0.0f, 2.0f };
+
+	out.clamp_range = { 0.0f, 1.0f };
+
 	out.flags |= blink_EnvelopeFlags_HostClamp;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }
 
-inline auto envelope_manipulator_target()
+auto inline envelope_manipulator_target()
 {
 	blink::EnvelopeManipulatorTargetSpec out;
 
@@ -35,6 +34,6 @@ inline auto envelope_manipulator_target()
 	return out;
 }
 
-} // fm
-} // carrier
+} // grain_uniformity
 } // params
+} // fudge
