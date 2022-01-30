@@ -17,6 +17,13 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/attack.hpp
+    ./src/parameters/knee.hpp
+    ./src/parameters/mix.hpp
+    ./src/parameters/processing_mode.hpp
+    ./src/parameters/ratio.hpp
+    ./src/parameters/release.hpp
+    ./src/parameters/threshold.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
