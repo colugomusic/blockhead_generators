@@ -13,22 +13,16 @@ class NoiseGenerator
 {
 public:
 
-	enum class Mode
-	{
-		Multiply = 0,
-		Mix = 1,
-	};
-
 	ml::DSPVectorArray<2> operator()(
 		const ml::DSPVectorArray<2>& in,
-		Mode mode,
+		float mode,
 		const ml::DSPVector& amount,
 		float color,
 		float width);
 
 	ml::DSPVectorArray<2> operator()(
 		const ml::DSPVectorArray<2>& in,
-		int mode,
+		float mode,
 		const blink::EnvelopeIndexData& env_amount,
 		const blink::EnvelopeIndexData& env_color,
 		float width,

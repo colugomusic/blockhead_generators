@@ -80,9 +80,9 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 				tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
 				tract_input.fricative_intensity = 0.0f;
 				tract_input.glottal_output = tract_in.constRow(r);
-				tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, index);
+				tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, math::convert::bi_to_uni(index));
 				tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
-				tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, tongue_index);
+				tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, math::convert::bi_to_uni(tongue_index));
 
 				tract_out.row(r) = tract_[r](model_SR, speed, tract_input);
 			}

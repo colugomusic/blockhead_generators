@@ -21,13 +21,13 @@ AudioData::Sliders::Sliders(const Plugin& plugin, const blink_ParameterData* par
 }
 
 AudioData::Options::Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: noise_mode(parameter_data[int(Parameters::Index::Option_NoiseMode)].option.data.points[0].y)
+	: noise_mode { *plugin.params.options.noise_mode, parameter_data }
 {
 }
 
 AudioData::Toggles::Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
-	: loop(parameter_data[int(Parameters::Index::Tog_Loop)].toggle.data.points[0].value == BLINK_TRUE)
-	, reverse(parameter_data[int(Parameters::Index::Tog_Reverse)].toggle.data.points[0].value == BLINK_TRUE)
+	: loop { *plugin.params.toggles.loop, parameter_data }
+	, reverse { *plugin.params.toggles.reverse, parameter_data }
 {
 }
 

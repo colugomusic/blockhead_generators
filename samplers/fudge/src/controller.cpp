@@ -39,19 +39,19 @@ void Controller::process(
 
 	sample_data_ = blink::SampleData(buffer.sample_info, unit_state.channel_mode);
 
-	if (data.toggles.reverse)
+	if (data.toggles.reverse.value)
 	{
 		sample_positions_ = std::int32_t(buffer.sample_info->num_frames - 1) - sample_positions_;
 	}
 
-	if (data.toggles.loop)
+	if (data.toggles.loop.value)
 	{
 		sample_positions_ = blink::math::wrap(sample_positions_, float(buffer.sample_info->num_frames));
 	}
 
 	buffer_ = &buffer;
 	frame_increment_ = float(buffer.sample_info->SR) / SR;
-	sample_loop_ = data.toggles.loop;
+	sample_loop_ = data.toggles.loop.value;
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();
 

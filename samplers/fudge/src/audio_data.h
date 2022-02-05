@@ -4,6 +4,7 @@
 #include <blink/slider_data.hpp>
 #include <blink/parameters/chord_data.hpp>
 #include <blink/parameters/option_data.hpp>
+#include <blink/parameters/toggle_data.hpp>
 #include "plugin.h"
 #include "parameters.h"
 
@@ -51,15 +52,15 @@ struct AudioData
 	{
 		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
-		int noise_mode;
+		blink::OptionData<int(Parameters::Index::Option_NoiseMode)> noise_mode;
 	} options;
 
 	struct Toggles
 	{
 		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
-		bool loop;
-		bool reverse;
+		blink::ToggleData<int(Parameters::Index::Tog_Loop)> loop;
+		blink::ToggleData<int(Parameters::Index::Tog_Reverse)> reverse;
 	} toggles;
 
 	const blink_WarpPoints* warp_points;

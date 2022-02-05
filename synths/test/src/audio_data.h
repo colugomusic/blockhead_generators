@@ -3,6 +3,7 @@
 #include <blink/envelope_data.hpp>
 #include <blink/slider_data.hpp>
 #include <blink/effect_unit.hpp>
+#include <blink/parameters/option_data.hpp>
 #include "plugin.h"
 
 namespace test {
@@ -34,7 +35,7 @@ struct AudioData
 	{
 		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
-		int noise_mode;
+		blink::OptionData<int(Parameters::Index::Option_NoiseMode)> noise_mode;
 	} options;
 
 	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);

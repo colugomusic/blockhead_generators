@@ -27,8 +27,12 @@ list(APPEND SRC
 	../../shared/resampler.h
 	../../shared/tract.h
 	../../shared/tract.cpp
-	../../shared/tract_parameters.h
-	../../shared/tract_parameters.cpp
+	../../shared/tract_parameters/fricative_intensity.hpp
+	../../shared/tract_parameters/quality.hpp
+	../../shared/tract_parameters/throat_diameter.hpp
+	../../shared/tract_parameters/throat_index.hpp
+	../../shared/tract_parameters/tongue_diameter.hpp
+	../../shared/tract_parameters/tongue_index.hpp
 )
 
 list(APPEND RES

@@ -1,6 +1,6 @@
 #include "noise_generator.h"
 
-ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in, Mode mode, const ml::DSPVector& amount, float color, float width)
+ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in, float mode, const ml::DSPVector& amount, float color, float width)
 {
 	ml::DSPVectorArray<2> out;
 
@@ -23,19 +23,15 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in
 		noise = ml::repeatRows<2>(noise_L);
 	}
 
-	if (mode == Mode::Multiply)
-	{
-		return in * ml::lerp(ml::DSPVectorArray<2>(1.0f), noise, ml::repeatRows<2>(amount));
-	}
-	else
-	{
-		return ml::lerp(in, noise, ml::repeatRows<2>(amount));
-	}
+	const auto mult { in * ml::lerp(ml::DSPVectorArray<2>(1.0f), noise, ml::repeatRows<2>(amount)) };
+	const auto mix { ml::lerp(in, noise, ml::repeatRows<2>(amount)) };
+
+	return ml::lerp(mult, mix, mode);
 }
 
 ml::DSPVectorArray<2> NoiseGenerator::operator()(
 	const ml::DSPVectorArray<2>& in,
-	int mode,
+	float mode, // 0: multiply, 1: mix
 	const blink::EnvelopeIndexData& env_amount,
 	const blink::EnvelopeIndexData& env_color,
 	float width,
@@ -59,5 +55,5 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(
 
 	env_color.search_vec(block_positions, 1, &color);
 
-	return operator()(in, Mode(mode), amount, color, width);
+	return operator()(in, mode, amount, color, width);
 }

@@ -3,6 +3,7 @@
 #include <blink/envelope_data.hpp>
 #include <blink/slider_data.hpp>
 #include <blink/parameters/option_data.hpp>
+#include <blink/parameters/toggle_data.hpp>
 #include "plugin.h"
 #include "parameters.h"
 
@@ -36,15 +37,15 @@ struct AudioData
 	{
 		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
-		int noise_mode;
+		blink::OptionData<int(classic::Parameters::Index::Option_NoiseMode)> noise_mode;
 	} options;
 
 	struct Toggles
 	{
 		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
-		bool loop;
-		bool reverse;
+		blink::ToggleData<int(classic::Parameters::Index::Tog_Loop)> loop;
+		blink::ToggleData<int(classic::Parameters::Index::Tog_Reverse)> reverse;
 	} toggles;
 
 	AudioData(const Plugin& plugin, const blink_ParameterData* parameter_data);

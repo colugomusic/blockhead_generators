@@ -45,24 +45,24 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value;
 
-	if (data.toggles.reverse)
+	if (data.toggles.reverse.value)
 	{
 		sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
 	}
 
 	if (buffer.sample_info->num_channels > 1)
 	{
-		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggles.loop);
+		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggles.loop.value);
 	}
 	else
 	{
-		out_vec = process_mono_sample(sample_data, sample_pos, data.toggles.loop);
+		out_vec = process_mono_sample(sample_data, sample_pos, data.toggles.loop.value);
 	}
 
 	out_vec =
 		noise_gen_(
 			out_vec,
-			data.options.noise_mode,
+			data.options.noise_mode.value,
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
 			data.sliders.noise_width.search(block_positions()),

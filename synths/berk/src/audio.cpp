@@ -63,7 +63,7 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 		Glottis::Input glottis_input;
 
 		glottis_input.aspirate_noise = aspirate_noise;
-		glottis_input.buzz = buzz;
+		glottis_input.buzz = math::convert::bi_to_uni(buzz);
 		glottis_input.pitch = pitch;
 
 		const auto glottal_output = glottis_(model_SR, speed, glottis_input);
@@ -75,9 +75,9 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 		tract_input.fricative_intensity = fricative_intensity;
 		tract_input.fricative_noise = fricative_noise * glottis_.noise_modulator();
 		tract_input.glottal_output = glottal_output;
-		tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, index);
+		tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, math::convert::bi_to_uni(index));
 		tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
-		tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, tongue_index);
+		tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, math::convert::bi_to_uni(tongue_index));
 
 		return tract_(model_SR, speed, tract_input);
 	};
