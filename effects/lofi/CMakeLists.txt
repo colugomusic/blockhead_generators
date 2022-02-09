@@ -15,6 +15,8 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/bit_reduction.hpp
+    ./src/parameters/sample_rate.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
