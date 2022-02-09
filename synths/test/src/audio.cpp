@@ -44,7 +44,7 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 	out_vec =
 		noise_gen_(
 			out_vec,
-			data.options.noise_mode.value,
+			float(data.options.noise_mode.value),
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
 			data.sliders.noise_width.value,

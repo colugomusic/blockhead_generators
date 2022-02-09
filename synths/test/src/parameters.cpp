@@ -56,6 +56,7 @@ Parameters::Parameters(Plugin* plugin)
 
 		env.noise_amount->set_group_index(group_noise);
 		env.noise_color->set_group_index(group_noise);
+		options.noise_mode->set_group_index(group_noise);
 		sliders.noise_width->set_group_index(group_noise);
 	}
 
