@@ -3,6 +3,7 @@
 #include <blink/envelope_data.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/slider_data.hpp>
+#include <blink/parameters/toggle_data.hpp>
 
 using namespace blink;
 
@@ -27,13 +28,13 @@ struct Data
 	struct Toggles
 	{
 		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: loop(parameter_data[int(Parameters::Index::Tog_Loop)].toggle.data.points[0].value == BLINK_TRUE)
-			, reverse(parameter_data[int(Parameters::Index::Tog_Reverse)].toggle.data.points[0].value == BLINK_TRUE)
+			: loop { *plugin.params.toggles.loop, parameter_data }
+			, reverse { *plugin.params.toggles.reverse, parameter_data }
 		{
 		}
 
-		bool loop;
-		bool reverse;
+		blink::ToggleData<int(Parameters::Index::Tog_Loop)> loop;
+		blink::ToggleData<int(Parameters::Index::Tog_Reverse)> reverse;
 	} toggles;
 
 	struct Envelopes
@@ -88,7 +89,7 @@ static void calculate_positions(
 	auto warped_sample_positions = warped_block_positions / (float(song_rate) / sample_data.get_SR());
 	auto final_sample_positions = warped_sample_positions;
 
-	if (data.toggles.loop)
+	if (data.toggles.loop.value)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -96,7 +97,7 @@ static void calculate_positions(
 		}
 	}
 
-	if (data.toggles.reverse)
+	if (data.toggles.reverse.value)
 	{
 		final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
 	}
