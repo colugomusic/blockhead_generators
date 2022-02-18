@@ -158,12 +158,12 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 	const auto sample_data { SampleData { buffer.sample_info, unit_state.channel_mode } };
 
-	auto frames_remaining = n;
+	auto frames_remaining { int64_t(n) };
 	int index = 0;
 
 	BlockPositions block_positions;
 
-	while (frames_remaining > 0 && frames_remaining <= buffer.sample_info->num_frames)
+	while (frames_remaining > 0)
 	{
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
 
