@@ -24,6 +24,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	config.unit_state_id = unit_state.id;
 	config.env.pitch = data.envelopes.pitch.data;
+	config.option.reverse = data.options.reverse.data;
 	config.sample_offset = data.sliders.sample_offset.value;
 	config.transpose = data.sliders.pitch.value;
 	config.warp_points = unit_state.warp_points;
@@ -32,7 +33,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	tape_transformer_(config, block_positions(), kFloatsPerDSPVector);
 
-	auto sample_pos { tape_transformer_.get_warped_positions().positions };
+	auto sample_pos { tape_transformer_.get_reversed_positions().positions };
 
 	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
 

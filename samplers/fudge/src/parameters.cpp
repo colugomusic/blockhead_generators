@@ -24,6 +24,7 @@ namespace fudge {
 Parameters::Parameters(Plugin* plugin)
 {
 	options.noise_mode = plugin->add_parameter(params::noise_mode::option());
+	options.reverse = plugin->add_parameter(params::reverse::option());
 	sliders.noise_width = plugin->add_parameter(params::noise_width::slider_parameter());
 
 	env.amp = plugin->add_parameter(params::amp::envelope_parameter());

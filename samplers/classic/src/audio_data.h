@@ -38,6 +38,7 @@ struct AudioData
 		Options(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::OptionData<int(classic::Parameters::Index::Option_NoiseMode)> noise_mode;
+		blink::OptionData<int(classic::Parameters::Index::Option_Reverse)> reverse;
 	} options;
 
 	struct Toggles

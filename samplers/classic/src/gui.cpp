@@ -113,7 +113,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		auto sculpted_sample_positions { tape_transformer_.get_pitched_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
 		auto warped_sample_positions { tape_transformer_.get_warped_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
-		auto final_sample_positions { warped_sample_positions };
+		auto final_sample_positions { tape_transformer_.get_reversed_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
 
 		if (data.toggles.loop.value)
 		{

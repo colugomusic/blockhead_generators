@@ -8,15 +8,16 @@ namespace reverse {
 
 static constexpr auto UUID { blink::std_params::reverse::UUID };
 
+auto inline option()
+{
+	return blink::std_params::reverse::option();
+}
+
 auto inline toggle()
 {
-	auto out { blink::std_params::reverse::toggle() };
-
-	out.flags |= blink_ToggleFlags_CanManipulate;
-	out.flags |= blink_ToggleFlags_IsManipulatorTarget;
-
-	return out;
+	return blink::std_params::reverse::toggle();
 }
+
 
 } // reverse
 } // params
