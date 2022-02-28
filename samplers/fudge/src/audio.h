@@ -41,7 +41,6 @@ private:
 	
 	const Plugin* plugin_;
 	blink::Traverser block_traverser_;
-	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	NoiseGenerator noise_gen_;
 	Controller controller_;
 	std::array<Particle, 4> particles_;

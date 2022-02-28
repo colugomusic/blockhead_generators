@@ -169,9 +169,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		block_positions(buffer.positions + index, unit_state.data_offset, count);
 
-		block_traverser_.generate(block_positions, count);
-
-		traverser_resetter_.check(data.envelopes.speed.data, &block_traverser_);
+		block_traverser_.generate(unit_state.id, block_positions, count);
 
 		calculate_positions(
 			data,

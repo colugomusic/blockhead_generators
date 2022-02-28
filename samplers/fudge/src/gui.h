@@ -16,7 +16,6 @@ public:
 private:
 
 	blink::Traverser block_traverser_;
-	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
 	blink::std_traversers::Fudge position_traverser_;
 
 };

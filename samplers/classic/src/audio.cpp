@@ -20,24 +20,19 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	AudioData data(*plugin_, unit_state.parameter_data);
 
-	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
+	transform::Tape::Config config;
 
-	const auto warp_points = unit_state.warp_points;
+	config.unit_state_id = unit_state.id;
+	config.env.pitch = data.envelopes.pitch.data;
+	config.sample_offset = data.sliders.sample_offset.value;
+	config.transpose = data.sliders.pitch.value;
+	config.warp_points = unit_state.warp_points;
+	config.outputs.derivatives.pitch = false;
+	config.outputs.derivatives.warped = false;
 
-	traverser_resetter_.check(data.envelopes.pitch.data, &block_traverser_);
+	tape_transformer_(config, block_positions(), kFloatsPerDSPVector);
 
-	snd::transport::DSPVectorFramePosition sample_pos;
-
-	position_traverser_.get_positions(
-		data.sliders.pitch.value,
-		data.envelopes.pitch,
-		warp_points,
-		block_traverser_,
-		data.sliders.sample_offset.value,
-		kFloatsPerDSPVector,
-		nullptr,
-		&sample_pos,
-		nullptr);
+	auto sample_pos { tape_transformer_.get_warped_positions().positions };
 
 	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
 
@@ -45,10 +40,10 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value;
 
-	if (data.toggles.reverse.value)
-	{
-		sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
-	}
+	//if (data.toggles.reverse.value)
+	//{
+	//	sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
+	//}
 
 	if (buffer.sample_info->num_channels > 1)
 	{

@@ -23,9 +23,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	AudioData data(*plugin_, unit_state);
 
-	block_traverser_.generate(block_positions(), kFloatsPerDSPVector);
-
-	traverser_resetter_.check(data.envelopes.speed.data, &block_traverser_);
+	block_traverser_.generate(unit_state.id, block_positions(), kFloatsPerDSPVector);
 
 	const auto analysis_data { buffer.analysis_ready ? plugin_->get_analysis_data(buffer.sample_info->id) : nullptr };
 

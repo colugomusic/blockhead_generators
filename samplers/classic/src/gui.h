@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink/standard_traversers/classic.hpp>
+#include <blink/transform/tape.hpp>
 #include <blink_sampler.h>
 
 namespace classic {
@@ -15,9 +15,7 @@ public:
 
 private:
 
-	blink::Traverser block_traverser_;
-	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
-	blink::std_traversers::Classic position_traverser_;
+	blink::transform::Tape tape_transformer_;
 
 };
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <blink/sampler_unit.hpp>
-#include <blink/standard_traversers/classic.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
+#include <blink/transform/tape.hpp>
 #include "shared/noise_generator.h"
 
 #pragma warning(push, 0)
@@ -33,9 +33,7 @@ private:
 	ml::DSPVectorArray<2> process_mono_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);
 	
 	const Plugin* plugin_;
-	blink::Traverser block_traverser_;
-	blink::TraverserResetter<blink_EnvelopeData> traverser_resetter_;
-	blink::std_traversers::Classic position_traverser_;
+	blink::transform::Tape tape_transformer_;
 	NoiseGenerator noise_gen_;
 };
 

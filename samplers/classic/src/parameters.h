@@ -12,6 +12,7 @@ struct Parameters
 	enum class Index
 	{
 		Option_NoiseMode,
+		Option_Reverse,
 		Sld_NoiseWidth,
 
 		Env_Amp,
@@ -55,6 +56,7 @@ struct Parameters
 	struct Options
 	{
 		std::shared_ptr<blink::OptionParameter> noise_mode;
+		std::shared_ptr<blink::OptionParameter> reverse;
 	} options;
 
 	struct Toggles
