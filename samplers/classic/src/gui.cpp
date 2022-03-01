@@ -123,10 +123,10 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 			}
 		}
 
-		//if (data.toggles.reverse.value)
-		//{
-		//	final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
-		//}
+		if (data.toggles.reverse.value)
+		{
+			final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
+		}
 
 		if (out->sculpted_block_positions)
 		{
