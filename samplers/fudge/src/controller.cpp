@@ -3,6 +3,9 @@
 #include "plugin.h"
 #include "convert.h"
 #include <blink/dsp.hpp>
+#include <blink/transform/stretch.hpp>
+
+using namespace blink;
 
 namespace fudge {
 
@@ -24,17 +27,20 @@ void Controller::process(
 	SR_ = SR;
 	block_positions_ = &block_positions;
 
-	position_traverser_.get_positions(
-		data.sliders.speed.value,
-		data.envelopes.speed.data,
-		data.warp_points,
-		block_traverser,
-		data.sliders.sample_offset.value,
-		kFloatsPerDSPVector,
-		nullptr,
-		&sample_positions_,
-		nullptr);
+	transform::Stretch::Config config;
 
+	config.unit_state_id = unit_state.id;
+	config.env.speed = data.envelopes.speed.data;
+	config.option.reverse = data.options.reverse.data;
+	config.sample_offset = data.sliders.sample_offset.value;
+	config.speed = data.sliders.speed.value;
+	config.warp_points = unit_state.warp_points;
+	config.outputs.derivatives.sped = false;
+	config.outputs.derivatives.warped = false;
+
+	stretch_transformer_(config, block_positions, kFloatsPerDSPVector);
+
+	sample_positions_ = stretch_transformer_.get_reversed_positions().positions;
 	sample_positions_ /= float(buffer.song_rate) / buffer.sample_info->SR;
 
 	sample_data_ = blink::SampleData(buffer.sample_info, unit_state.channel_mode);

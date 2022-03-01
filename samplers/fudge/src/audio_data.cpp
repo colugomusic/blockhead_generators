@@ -34,6 +34,7 @@ AudioData::Chords::Chords(const Plugin& plugin, const blink_ParameterData* param
 
 AudioData::Options::Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
 	: noise_mode { *plugin.params.options.noise_mode, parameter_data }
+	, reverse { *plugin.params.options.reverse, parameter_data }
 {
 }
 

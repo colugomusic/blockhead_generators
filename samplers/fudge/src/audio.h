@@ -1,7 +1,6 @@
 #pragma once
 
 #include <blink/sampler_unit.hpp>
-#include <blink/standard_traversers/fudge.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
 #include "shared/noise_generator.h"

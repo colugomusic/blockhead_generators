@@ -3,8 +3,8 @@
 #include <blink_sampler.h>
 #include <blink/traverser.hpp>
 #include <blink/sample_data.hpp>
-#include <blink/standard_traversers/fudge.hpp>
 #include <blink/block_positions.hpp>
+#include <blink/transform/stretch.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPOps.h>
@@ -55,7 +55,6 @@ private:
 	float snap_ratio_to_scale(int index, float ff) const;
 
 	const Plugin* plugin_;
-	blink::std_traversers::Fudge position_traverser_;
 
 	const blink_SamplerBuffer* buffer_;
 	const blink::BlockPositions* block_positions_;
@@ -73,6 +72,7 @@ private:
 	float frame_increment_ = 1.0f;
 	bool sample_loop_;
 	blink_SR SR_;
+	blink::transform::Stretch stretch_transformer_;
 };
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink/standard_traversers/fudge.hpp>
+#include <blink/transform/stretch.hpp>
 #include <blink_sampler.h>
 
 namespace fudge {
@@ -15,8 +15,7 @@ public:
 
 private:
 
-	blink::Traverser block_traverser_;
-	blink::std_traversers::Fudge position_traverser_;
+	blink::transform::Stretch stretch_transformer_;
 
 };
 
