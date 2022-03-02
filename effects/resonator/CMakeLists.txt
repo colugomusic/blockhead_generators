@@ -24,6 +24,7 @@ list(APPEND SRC
     ./src/parameters/harmonics_scale_snap_amount.hpp
     ./src/parameters/harmonics_spread.hpp
     ./src/parameters/harmonics_width.hpp
+    ./src/parameters/mix.hpp
     ./src/parameters/pitch.hpp
     ./src/plugin.h
     ./src/plugin.cpp

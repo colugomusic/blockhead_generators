@@ -8,6 +8,8 @@ namespace pitch {
 
 static constexpr auto UUID { blink::std_params::pitch::UUID };
 
+inline auto slider_parameter() { return blink::std_params::pitch::slider_parameter(); }
+
 inline auto envelope_parameter()
 {
 	auto out = blink::std_params::pitch::envelope_parameter();

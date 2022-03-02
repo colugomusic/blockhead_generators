@@ -9,6 +9,7 @@
 #include "parameters/harmonics_scale_snap_amount.hpp"
 #include "parameters/harmonics_spread.hpp"
 #include "parameters/harmonics_width.hpp"
+#include "parameters/mix.hpp"
 #include "parameters/pitch.hpp"
 #include <blink/standard_parameters/all.hpp>
 
@@ -45,8 +46,8 @@ Parameters::Parameters(Plugin* plugin)
 		env.harmonics.scale_snap_amount->set_group_index(group_harmonics);
 	}
 
-	env.mix = plugin->add_parameter(std_params::mix::envelope_parameter());
-	sliders.pitch = plugin->add_parameter(std_params::pitch::slider_parameter());
+	env.mix = plugin->add_parameter(params::mix::envelope_parameter());
+	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
 
 	plugin->add_manipulator_target(params::damper::UUID, params::damper::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::feedback::UUID, params::feedback::envelope_manipulator_target());
@@ -56,6 +57,7 @@ Parameters::Parameters(Plugin* plugin)
 	plugin->add_manipulator_target(params::harmonics_scale_snap_amount::UUID, params::harmonics_scale_snap_amount::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::harmonics_spread::UUID, params::harmonics_spread::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::harmonics_width::UUID, params::harmonics_width::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::mix::UUID, params::mix::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::pitch::UUID, params::pitch::envelope_manipulator_target());
 }
 
