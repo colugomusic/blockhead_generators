@@ -15,6 +15,16 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/damper.hpp
+    ./src/parameters/feedback.hpp
+    ./src/parameters/fm_amount.hpp
+    ./src/parameters/fm_ratio.hpp
+    ./src/parameters/harmonics_amount.hpp
+    ./src/parameters/harmonics_scale.hpp
+    ./src/parameters/harmonics_scale_snap_amount.hpp
+    ./src/parameters/harmonics_spread.hpp
+    ./src/parameters/harmonics_width.hpp
+    ./src/parameters/pitch.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )

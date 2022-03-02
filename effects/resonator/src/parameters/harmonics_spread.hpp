@@ -2,7 +2,7 @@
 
 #include <blink/standard_parameters/harmonics_spread.hpp>
 
-namespace fudge {
+namespace resonator {
 namespace params {
 namespace harmonics_spread {
 
@@ -20,4 +20,4 @@ auto inline envelope_manipulator_target()
 
 } // harmonics_spread
 } // params
-} // fudge
+} // resonator
