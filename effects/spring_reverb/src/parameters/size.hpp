@@ -10,6 +10,15 @@ namespace size {
 
 static constexpr auto UUID { "65e00902-5318-4d76-9b86-2479dcce7f52" };
 
+inline auto envelope()
+{
+	auto out { blink::std_params::percentage::envelope() };
+
+	out.default_value = 0.5f;
+
+	return out;
+}
+
 inline auto envelope_parameter()
 {
 	blink::EnvelopeParameterSpec out;
@@ -17,8 +26,7 @@ inline auto envelope_parameter()
 	out.uuid = UUID;
 	out.name = "Size";
 
-	out.envelope = blink::std_params::percentage::envelope();
-	out.envelope.default_value = 0.5f;
+	out.envelope = envelope();
 	out.clamp_range = { 0.0f, 1.0f };
 
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
@@ -34,7 +42,7 @@ auto inline envelope_manipulator_target()
 	blink::EnvelopeManipulatorTargetSpec out;
 
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
-	out.override_envelope = blink::std_params::percentage::envelope();
+	out.override_envelope = envelope();
 
 	return out;
 }
