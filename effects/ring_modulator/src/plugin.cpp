@@ -17,7 +17,7 @@ using namespace ring_modulator;
 
 blink_PluginInfo blink_get_plugin_info()
 {
-	blink_PluginInfo out = blink_PluginInfo();
+	blink_PluginInfo out;
 
 	out.uuid = "881569c5-108b-4923-b30e-1e1ac6c1a04f";
 	out.name = "Ring Modulator";
@@ -57,7 +57,7 @@ blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto obj = (ring_modulator::Instance*)(instance.proc_data);
+	const auto obj { static_cast<ring_modulator::Instance*>(instance.proc_data) };
 
 	g_plugin->destroy_instance(obj);
 
@@ -104,12 +104,12 @@ blink_ResourceData blink_get_resource_data(const char* path)
 {
 	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
 
-	const auto fs = cmrc::ring_modulator::get_filesystem();
+	const auto fs { cmrc::ring_modulator::get_filesystem() };
 
 	if (!fs.exists(path)) return { 0, 0 };
 	if (!fs.is_file(path)) return { 0, 0 };
 
-	const auto file = fs.open(path);
+	const auto file { fs.open(path) };
 
 	return g_plugin->resources().store(path, file);
 }
