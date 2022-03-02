@@ -1,58 +1,21 @@
 #include "parameters.h"
-#include <blink/standard_parameters/all.hpp>
+#include "parameters/decay.hpp"
+#include "parameters/size.hpp"
+#include "parameters/mix.hpp"
 
 using namespace blink;
 
 namespace spring_reverb {
-namespace parameters {
-namespace envelopes {
-
-auto size()
-{
-	EnvelopeParameterSpec out;
-
-	out.uuid = "65e00902-5318-4d76-9b86-2479dcce7f52";
-	out.name = "Size";
-
-	out.envelope = std_params::percentage::envelope();
-	out.envelope.default_value = 0.5f;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-auto decay()
-{
-	EnvelopeParameterSpec out;
-
-	out.uuid = "aa47aa82-0e26-4d3b-8f60-ddb5d57353e7";
-	out.name = "Decay";
-
-	out.envelope = std_params::percentage::envelope();
-	out.envelope.default_value = 0.5f;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-auto mix()
-{
-	auto out = std_params::mix::envelope_parameter();
-
-	out.envelope.default_value = 0.5f;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-} // envelopes
-} // parameters
 
 Parameters::Parameters(blink::Plugin* plugin)
 {
-	env.size = plugin->add_parameter(parameters::envelopes::size());
-	env.decay = plugin->add_parameter(parameters::envelopes::decay());
-	env.mix = plugin->add_parameter(parameters::envelopes::mix());
+	env.size = plugin->add_parameter(params::size::envelope_parameter());
+	env.decay = plugin->add_parameter(params::decay::envelope_parameter());
+	env.mix = plugin->add_parameter(params::mix::envelope_parameter());
+
+	plugin->add_manipulator_target(params::decay::UUID, params::decay::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::mix::UUID, params::mix::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::size::UUID, params::size::envelope_manipulator_target());
 }
 
 } // spring_reverb
