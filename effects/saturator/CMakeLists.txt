@@ -18,6 +18,9 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/amp.hpp
+    ./src/parameters/drive.hpp
+    ./src/parameters/mix.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
