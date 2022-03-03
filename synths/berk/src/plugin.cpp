@@ -2,13 +2,13 @@
 
 #include "plugin.h"
 
-#include <blink/bind.hpp>
+#include <blink/bind_synth.hpp>
 #include <blink/errors.hpp>
 #include "parameters.h"
 
 using namespace blink;
 
-namespace berk { Plugin* g_plugin = nullptr; }
+namespace berk { Plugin* g_plugin {}; }
 
 using namespace berk;
 
@@ -44,20 +44,16 @@ blink_Error blink_terminate()
 
 blink_SynthInstance blink_make_synth_instance()
 {
-	if (!berk::g_plugin) return blink_SynthInstance{ 0 };
+	if (!g_plugin) return blink_SynthInstance{ 0 };
 
-	return bind::synth_instance(berk::g_plugin->add_instance());
+	return bind::synth_instance(g_plugin->add_instance());
 }
 
 blink_Error blink_destroy_synth_instance(blink_SynthInstance instance)
 {
-	if (!berk::g_plugin) return blink_StdError_NotInitialized;
+	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto obj = (berk::Instance*)(instance.proc_data);
-
-	berk::g_plugin->destroy_instance(obj);
-
-	return BLINK_OK;
+	return g_plugin->destroy_instance(std::move(instance));
 }
 
 int blink_get_num_groups()
@@ -93,13 +89,7 @@ blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_Envelop
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto target { g_plugin->get_envelope_manipulator_target(uuid) };
-
-	if (!target) return blink_StdError_ManipulatorTargetDoesNotExist;
-
-	*out = bind::envelope_manipulator_target(**target);
-
-	return BLINK_OK;
+	return g_plugin->get_envelope_manipulator_target(uuid, out);
 }
 
 const char* blink_get_error_string(blink_Error error)
@@ -111,14 +101,5 @@ CMRC_DECLARE(berk);
 
 blink_ResourceData blink_get_resource_data(const char* path)
 {
-	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
-
-	const auto fs = cmrc::berk::get_filesystem();
-
-	if (!fs.exists(path)) return { 0, 0 };
-	if (!fs.is_file(path)) return { 0, 0 };
-
-	const auto file = fs.open(path);
-
-	return g_plugin->resources().store(path, file);
+	return g_plugin->get_resource_data(cmrc::berk::get_filesystem(), path);
 }

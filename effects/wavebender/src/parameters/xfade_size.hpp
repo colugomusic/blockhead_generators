@@ -22,10 +22,10 @@ auto envelope_parameter()
 	out.options.push_back(blink_Index(Parameters::Index::Opt_XFadeMode));
 	out.clamp_range = { 0.0f, 1.0f };
 
-	out.flags = blink_EnvelopeFlags_CanManipulate;
-	out.flags = blink_EnvelopeFlags_DefaultActive;
-	out.flags = blink_EnvelopeFlags_HostClamp;
-	out.flags = blink_EnvelopeFlags_IsManipulatorTarget;
+	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_EnvelopeFlags_HostClamp;
+	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }

@@ -16,7 +16,7 @@ public:
 
 private:
 
-	blink::SynthInstance* make_instance() override { return new Instance(this); }
+	auto make_instance() -> std::unique_ptr<blink::SynthInstance> override { return std::make_unique<Instance>(this); }
 
 	Parameters params_;
 };

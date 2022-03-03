@@ -26,7 +26,7 @@ public:
 
 private:
 
-	blink::SamplerInstance* make_instance() override { return new Instance(this); }
+	auto make_instance() -> std::unique_ptr<blink::SamplerInstance> override { return std::make_unique<Instance>(this); }
 
 	std::map<blink_ID, std::shared_ptr<SampleAnalysis>> sample_analysis_;
 	GUI gui_;

@@ -1,17 +1,17 @@
 #define BLINK_EXPORT
 #include "plugin.h"
 
-#include <blink/bind.hpp>
+#include <blink/bind_effect.hpp>
 #include <blink/errors.hpp>
 
-namespace lofi { Plugin* g_plugin = nullptr; }
+namespace lofi { Plugin* g_plugin {}; }
 
 using namespace blink;
 using namespace lofi;
 
 blink_PluginInfo blink_get_plugin_info()
 {
-	blink_PluginInfo out = blink_PluginInfo();
+	blink_PluginInfo out;
 
 	out.uuid = "90e5db1b-19c0-4ad5-aecf-3622db865584";
 	out.name = "Lofi";
@@ -51,11 +51,7 @@ blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto obj = (lofi::Instance*)(instance.proc_data);
-
-	g_plugin->destroy_instance(obj);
-
-	return BLINK_OK;
+	return g_plugin->destroy_instance(std::move(instance));
 }
 
 int blink_get_num_groups()
@@ -91,13 +87,7 @@ blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_Envelop
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto target { g_plugin->get_envelope_manipulator_target(uuid) };
-
-	if (!target) return blink_StdError_ManipulatorTargetDoesNotExist;
-
-	*out = bind::envelope_manipulator_target(**target);
-
-	return BLINK_OK;
+	return g_plugin->get_envelope_manipulator_target(uuid, out);
 }
 
 const char* blink_get_error_string(blink_Error error)
@@ -109,14 +99,5 @@ CMRC_DECLARE(lofi);
 
 blink_ResourceData blink_get_resource_data(const char* path)
 {
-	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
-
-	const auto fs = cmrc::lofi::get_filesystem();
-
-	if (!fs.exists(path)) return { 0, 0 };
-	if (!fs.is_file(path)) return { 0, 0 };
-
-	const auto file = fs.open(path);
-
-	return g_plugin->resources().store(path, file);
+	return g_plugin->get_resource_data(cmrc::lofi::get_filesystem(), path);
 }
