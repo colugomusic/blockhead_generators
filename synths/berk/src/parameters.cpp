@@ -1,6 +1,9 @@
 #include "parameters.h"
-#include <blink/standard_parameters/all.hpp>
 #include "plugin.h"
+#include "parameters/amp.hpp"
+#include "parameters/buzz.hpp"
+#include "parameters/pan.hpp"
+#include "parameters/pitch.hpp"
 #include "shared/tract_parameters/fricative_intensity.hpp"
 #include "shared/tract_parameters/quality.hpp"
 #include "shared/tract_parameters/throat_diameter.hpp"
@@ -11,56 +14,16 @@
 using namespace blink;
 
 namespace berk {
-namespace parameters {
-
-namespace envelopes {
-
-auto amp()
-{
-	auto out = std_params::amp::envelope_parameter();
-
-	out.envelope.default_value = 0.5f;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-auto pan()
-{
-	return std_params::pan::envelope_parameter();
-}
-
-auto pitch()
-{
-	auto out = std_params::pitch::envelope_parameter();
-
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-auto buzz()
-{
-	auto out = std_params::formant::envelope_parameter();
-
-	out.uuid = "a62d1f52-d493-4902-b92d-c09f5a92e8d2";
-	out.name = "Buzz";
-
-	return out;
-}
-
-} // envelopes
-} // parameters
 
 Parameters::Parameters(blink::Plugin* plugin)
 {
-	env.amp = plugin->add_parameter(parameters::envelopes::amp());
-	env.pan = plugin->add_parameter(parameters::envelopes::pan());
+	env.amp = plugin->add_parameter(params::amp::envelope_parameter());
+	env.pan = plugin->add_parameter(params::pan::envelope_parameter());
 
 	auto group_voice = plugin->add_group("Voice");
 	{
-		env.pitch = plugin->add_parameter(parameters::envelopes::pitch());
-		env.buzz = plugin->add_parameter(parameters::envelopes::buzz());
+		env.pitch = plugin->add_parameter(params::pitch::envelope_parameter());
+		env.buzz = plugin->add_parameter(params::buzz::envelope_parameter());
 
 		env.pitch->set_group_index(group_voice);
 		env.buzz->set_group_index(group_voice);
@@ -93,6 +56,10 @@ Parameters::Parameters(blink::Plugin* plugin)
 
 	env.quality = plugin->add_parameter(tract_params::quality::envelope_parameter());
 
+	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::buzz::UUID, params::buzz::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::pitch::UUID, params::pitch::envelope_manipulator_target());
 	plugin->add_manipulator_target(tract_params::fricative_intensity::UUID, tract_params::fricative_intensity::envelope_manipulator_target());
 	plugin->add_manipulator_target(tract_params::quality::UUID, tract_params::quality::envelope_manipulator_target());
 	plugin->add_manipulator_target(tract_params::throat_diameter::UUID, tract_params::throat_diameter::envelope_manipulator_target());

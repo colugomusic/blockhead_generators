@@ -1,7 +1,6 @@
 #include "parameters.h"
 #include <blink/standard_parameters/all.hpp>
 #include "plugin.h"
-#include "shared/tract_parameters/fricative_intensity.hpp"
 #include "shared/tract_parameters/quality.hpp"
 #include "shared/tract_parameters/throat_diameter.hpp"
 #include "shared/tract_parameters/throat_index.hpp"

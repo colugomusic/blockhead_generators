@@ -20,6 +20,10 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+    ./src/parameters/amp.hpp
+    ./src/parameters/buzz.hpp
+    ./src/parameters/pan.hpp
+    ./src/parameters/pitch.hpp
     ./src/plugin.h
     ./src/plugin.cpp
     ./src/simplexnoise1234.h
