@@ -3,6 +3,7 @@
 #include "plugin.h"
 #include "instance.h"
 #include <blink/dsp.hpp>
+#include <snd/ease.hpp>
 
 using namespace blink;
 
@@ -20,6 +21,8 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	AudioData data(*plugin_, unit_state.parameter_data);
 
+	const auto generate_correction_grains { data.options.reverse.data->points.count > 0 };
+		
 	transform::Tape::Config config;
 
 	config.unit_state_id = unit_state.id;
@@ -30,29 +33,26 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 	config.warp_points = unit_state.warp_points;
 	config.outputs.derivatives.pitch = false;
 	config.outputs.derivatives.warped = false;
+	config.outputs.correction_grains = generate_correction_grains;
 
 	tape_transformer_(config, block_positions(), kFloatsPerDSPVector);
 
 	auto sample_pos { tape_transformer_.get_reversed_positions().positions };
 
-	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
+	dry_positions_(sample_pos, 0, kFloatsPerDSPVector);
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
 
-	auto amp = data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value;
+	out_vec = process_sample(data, buffer, sample_data, sample_pos);
 
-	if (data.toggles.reverse.value)
+	if (generate_correction_grains)
 	{
-		sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
-	}
-
-	if (buffer.sample_info->num_channels > 1)
-	{
-		out_vec = process_stereo_sample(sample_data, sample_pos, data.toggles.loop.value);
-	}
-	else
-	{
-		out_vec = process_mono_sample(sample_data, sample_pos, data.toggles.loop.value);
+		out_vec = apply_correction_grains(
+			out_vec, 
+			data, 
+			buffer, 
+			sample_data, 
+			tape_transformer_.get_correction_grains());
 	}
 
 	out_vec =
@@ -64,6 +64,8 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 			data.sliders.noise_width.search(block_positions()),
 			block_positions());
 	
+	auto amp { data.envelopes.amp.search_vec(block_positions()) * data.sliders.amp.value };
+
 	out_vec = stereo_pan(out_vec, data.sliders.pan.value, data.envelopes.pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
@@ -71,6 +73,92 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);
 
 	return BLINK_OK;
+}
+
+ml::DSPVectorArray<2> Audio::apply_correction_grains(
+	const ml::DSPVectorArray<2>& dry,
+	const AudioData& data,
+	const blink_SamplerBuffer& buffer,
+	const blink::SampleData& sample_data,
+	const blink::transform::CorrectionGrains& grain_info)
+{
+	if (!correction_grain_.on && grain_info.count < 1) return dry;
+
+	auto grains_remaining { grain_info.count };
+
+	snd::transport::DSPVectorFramePosition grain_positions;
+	ml::DSPVector xfade;
+
+	for (int i { 0 }; i < kFloatsPerDSPVector; i++)
+	{
+		if (correction_grain_.on)
+		{
+			correction_grain_.pos += correction_grain_.ff;
+			correction_grain_.vpos += correction_grain_.vff;
+
+			grain_positions.set(i, correction_grain_.pos);
+			xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(correction_grain_.beg, correction_grain_.vend, correction_grain_.vpos));
+
+			if (correction_grain_.vpos >= correction_grain_.vend) correction_grain_.on = false;
+		}
+		else
+		{
+			xfade[i] = 1.0f;
+
+			if (grains_remaining > 0 && i == grain_info.buffer_index[grain_info.count - grains_remaining])
+			{
+				correction_grain_.on = true;
+
+				const auto beg { i == 0 ? dry_positions_.prev_pos : dry_positions_[i - 1] };
+
+				correction_grain_.beg = beg;
+				correction_grain_.pos = beg;
+				correction_grain_.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate);
+				correction_grain_.vpos = beg;
+				correction_grain_.vend = beg + grain_info.length[i];
+				correction_grain_.vff = std::abs(grain_info.ff[i]);
+
+				grain_positions.set(i, correction_grain_.pos);
+				xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(correction_grain_.beg, correction_grain_.vend, correction_grain_.vpos));
+
+				grains_remaining--;
+			}
+		}
+	}
+
+	ml::DSPVectorArray<2> out;
+
+	const auto wet { process_sample(data, buffer, sample_data, grain_positions) };
+
+	//out.row(0) = dry.constRow(0) * xfade;
+	//out.row(1) = wet.constRow(1) * (1.0f - xfade);
+
+	//return out;
+	return ml::lerp(wet, dry, ml::repeatRows<2>(xfade));
+}
+
+ml::DSPVectorArray<2> Audio::process_sample(
+	const AudioData& data,
+	const blink_SamplerBuffer& buffer,
+	const blink::SampleData& sample_data,
+	snd::transport::DSPVectorFramePosition sample_pos)
+{
+	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
+	tmp=sample_pos;
+
+	if (data.toggles.reverse.value)
+	{
+		sample_pos = std::int32_t(buffer.sample_info->num_frames - 1) - sample_pos;
+	}
+
+	if (buffer.sample_info->num_channels > 1)
+	{
+		return process_stereo_sample(sample_data, sample_pos, data.toggles.loop.value);
+	}
+	else
+	{
+		return process_mono_sample(sample_data, sample_pos, data.toggles.loop.value);
+	}
 }
 
 ml::DSPVectorArray<2> Audio::process_stereo_sample(const SampleData& sample_data, const snd::transport::DSPVectorFramePosition &sample_pos, bool loop)
