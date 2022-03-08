@@ -28,7 +28,7 @@ public:
 
 private:
 
-	void reset() override {}
+	void reset() override;
 
 	ml::DSPVectorArray<2> process_sample(const AudioData& data, const blink_SamplerBuffer& buffer, const blink::SampleData& sample_data, snd::transport::DSPVectorFramePosition sample_pos);
 	ml::DSPVectorArray<2> process_stereo_sample(const blink::SampleData& sample_data, const snd::transport::DSPVectorFramePosition& sample_pos, bool loop);
@@ -43,20 +43,23 @@ private:
 
 	const Plugin* plugin_;
 	blink::transform::Tape tape_transformer_;
-	blink::BlockPositions dry_positions_;
-	snd::transport::DSPVectorFramePosition tmp;
 	NoiseGenerator noise_gen_;
 
-	struct CorrectionGrain
+	struct ReverseCorrection
 	{
-		bool on {};
-		float beg {};
-		float pos {};
-		float ff {};
-		float vpos {};
-		float vend {};
-		float vff {};
-	} correction_grain_;
+		struct Grain
+		{
+			bool on {};
+			float beg {};
+			float pos {};
+			float ff {};
+			float vpos {};
+			float vend {};
+			float vff {};
+		} grain;
+
+		blink::BlockPositions dry_positions;
+	} reverse_correction_;
 };
 
 } // classic

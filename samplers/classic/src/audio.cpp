@@ -21,7 +21,10 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	AudioData data(*plugin_, unit_state.parameter_data);
 
-	const auto generate_correction_grains { data.options.reverse.data->points.count > 0 };
+	const auto generate_correction_grains {
+		unit_state.smooth_transitions &&
+		data.options.reverse.data->points.count > 1
+	};
 		
 	transform::Tape::Config config;
 
@@ -39,7 +42,10 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	auto sample_pos { tape_transformer_.get_reversed_positions().positions };
 
-	dry_positions_(sample_pos, 0, kFloatsPerDSPVector);
+	if (generate_correction_grains)
+	{
+		reverse_correction_.dry_positions(sample_pos, 0, kFloatsPerDSPVector);
+	}
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
 
@@ -82,7 +88,7 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 	const blink::SampleData& sample_data,
 	const blink::transform::CorrectionGrains& grain_info)
 {
-	if (!correction_grain_.on && grain_info.count < 1) return dry;
+	if (!reverse_correction_.grain.on && grain_info.count < 1) return dry;
 
 	auto grains_remaining { grain_info.count };
 
@@ -91,15 +97,15 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 
 	for (int i { 0 }; i < kFloatsPerDSPVector; i++)
 	{
-		if (correction_grain_.on)
+		if (reverse_correction_.grain.on)
 		{
-			correction_grain_.pos += correction_grain_.ff;
-			correction_grain_.vpos += correction_grain_.vff;
+			reverse_correction_.grain.pos += reverse_correction_.grain.ff;
+			reverse_correction_.grain.vpos += reverse_correction_.grain.vff;
 
-			grain_positions.set(i, correction_grain_.pos);
-			xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(correction_grain_.beg, correction_grain_.vend, correction_grain_.vpos));
+			grain_positions.set(i, reverse_correction_.grain.pos);
+			xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(reverse_correction_.grain.beg, reverse_correction_.grain.vend, reverse_correction_.grain.vpos));
 
-			if (correction_grain_.vpos >= correction_grain_.vend) correction_grain_.on = false;
+			if (reverse_correction_.grain.vpos >= reverse_correction_.grain.vend) reverse_correction_.grain.on = false;
 		}
 		else
 		{
@@ -107,19 +113,19 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 
 			if (grains_remaining > 0 && i == grain_info.buffer_index[grain_info.count - grains_remaining])
 			{
-				correction_grain_.on = true;
+				reverse_correction_.grain.on = true;
 
-				const auto beg { i == 0 ? dry_positions_.prev_pos : dry_positions_[i - 1] };
+				const auto beg { i == 0 ? reverse_correction_.dry_positions.prev_pos : reverse_correction_.dry_positions[i - 1] };
 
-				correction_grain_.beg = beg;
-				correction_grain_.pos = beg;
-				correction_grain_.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate);
-				correction_grain_.vpos = beg;
-				correction_grain_.vend = beg + grain_info.length[i];
-				correction_grain_.vff = std::abs(grain_info.ff[i]);
+				reverse_correction_.grain.beg = beg;
+				reverse_correction_.grain.pos = beg;
+				reverse_correction_.grain.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate);
+				reverse_correction_.grain.vpos = beg;
+				reverse_correction_.grain.vend = beg + grain_info.length[i];
+				reverse_correction_.grain.vff = std::abs(grain_info.ff[i]);
 
-				grain_positions.set(i, correction_grain_.pos);
-				xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(correction_grain_.beg, correction_grain_.vend, correction_grain_.vpos));
+				grain_positions.set(i, reverse_correction_.grain.pos);
+				xfade[i] = snd::ease::quadratic::in_out(snd::inverse_lerp(reverse_correction_.grain.beg, reverse_correction_.grain.vend, reverse_correction_.grain.vpos));
 
 				grains_remaining--;
 			}
@@ -130,10 +136,6 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 
 	const auto wet { process_sample(data, buffer, sample_data, grain_positions) };
 
-	//out.row(0) = dry.constRow(0) * xfade;
-	//out.row(1) = wet.constRow(1) * (1.0f - xfade);
-
-	//return out;
 	return ml::lerp(wet, dry, ml::repeatRows<2>(xfade));
 }
 
@@ -144,7 +146,6 @@ ml::DSPVectorArray<2> Audio::process_sample(
 	snd::transport::DSPVectorFramePosition sample_pos)
 {
 	sample_pos /= float(buffer.song_rate) / buffer.sample_info->SR;
-	tmp=sample_pos;
 
 	if (data.toggles.reverse.value)
 	{
@@ -198,6 +199,11 @@ ml::DSPVectorArray<2> Audio::process_mono_sample(const SampleData& sample_data, 
 blink_Error Audio::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks) const
 {
 	return BLINK_OK;
+}
+
+void Audio::reset()
+{
+	reverse_correction_.grain = {};
 }
 
 } // classic
