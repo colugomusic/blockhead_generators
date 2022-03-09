@@ -94,14 +94,14 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 	{
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
 
-		block_positions(buffer.positions + index, unit_state.data_offset, count);
+		block_positions(buffer.positions + index, count);
 
 		transform::Stretch::Config config;
 
 		config.unit_state_id = unit_state.id;
 		config.env.speed = data.envelopes.speed.data;
 		config.option.reverse = data.options.reverse.data;
-		config.sample_offset = data.sliders.sample_offset.value;
+		config.sample_offset = unit_state.sample_offset + data.sliders.sample_offset.value;
 		config.speed = data.sliders.speed.value;
 		config.warp_points = data.warp_points;
 		config.outputs.derivatives.sped = true;

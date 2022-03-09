@@ -43,7 +43,7 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 	static const ml::DSPVector MAX_TONGUE_DIAMETER(3.5f);
 
 	const auto min_position = ml::min(ml::intToFloat(block_positions().positions.pos));
-	const auto gate = min_position >= -unit_state.data_offset;
+	const auto gate = min_position >= 0;
 
 	const auto model_SR = int(std::pow(2.0f, quality - 1.0f) * 44100.0f);
 	const auto speed = float(model_SR) / SR();
