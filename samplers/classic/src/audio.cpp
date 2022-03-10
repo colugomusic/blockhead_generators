@@ -31,7 +31,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 	config.unit_state_id = unit_state.id;
 	config.env.pitch = data.envelopes.pitch.data;
 	config.option.reverse = data.options.reverse.data;
-	config.sample_offset = unit_state.sample_offset + data.sliders.sample_offset.value;
+	config.sample_offset = data.sliders.sample_offset.value;
 	config.transpose = data.sliders.pitch.value;
 	config.warp_points = unit_state.warp_points;
 	config.outputs.derivatives.pitch = false;
@@ -44,7 +44,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	if (generate_correction_grains)
 	{
-		reverse_correction_.dry_positions(sample_pos, kFloatsPerDSPVector);
+		reverse_correction_.dry_positions(sample_pos, 0, kFloatsPerDSPVector);
 	}
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
