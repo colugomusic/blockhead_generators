@@ -34,6 +34,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec(in);
 
+	block_traverser_.generate(block_positions());
 	controller_.process(data, buffer, SR());
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
