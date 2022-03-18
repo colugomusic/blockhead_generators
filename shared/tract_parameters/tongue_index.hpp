@@ -12,8 +12,8 @@ inline auto envelope_parameter()
 	blink::EnvelopeParameterSpec out;
 
 	out.uuid = UUID;
-	out.name = "Tongue Index";
-	out.short_name = "Index";
+	out.name = "Tongue Position";
+	out.short_name = "Position";
 	out.envelope = blink::std_params::percentage::bipolar::envelope();
 	out.envelope.default_value = 0.0f;
 

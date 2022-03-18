@@ -21,6 +21,19 @@ void Audio::stream_init()
 	input_buffer_.resize(buffer_size);
 }
 
+template <size_t ROWS>
+static bool is_silent(const ml::DSPVectorArray<ROWS>& x)
+{
+	static constexpr auto THRESHOLD { 0.00001f };
+
+	for (int r { 0 }; r < ROWS; r++)
+	{
+		if (ml::max(ml::abs(x.constRow(r))) > THRESHOLD) return false;
+	}
+
+	return true;
+}
+
 blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out)
 {
 	AudioData data(*plugin_, unit_state.parameter_data);
@@ -70,8 +83,10 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 				return out;
 			};
 
-			ml::DSPVectorArray<2> tract_in = input_resampler_(input_source, 1.0f / speed);
+			ml::DSPVectorArray<2> tract_in { input_resampler_(input_source, 1.0f / speed) };
 			ml::DSPVectorArray<2> tract_out;
+
+			if (is_silent(tract_in)) return tract_out;
 
 			for (int r = 0; r < 2; r++)
 			{
