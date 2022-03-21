@@ -119,7 +119,7 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 
 				reverse_correction_.grain.beg = beg;
 				reverse_correction_.grain.pos = beg;
-				reverse_correction_.grain.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate);
+				reverse_correction_.grain.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate) / SR();
 				reverse_correction_.grain.vpos = beg;
 				reverse_correction_.grain.vend = beg + grain_info.length[i];
 				reverse_correction_.grain.vff = std::abs(grain_info.ff[i]);
