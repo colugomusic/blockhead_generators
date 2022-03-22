@@ -117,9 +117,13 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 
 				const auto beg { i == 0 ? reverse_correction_.dry_positions.prev_pos : reverse_correction_.dry_positions[i - 1] };
 
+				// i hate math
+				const auto a { float(buffer.song_rate) / buffer.sample_info->SR };
+				const auto b { float(buffer.sample_info->SR) / SR() };
+
 				reverse_correction_.grain.beg = beg;
 				reverse_correction_.grain.pos = beg;
-				reverse_correction_.grain.ff = grain_info.ff[i] / (float(buffer.sample_info->SR) / buffer.song_rate) / SR();
+				reverse_correction_.grain.ff = grain_info.ff[i] * a * b;
 				reverse_correction_.grain.vpos = beg;
 				reverse_correction_.grain.vend = beg + grain_info.length[i];
 				reverse_correction_.grain.vff = std::abs(grain_info.ff[i]);
