@@ -47,6 +47,8 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 
 void Audio::reset()
 {
+	filter_[0] = {};
+	filter_[1] = {};
 }
 
 } // bandpass

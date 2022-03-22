@@ -47,6 +47,8 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 
 void Audio::reset()
 {
+	lopass_[0] = {};
+	lopass_[1] = {};
 }
 
 } // lowpass
