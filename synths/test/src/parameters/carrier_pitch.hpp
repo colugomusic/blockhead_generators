@@ -2,6 +2,7 @@
 
 #include <blink/standard_parameters/pitch.hpp>
 
+namespace test {
 namespace params {
 namespace carrier {
 namespace pitch {
@@ -21,6 +22,20 @@ auto inline envelope_parameter()
 	return out;
 }
 
+auto inline slider_parameter()
+{
+	auto out { blink::std_params::pitch::slider_parameter() };
+
+	out.name = "Carrier Pitch";
+	out.short_name = "Pitch";
+	out.flags |= blink_SliderFlags_CanManipulate;
+
+	return out;
+}
+
+auto inline envelope_manipulator_target() { return blink::std_params::pitch::envelope_manipulator_target(); }
+
 } // pitch
 } // carrier
 } // params
+} // test

@@ -3,6 +3,7 @@
 #include <blink/parameters/envelope_parameter_spec.hpp>
 #include <blink/standard_parameters/percentage.hpp>
 
+namespace test {
 namespace params {
 namespace carrier {
 namespace waveform {
@@ -39,3 +40,4 @@ inline auto envelope_manipulator_target()
 } // waveform
 } // carrier
 } // params
+} // test

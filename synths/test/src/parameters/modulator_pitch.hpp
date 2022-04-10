@@ -2,6 +2,7 @@
 
 #include <blink/standard_parameters/pitch.hpp>
 
+namespace test {
 namespace params {
 namespace modulator {
 namespace pitch {
@@ -22,6 +23,9 @@ auto inline envelope_parameter()
 	return out;
 }
 
+auto inline envelope_manipulator_target() { return blink::std_params::pitch::envelope_manipulator_target(); }
+
 } // pitch
 } // modulator
 } // params
+} // test

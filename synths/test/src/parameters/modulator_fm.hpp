@@ -2,6 +2,7 @@
 
 #include <blink/standard_parameters/percentage.hpp>
 
+namespace test {
 namespace params {
 namespace modulator {
 namespace fm {
@@ -38,3 +39,4 @@ inline auto envelope_manipulator_target()
 } // fm
 } // modulator
 } // params
+} // test

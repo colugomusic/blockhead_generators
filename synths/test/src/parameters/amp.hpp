@@ -2,6 +2,7 @@
 
 #include <blink/standard_parameters/amp.hpp>
 
+namespace test {
 namespace params {
 namespace amp {
 
@@ -17,5 +18,9 @@ auto envelope_parameter()
 	return out;
 }
 
+auto inline slider_parameter() { return blink::std_params::amp::slider_parameter(); }
+auto inline envelope_manipulator_target() { return blink::std_params::amp::envelope_manipulator_target(); }
+
 } // amp
 } // params
+} // test

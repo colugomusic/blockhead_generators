@@ -2,6 +2,7 @@
 #include "audio_data.h"
 #include "plugin.h"
 #include "instance.h"
+#include <blink/dsp.hpp>
 
 using namespace blink;
 
@@ -17,15 +18,16 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 {
 	AudioData data(*plugin_, unit_state.parameter_data);
 
-	const auto amp = data.envelopes.amp.search_vec(block_positions());
+	auto amp = data.envelopes.amp.search_vec(block_positions());
  	const auto wave = data.envelopes.wave.search_vec(block_positions());
-	const auto p0 = data.envelopes.p0.search_vec(block_positions()) + 60.0f;
-	const auto p1 = data.envelopes.p1.search_vec(block_positions()) + 60.0f;
+	const auto env_carrier_pitch = data.envelopes.p0.search_vec(block_positions());
+	const auto env_modulator_pitch = data.envelopes.p1.search_vec(block_positions());
+	const auto sld_carrier_pitch = data.sliders.carrier_pitch.search_vec(block_positions());
 	const auto fm0 = data.envelopes.fm0.search_vec(block_positions());
 	const auto fm1 = data.envelopes.fm1.search_vec(block_positions());
 	
-	const auto freq0 = blink::math::convert::pitch_to_frequency(p0);
-	const auto freq1 = blink::math::convert::pitch_to_frequency(p1);
+	const auto freq0 = blink::math::convert::pitch_to_frequency(60.0f + env_carrier_pitch + sld_carrier_pitch);
+	const auto freq1 = blink::math::convert::pitch_to_frequency(60.0f + env_modulator_pitch);
 
 	ml::DSPVector osc_out;
 
@@ -50,6 +52,9 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 			data.sliders.noise_width.value,
 			block_positions());
 
+	amp *= data.sliders.amp.value;
+
+	out_vec = stereo_pan(out_vec, data.sliders.pan.value, data.envelopes.pan, block_positions());
 	out_vec *= ml::repeatRows<2>(amp);
 
 	ml::storeAligned(out_vec.constRow(0), out);

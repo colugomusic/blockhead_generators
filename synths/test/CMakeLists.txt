@@ -24,6 +24,7 @@ list(APPEND SRC
     ./src/parameters/carrier_waveform.hpp
     ./src/parameters/modulator_fm.hpp
     ./src/parameters/modulator_pitch.hpp
+    ./src/parameters/pan.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 	../../shared/noise_generator.h

@@ -5,6 +5,7 @@
 #include "parameters/carrier_waveform.hpp"
 #include "parameters/modulator_fm.hpp"
 #include "parameters/modulator_pitch.hpp"
+#include "parameters/pan.hpp"
 #include <blink/standard_parameters/all.hpp>
 
 using namespace blink;
@@ -14,6 +15,7 @@ namespace test {
 Parameters::Parameters(Plugin* plugin)
 {
 	env.amp = plugin->add_parameter(params::amp::envelope_parameter());
+	env.pan = plugin->add_parameter(params::pan::envelope_parameter());
 
 	auto group_carrier = plugin->add_group("Carrier");
 	{
@@ -60,11 +62,16 @@ Parameters::Parameters(Plugin* plugin)
 		sliders.noise_width->set_group_index(group_noise);
 	}
 
-	plugin->add_manipulator_target(params::amp::UUID, std_params::amp::envelope_manipulator_target());
+	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());
+	sliders.pan = plugin->add_parameter(params::pan::slider_parameter());
+	sliders.carrier_pitch = plugin->add_parameter(params::carrier::pitch::slider_parameter());
+
+	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::carrier::waveform::UUID, params::carrier::waveform::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::carrier::pitch::UUID, std_params::pitch::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::carrier::pitch::UUID, params::carrier::pitch::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::carrier::fm::UUID, params::carrier::fm::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::modulator::pitch::UUID, std_params::pitch::envelope_manipulator_target());
+	plugin->add_manipulator_target(params::modulator::pitch::UUID, params::modulator::pitch::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::modulator::fm::UUID, params::modulator::fm::envelope_manipulator_target());
 	plugin->add_manipulator_target(BLINK_STD_UUID_NOISE_AMOUNT, std_params::noise_amount::envelope_manipulator_target());
 	plugin->add_manipulator_target(BLINK_STD_UUID_NOISE_COLOR, std_params::noise_color::envelope_manipulator_target());

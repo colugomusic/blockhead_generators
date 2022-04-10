@@ -15,6 +15,7 @@ struct AudioData
 		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data);
 
 		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
+		blink::EnvelopeData<int(Parameters::Index::Env_Pan)> pan;
 		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_Wave)> wave;
 		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_Pitch)> p0;
 		blink::EnvelopeData<int(Parameters::Index::Env_Carrier_FM)> fm0;
@@ -26,6 +27,9 @@ struct AudioData
 
 	struct Sliders
 	{
+		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(Parameters::Index::Sld_Pan)> pan;
+		blink::SliderData<int(Parameters::Index::Sld_Carrier_Pitch)> carrier_pitch;
 		blink::SliderData<int(Parameters::Index::Sld_NoiseWidth)> noise_width;
 
 		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data);
