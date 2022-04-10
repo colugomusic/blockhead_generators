@@ -20,6 +20,9 @@ struct Parameters
 		Env_TongueDiameter,
 		Env_FricativeIntensity,
 		Env_Quality,
+		Sld_Amp,
+		Sld_Pan,
+		Sld_Pitch,
 	};
 
 	struct Envelopes
@@ -35,6 +38,13 @@ struct Parameters
 		std::shared_ptr<blink::EnvelopeParameter> fricative_intensity;
 		std::shared_ptr<blink::EnvelopeParameter> quality;
 	} env;
+
+	struct Sliders
+	{
+		std::shared_ptr<blink::SliderParameter<float>> amp;
+		std::shared_ptr<blink::SliderParameter<float>> pan;
+		std::shared_ptr<blink::SliderParameter<float>> pitch;
+	} sliders;
 
 	Parameters(blink::Plugin* plugin);
 };

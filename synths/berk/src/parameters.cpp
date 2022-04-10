@@ -56,6 +56,10 @@ Parameters::Parameters(blink::Plugin* plugin)
 
 	env.quality = plugin->add_parameter(tract_params::quality::envelope_parameter());
 
+	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());
+	sliders.pan = plugin->add_parameter(params::pan::slider_parameter());
+	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
+
 	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::buzz::UUID, params::buzz::envelope_manipulator_target());
 	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
