@@ -60,6 +60,17 @@ blink_PluginInfo blink_get_plugin_info()
 	return out;
 }
 
+blink_SamplerInfo blink_get_sampler_info()
+{
+	blink_SamplerInfo out{ 0 };
+
+	out.baked_waveform_could_be_different = true;
+	out.enable_warp_markers = true;
+	out.requires_preprocessing = true;
+
+	return out;
+}
+
 blink_Error blink_init()
 {
 	if (g_plugin) return blink_StdError_AlreadyInitialized;
