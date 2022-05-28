@@ -29,7 +29,6 @@ private:
 	std::uint64_t buffer_id_ = 0;
 	bool primed_ = false;
 	bool record_ = false;
-	blink::Traverser block_traverser_;
 	Controller controller_;
 	Particle particle_;
 };

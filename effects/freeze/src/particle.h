@@ -18,7 +18,7 @@ public:
 
 	Particle(const Controller& controller, std::function<float(int, std::size_t, float)> read);
 
-	LR process(int vector_);
+	LR process(int vector_, float* dry);
 	void clear();
 	void queue_reset() { queue_reset_ = true; }
 
@@ -33,11 +33,11 @@ private:
 
 	const Controller* controller_;
 	bool first_grain_ = true;
-	char flip_flop_ = 0;
-	float trigger_timer_ = 0.0f;
+	char flip_flop_{};
+	float trigger_timer_{};
 	std::array<Grain, 2> grains_;
 	std::function<float(int, std::size_t, float)> read_;
-	bool queue_reset_ = false;
+	bool queue_reset_{};
 };
 
 } // freeze

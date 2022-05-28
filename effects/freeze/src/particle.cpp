@@ -11,7 +11,7 @@ Particle::Particle(const Controller& controller, std::function<float(int, std::s
 {
 }
 
-LR Particle::process(int vector_index)
+LR Particle::process(int vector_index, float* dry)
 {
 	LR out;
 
@@ -41,14 +41,11 @@ LR Particle::process(int vector_index)
 
 		if (grain.frame < grain.window)
 		{
-			if (grain.fade_in)
-			{
-				grain.frame_amp = blink::math::ease::quadratic::in_out(1.f - ((grain.window - grain.frame) / grain.window));
+			grain.frame_amp = blink::math::ease::quadratic::in_out(1.f - ((grain.window - grain.frame) / grain.window));
 
-				float other_grain_duck = 1.f - grain.frame_amp;
+			float other_grain_duck = 1.f - grain.frame_amp;
 
-				other_grain(g).duck = other_grain_duck;
-			}
+			other_grain(g).duck = other_grain_duck;
 		}
 
 		float self_duck = 1.f;
@@ -78,6 +75,16 @@ LR Particle::process(int vector_index)
 
 		out.L += L;
 		out.R += R;
+
+		if (grain.dry && grain.frame < grain.window)
+		{
+			*dry = 1.0f - overall_amp;
+		}
+	}
+
+	if (!grains_[0].on && !grains_[1].on)
+	{
+		*dry = 1.0f;
 	}
 
 	trigger_timer_++;
@@ -94,20 +101,8 @@ LR Particle::read_stereo_frame(int vector_index, const Grain& grain) const
 		return { 0.0f, 0.0f };
 	}
 
-	if (pos >= grain.edge)
-	{
-		return { 0.0f, 0.0f };
-	}
-
-	auto amp = 1.0f;
-
-	if (pos >= grain.edge - 512)
-	{
-		amp = 1.0f - blink::math::inverse_lerp(float(grain.edge - 512), float(grain.edge), pos);
-	}
-
-	const auto L = read_(vector_index, 0, pos) * amp;
-	const auto R = read_(vector_index, 1, pos) * amp;
+	const auto L = read_(vector_index, 0, pos);
+	const auto R = read_(vector_index, 1, pos);
 
 	return { L, R };
 }
@@ -130,31 +125,30 @@ void Particle::reset(int index)
 
 void Particle::trigger_next_grain(int index)
 {
-	constexpr auto MAX_WINDOW_SIZE = 4096.0f;
+	constexpr auto MAX_WINDOW_SIZE{ 4096.0f };
 
-	flip_flop_ = flip_flop_ == 0 ? 1 : 0;
+	const auto size{ controller_->size()[index] };
+	const auto& buffer{ controller_->buffer() };
+	const auto frames_available{ buffer.frames_available() };
 
-	auto ff = controller_->ff()[index];
-	auto size = controller_->size()[index];
-	auto period = size;
-	const auto fade_in = true;// !first_grain_ || ff != 1.0f;
+	if (frames_available < size) return;
+
+	flip_flop_ = 1 - flip_flop_;
+
+	auto ff{ controller_->ff()[index] };
+
+	grains_[flip_flop_].on = true;
+	grains_[flip_flop_].dry = first_grain_;
+	grains_[flip_flop_].ff = ff;
+	grains_[flip_flop_].size = size;
+	grains_[flip_flop_].period = size;
+	grains_[flip_flop_].window = std::min(MAX_WINDOW_SIZE, std::floor(size / 3));
+	grains_[flip_flop_].frame = 0.f;
+	grains_[flip_flop_].frame_amp = 0.f;
+	grains_[flip_flop_].duck = 1.f;
 
 	first_grain_ = false;
 
-	const auto& buffer = controller_->buffer();
-	const auto frames_available = buffer.frames_available();
-	const auto edge = frames_available;
-
-	grains_[flip_flop_].on = true;
-	grains_[flip_flop_].fade_in = fade_in;
-	grains_[flip_flop_].ff = ff;
-	grains_[flip_flop_].size = size;
-	grains_[flip_flop_].period = period;
-	grains_[flip_flop_].edge = edge;
-	grains_[flip_flop_].window = std::min(MAX_WINDOW_SIZE, std::floor(size / 3));
-	grains_[flip_flop_].frame = 0.f;
-	grains_[flip_flop_].frame_amp = fade_in ? 0.f : 1.f;
-	grains_[flip_flop_].duck = 1.f;
 }
 
 } // freeze

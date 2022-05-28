@@ -12,6 +12,14 @@ class Buffer
 {
 public:
 
+	Buffer()
+	{
+		for (int row{}; row < 2; row++)
+		{
+			data_[row].fill(0.0f);
+		}
+	}
+
 	static bool not_zero(float L, float R, float threshold = 0.0001f)
 	{
 		return L > threshold || L < -threshold || R > threshold || R < -threshold;

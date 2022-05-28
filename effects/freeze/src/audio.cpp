@@ -8,11 +8,11 @@ using namespace blink;
 namespace freeze {
 
 Audio::Audio(Instance* instance)
-	: blink::EffectUnit(instance)
-	, plugin_(instance->get_plugin())
-	, instance_(instance)
-	, controller_(plugin_, instance->buffer, block_traverser_)
-	, particle_(controller_, [this](int vector_index, std::size_t row, float pos) { return buffer_read(vector_index, row, pos); })
+	: blink::EffectUnit{ instance }
+	, plugin_{ instance->get_plugin() }
+	, instance_{ instance }
+	, controller_{ plugin_, instance->buffer }
+	, particle_{ controller_, [this](int vector_index, std::size_t row, float pos) { return buffer_read(vector_index, row, pos); } }
 {
 }
 
@@ -34,8 +34,9 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec(in);
 
-	block_traverser_.generate(block_positions());
-	controller_.process(data, buffer, SR());
+	controller_.process(data, buffer, SR(), block_positions());
+
+	ml::DSPVector dry;
 
 	for (int i = 0; i < kFloatsPerDSPVector; i++)
 	{
@@ -48,6 +49,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 				if (local_block_position >= 0)
 				{
 					record_ = true;
+					particle_.queue_reset();
 				}
 			}
 
@@ -57,11 +59,13 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 			}
 		}
 		
-		auto LR = particle_.process(i);
+		auto LR = particle_.process(i, &dry[i]);
 
 		out_vec.row(0)[i] = LR.L;
 		out_vec.row(1)[i] = LR.R;
 	}
+
+	out_vec += ml::repeatRows<2>(dry) * in_vec;
 
 	const auto mix = data.envelopes.mix.search_vec(block_positions());
 
