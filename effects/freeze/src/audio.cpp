@@ -18,6 +18,7 @@ Audio::Audio(Instance* instance)
 
 void Audio::reset()
 {
+	instance_->buffer.clear();
 	particle_.queue_reset();
 }
 

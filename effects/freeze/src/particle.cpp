@@ -131,7 +131,7 @@ void Particle::trigger_next_grain(int index)
 	const auto& buffer{ controller_->buffer() };
 	const auto frames_available{ buffer.frames_available() };
 
-	if (frames_available < size) return;
+	if (frames_available < size * 0.5f) return;
 
 	flip_flop_ = 1 - flip_flop_;
 
