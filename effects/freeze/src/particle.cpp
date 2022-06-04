@@ -128,14 +128,13 @@ void Particle::trigger_next_grain(int index)
 	constexpr auto MAX_WINDOW_SIZE{ 4096.0f };
 
 	const auto size{ controller_->size()[index] };
+	const auto ff{ controller_->ff()[index] };
 	const auto& buffer{ controller_->buffer() };
 	const auto frames_available{ buffer.frames_available() };
 
-	if (frames_available < size * 0.5f) return;
+	if (frames_available < size * 0.5f * ff) return;
 
 	flip_flop_ = 1 - flip_flop_;
-
-	auto ff{ controller_->ff()[index] };
 
 	grains_[flip_flop_].on = true;
 	grains_[flip_flop_].dry = first_grain_;
