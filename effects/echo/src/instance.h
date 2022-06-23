@@ -2,7 +2,7 @@
 
 #include <blink/effect_instance.hpp>
 
-namespace delay {
+namespace echo {
 
 class Plugin;
 
@@ -12,13 +12,13 @@ public:
 
 	Instance(Plugin* plugin);
 
-	Plugin* get_plugin() const { return plugin_; }
+	auto get_plugin() const { return plugin_; }
 
 private:
 
-	std::shared_ptr<blink::EffectUnit> make_unit() override;
+	auto make_unit() -> std::shared_ptr<blink::EffectUnit> override;
 
 	Plugin* plugin_;
 };
 
-} // delay
+} // echo

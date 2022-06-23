@@ -4,7 +4,7 @@
 #include "instance.h"
 #include "parameters.h"
 
-namespace delay {
+namespace echo {
 
 class Plugin : public blink::EffectPlugin
 {
@@ -16,9 +16,9 @@ public:
 
 private:
 
-	blink::EffectInstance* make_instance() override { return new Instance(this); }
+	auto make_instance() -> std::unique_ptr<blink::EffectInstance> override { return std::make_unique<Instance>(this); }
 
 	Parameters params_;
 };
 
-} // delay
+} // echo

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(effect_delay VERSION 0.1.0)
+project(effect_echo VERSION 0.1.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
@@ -14,6 +14,9 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
+	./src/parameters/amp.hpp
+	./src/parameters/feedback.hpp
+	./src/parameters/time.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )
@@ -22,8 +25,8 @@ list(APPEND RES
     ./res/icon.png
 )
 
-blink_plugin_add_effect("delay" "${SRC}" "${RES}")
+blink_plugin_add_effect("echo" "${SRC}" "${RES}")
 
-target_include_directories(effect_delay PRIVATE
+target_include_directories(effect_echo PRIVATE
 	../..
 )

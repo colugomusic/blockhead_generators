@@ -1,21 +1,22 @@
 #define BLINK_EXPORT
 #include "plugin.h"
 
-#include <cmrc/cmrc.hpp>
-#include <blink/bind.hpp>
+#include <blink/bind_effect.hpp>
 #include <blink/errors.hpp>
 
-namespace delay { Plugin* g_plugin = nullptr; }
+namespace echo { Plugin* g_plugin {}; }
 
 using namespace blink;
-using namespace delay;
+using namespace echo;
 
 blink_PluginInfo blink_get_plugin_info()
 {
 	blink_PluginInfo out = blink_PluginInfo();
 
-	out.uuid = "742b3f81-c51b-42ab-8b01-5ddf717b322a";
-	out.name = "Delay";
+	out.uuid = "4371f6cb-d452-49c2-af70-79663402c816";
+	out.name = "Echo";
+	out.category = BLINK_STD_CATEGORY_DELAY;
+	out.category = BLINK_STD_CATEGORY_UTILITY;
 	out.version = PLUGIN_VERSION;
 	out.has_icon = true;
 
@@ -26,7 +27,7 @@ blink_Error blink_init()
 {
 	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new delay::Plugin();
+	g_plugin = new echo::Plugin();
 
 	return BLINK_OK;
 }
@@ -42,7 +43,7 @@ blink_Error blink_terminate()
 
 blink_EffectInstance blink_make_effect_instance()
 {
-	if (!g_plugin) return blink_EffectInstance{0};
+	if (!g_plugin) return blink_EffectInstance{ 0 };
 
 	return bind::effect_instance(g_plugin->add_instance());
 }
@@ -51,11 +52,7 @@ blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 {
 	if (!g_plugin) return blink_StdError_NotInitialized;
 
-	const auto obj = (delay::Instance*)(instance.proc_data);
-
-	g_plugin->destroy_instance(obj);
-
-	return BLINK_OK;
+	return g_plugin->destroy_instance(std::move(instance));
 }
 
 int blink_get_num_groups()
@@ -87,23 +84,21 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 	return bind::parameter(g_plugin->get_parameter(uuid));
 }
 
+blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_EnvelopeManipulatorTarget* out)
+{
+	if (!g_plugin) return blink_StdError_NotInitialized;
+
+	return g_plugin->get_envelope_manipulator_target(uuid, out);
+}
+
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));
 }
 
-CMRC_DECLARE(delay);
+CMRC_DECLARE(echo);
 
 blink_ResourceData blink_get_resource_data(const char* path)
 {
-	if (g_plugin->resources().has(path)) return g_plugin->resources().get(path);
-
-	const auto fs = cmrc::delay::get_filesystem();
-
-	if (!fs.exists(path)) return { 0, 0 };
-	if (!fs.is_file(path)) return { 0, 0 };
-
-	const auto file = fs.open(path);
-
-	return g_plugin->resources().store(path, file);
+	return g_plugin->get_resource_data(cmrc::echo::get_filesystem(), path);
 }
