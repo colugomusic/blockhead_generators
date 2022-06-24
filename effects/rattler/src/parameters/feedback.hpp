@@ -2,7 +2,7 @@
 
 #include <blink/standard_parameters/feedback.hpp>
 
-namespace echo {
+namespace rattler {
 namespace params {
 namespace feedback {
 
@@ -22,4 +22,4 @@ auto inline envelope_manipulator_target() { return blink::std_params::feedback::
 
 } // feedback
 } // params
-} // echo
+} // rattler

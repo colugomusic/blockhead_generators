@@ -2,7 +2,7 @@
 
 #include <blink/standard_parameters/amp.hpp>
 
-namespace echo {
+namespace rattler {
 namespace params {
 namespace amp {
 
@@ -23,4 +23,4 @@ auto inline envelope_manipulator_target() { return blink::std_params::amp::envel
 
 } // amp
 } // params
-} // echo
+} // rattler

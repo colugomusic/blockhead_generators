@@ -4,7 +4,7 @@
 #include "instance.h"
 #include "parameters.h"
 
-namespace echo {
+namespace rattler {
 
 class Plugin : public blink::EffectPlugin
 {
@@ -21,4 +21,4 @@ private:
 	Parameters params_;
 };
 
-} // echo
+} // rattler

@@ -4,19 +4,18 @@
 #include <blink/bind_effect.hpp>
 #include <blink/errors.hpp>
 
-namespace echo { Plugin* g_plugin {}; }
+namespace rattler { Plugin* g_plugin {}; }
 
 using namespace blink;
-using namespace echo;
+using namespace rattler;
 
 blink_PluginInfo blink_get_plugin_info()
 {
 	blink_PluginInfo out = blink_PluginInfo();
 
 	out.uuid = "4371f6cb-d452-49c2-af70-79663402c816";
-	out.name = "Echo";
+	out.name = "Rattler";
 	out.category = BLINK_STD_CATEGORY_DELAY;
-	out.category = BLINK_STD_CATEGORY_UTILITY;
 	out.version = PLUGIN_VERSION;
 	out.has_icon = true;
 
@@ -27,7 +26,7 @@ blink_Error blink_init()
 {
 	if (g_plugin) return blink_StdError_AlreadyInitialized;
 
-	g_plugin = new echo::Plugin();
+	g_plugin = new rattler::Plugin();
 
 	return BLINK_OK;
 }
@@ -96,9 +95,9 @@ const char* blink_get_error_string(blink_Error error)
 	return blink::get_std_error_string(blink_StdError(error));
 }
 
-CMRC_DECLARE(echo);
+CMRC_DECLARE(rattler);
 
 blink_ResourceData blink_get_resource_data(const char* path)
 {
-	return g_plugin->get_resource_data(cmrc::echo::get_filesystem(), path);
+	return g_plugin->get_resource_data(cmrc::rattler::get_filesystem(), path);
 }

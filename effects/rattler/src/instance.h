@@ -2,7 +2,7 @@
 
 #include <blink/effect_instance.hpp>
 
-namespace echo {
+namespace rattler {
 
 class Plugin;
 
@@ -21,4 +21,4 @@ private:
 	Plugin* plugin_;
 };
 
-} // echo
+} // rattler
