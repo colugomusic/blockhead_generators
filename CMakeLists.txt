@@ -19,6 +19,7 @@ add_dependencies(all_plugins
     effect_freeze
     effect_gainer
     effect_lofi
+    effect_rattler
     effect_resonator
     effect_ring_modulator
     effect_saturator
