@@ -73,7 +73,7 @@ inline auto envelope()
 		return tweak::convert::ratio_to_linear(tweak::drag<float, 10, 100>(tweak::convert::linear_to_ratio(value), amount / 5, precise));
 	};
 
-	out.value_slider.from_string = [](const std::string& str) -> std::optional<float>
+	out.value_slider.from_string = [](std::string str) -> std::optional<float>
 	{
 		const auto number = tweak::find_positive_number<float>(str);
 

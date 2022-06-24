@@ -74,7 +74,7 @@ struct Tweak
 		return tweak::to_string(value) + "x";
 	}
 
-	static auto from_string(const std::string& str) -> std::optional<float>
+	static auto from_string(std::string str) -> std::optional<float>
 	{
 		static const auto HALF = convert::ratio_to_linear(0.5f);
 		static const auto DOUBLE = convert::ratio_to_linear(2.0f);
