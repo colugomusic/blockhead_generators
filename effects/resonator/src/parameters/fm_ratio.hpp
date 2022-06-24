@@ -96,7 +96,7 @@ struct Tweak
 			return 1.0f / std::stoi(match[1]);
 		}
 
-		const auto value = tweak::find_number<float>(str);
+		const auto value = tweak::find_number<float>(std::move(str));
 
 		if (!value) return {};
 

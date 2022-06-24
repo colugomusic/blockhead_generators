@@ -75,7 +75,7 @@ inline auto envelope()
 
 	out.value_slider.from_string = [](std::string str) -> std::optional<float>
 	{
-		const auto number = tweak::find_positive_number<float>(str);
+		const auto number = tweak::find_positive_number<float>(std::move(str));
 
 		if (!number) return number;
 
