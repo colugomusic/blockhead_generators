@@ -10,25 +10,29 @@ struct Parameters
 {
 	enum class Index
 	{
-		Env_Amp,
 		Env_Time,
 		Env_Feedback,
 		Env_Width,
-		Sld_Amp,
+		Env_Dry,
+		Env_Wet,
+		Sld_Dry,
+		Sld_Wet,
 		Sld_Width,
 	};
 
 	struct Envelopes
 	{
-		std::shared_ptr<blink::EnvelopeParameter> amp;
 		std::shared_ptr<blink::EnvelopeParameter> time;
 		std::shared_ptr<blink::EnvelopeParameter> feedback;
 		std::shared_ptr<blink::EnvelopeParameter> width;
+		std::shared_ptr<blink::EnvelopeParameter> dry;
+		std::shared_ptr<blink::EnvelopeParameter> wet;
 	} env;
 
 	struct Sliders
 	{
-		std::shared_ptr<blink::SliderParameter<float>> amp;
+		std::shared_ptr<blink::SliderParameter<float>> dry;
+		std::shared_ptr<blink::SliderParameter<float>> wet;
 		std::shared_ptr<blink::SliderParameter<float>> width;
 	} sliders;
 	

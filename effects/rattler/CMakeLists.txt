@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(effect_rattler VERSION 0.1.0)
+project(effect_rattler VERSION 0.1.1)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
@@ -14,9 +14,10 @@ list(APPEND SRC
     ./src/instance.cpp
     ./src/parameters.h
     ./src/parameters.cpp
-	./src/parameters/amp.hpp
+	./src/parameters/dry.hpp
 	./src/parameters/feedback.hpp
 	./src/parameters/time.hpp
+	./src/parameters/wet.hpp
     ./src/plugin.h
     ./src/plugin.cpp
 )

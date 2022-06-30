@@ -12,26 +12,30 @@ struct InputValues
 {
 	struct Envelopes
 	{
-		ml::DSPVector amp;
 		ml::DSPVector time;
 		ml::DSPVector feedback;
 		ml::DSPVector width;
+		ml::DSPVector dry;
+		ml::DSPVector wet;
 
 		Envelopes(const AudioData::Envelopes& data, const BlockPositions& positions)
-			: amp { data.amp.search_vec(positions) }
-			, time { data.time.search_vec(positions) }
+			: time { data.time.search_vec(positions) }
 			, feedback { data.feedback.search_vec(positions) }
 			, width { data.width.search_vec(positions) }
+			, dry { data.dry.search_vec(positions) }
+			, wet { data.wet.search_vec(positions) }
 		{}
 	} envelopes;
 
 	struct Sliders
 	{
-		float amp;
+		float dry;
+		float wet;
 		float width;
 
 		Sliders(const AudioData::Sliders& data)
-			: amp { data.amp.value }
+			: dry { data.dry.value }
+			, wet { data.wet.value }
 			, width { data.width.value }
 		{}
 	} sliders;
@@ -68,7 +72,8 @@ auto Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitStat
 {
 	InputValues input_values{ { plugin_->params(), unit_state.parameter_data }, block_positions() };
 
-	const auto amp { input_values.envelopes.amp* input_values.sliders.amp };
+	const auto dry { input_values.envelopes.dry + input_values.sliders.dry };
+	const auto wet { input_values.envelopes.wet + input_values.sliders.wet };
 	const auto feedback{ input_values.envelopes.feedback };
 	auto width{ input_values.envelopes.width + input_values.sliders.width };
 
@@ -84,7 +89,7 @@ auto Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitStat
 	ml::DSPVectorArray<2> in_vec(in);
 	ml::DSPVectorArray<2> out_vec{};
 
-	auto delay_input{ (in_vec * ml::repeatRows<2>(amp) * ml::repeatRows<2>(fade_in_(1.0f))) + feedback_ };
+	auto delay_input{ (in_vec * ml::repeatRows<2>(wet) * ml::repeatRows<2>(fade_in_(1.0f))) + feedback_ };
 
 	for (auto channel{ 0 }; channel < 2; channel++)
 	{
@@ -93,7 +98,7 @@ auto Audio::process(const blink_EffectBuffer& buffer, const blink_EffectUnitStat
 
 	feedback_ = out_vec * ml::repeatRows<2>(feedback);
 
-	out_vec += in_vec;
+	out_vec += ml::repeatRows<2>(dry) * in_vec;
 
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);

@@ -11,17 +11,19 @@ struct AudioData
 {
 	struct Envelopes
 	{
-		blink::EnvelopeData<int(Parameters::Index::Env_Amp)> amp;
 		blink::EnvelopeData<int(Parameters::Index::Env_Time)> time;
 		blink::EnvelopeData<int(Parameters::Index::Env_Feedback)> feedback;
 		blink::EnvelopeData<int(Parameters::Index::Env_Width)> width;
+		blink::EnvelopeData<int(Parameters::Index::Env_Dry)> dry;
+		blink::EnvelopeData<int(Parameters::Index::Env_Wet)> wet;
 
 		Envelopes(const Parameters& parameters, const blink_ParameterData* parameter_data);
 	} envelopes;
 
 	struct Sliders
 	{
-		blink::SliderData<int(Parameters::Index::Sld_Amp)> amp;
+		blink::SliderData<int(Parameters::Index::Sld_Dry)> dry;
+		blink::SliderData<int(Parameters::Index::Sld_Wet)> wet;
 		blink::SliderData<int(Parameters::Index::Sld_Width)> width;
 
 		Sliders(const Parameters& parameters, const blink_ParameterData* parameter_data);
