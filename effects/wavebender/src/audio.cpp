@@ -2,6 +2,7 @@
 #include "audio_data.h"
 #include "plugin.h"
 #include "instance.h"
+#include <snd/misc.hpp>
 
 using namespace blink;
 
@@ -331,8 +332,8 @@ float Audio::Channel::Span::read(float pos) const
 	auto index_1 { size_t(std::ceil(pos)) };
 	const auto x { pos - index_0 };
 
-	if (index_0 >= size) index_0 -= size;
-	if (index_1 >= size) index_1 -= size;
+	index_0 = snd::wrap(index_0, size);
+	index_1 = snd::wrap(index_1, size);
 
 	if (index_0 == index_1)
 	{
