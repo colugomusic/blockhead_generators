@@ -12,10 +12,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 	env.drive = plugin->add_parameter(params::drive::envelope_parameter());
 	env.amp = plugin->add_parameter(params::amp::envelope_parameter());
 	env.mix = plugin->add_parameter(params::mix::envelope_parameter());
-
-	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::drive::UUID, params::drive::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::mix::UUID, params::mix::envelope_manipulator_target());
 }
 
 } // saturator

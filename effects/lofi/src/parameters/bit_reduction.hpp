@@ -25,18 +25,11 @@ inline auto envelope_parameter()
 	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 	out.flags |= blink_EnvelopeFlags_HostClamp;
 
-	return out;
-}
-
-inline auto envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
 	out.override_envelope = blink::std_params::percentage::envelope();
 
 	return out;
-};
+}
 
 } // bit_reduction
 } // params

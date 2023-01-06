@@ -26,13 +26,6 @@ auto inline envelope_parameter()
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
 	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
-	return out;
-}
-
-auto inline envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
 	out.override_envelope = envelope();
 
 	return out;

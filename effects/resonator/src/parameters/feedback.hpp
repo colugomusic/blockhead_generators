@@ -17,11 +17,6 @@ inline auto envelope_parameter()
 	return out;
 }
 
-inline auto envelope_manipulator_target()
-{
-	return blink::std_params::feedback::envelope_manipulator_target();
-}
-
 } // feedback
 } // params
 } // resonator

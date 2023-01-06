@@ -33,8 +33,6 @@ auto inline slider_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::pitch::envelope_manipulator_target(); }
-
 } // pitch
 } // carrier
 } // params

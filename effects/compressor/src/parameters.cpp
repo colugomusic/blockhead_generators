@@ -20,13 +20,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 	env.knee = plugin->add_parameter(params::knee::envelope_parameter());
 	env.mix = plugin->add_parameter(params::mix::envelope_parameter());
 	options.stereo = plugin->add_parameter(params::processing_mode::option());
-
-	plugin->add_manipulator_target(params::attack::UUID, params::attack::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::knee::UUID, params::knee::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::mix::UUID, params::mix::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::ratio::UUID, params::ratio::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::release::UUID, params::release::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::threshold::UUID, params::threshold::envelope_manipulator_target());
 }
 
 } // compressor

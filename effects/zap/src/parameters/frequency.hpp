@@ -17,11 +17,6 @@ auto envelope_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target()
-{
-	return blink::std_params::filter_frequency::envelope_manipulator_target();
-}
-
 } // frequency
 } // params
 } // zap

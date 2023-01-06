@@ -18,7 +18,6 @@ auto inline envelope_parameter()
 }
 
 auto inline slider_parameter() { return blink::std_params::speed::slider_parameter(); }
-auto inline envelope_manipulator_target() { return blink::std_params::speed::envelope_manipulator_target(); }
 
 } // speed
 } // params

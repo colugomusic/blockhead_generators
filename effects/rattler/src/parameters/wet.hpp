@@ -26,8 +26,6 @@ auto inline slider_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::wet::envelope_manipulator_target(); }
-
 } // wet
 } // params
 } // rattler

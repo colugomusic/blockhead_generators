@@ -42,13 +42,6 @@ Parameters::Parameters(Plugin* plugin)
 
 	toggles.loop = plugin->add_parameter(params::loop::toggle());
 	toggles.reverse = plugin->add_parameter(params::reverse::toggle());
-
-	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pitch::UUID, params::pitch::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_amount::UUID, params::noise_amount::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_color::UUID, params::noise_color::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_width::UUID, params::noise_width::envelope_manipulator_target());
 }
 
 } // classic

@@ -20,12 +20,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 	sliders.dry = plugin->add_parameter(params::dry::slider_parameter());
 	sliders.wet = plugin->add_parameter(params::wet::slider_parameter());
 	sliders.width = plugin->add_parameter(params::width::slider_parameter());
-
-	plugin->add_manipulator_target(params::dry::UUID, params::dry::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::wet::UUID, params::wet::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::time::UUID, params::time::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::feedback::UUID, params::feedback::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::width::UUID, params::width::envelope_manipulator_target());
 }
 
 } // rattler

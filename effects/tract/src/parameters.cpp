@@ -33,13 +33,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 
 	env.quality = plugin->add_parameter(tract_params::quality::envelope_parameter());
 	env.mix = plugin->add_parameter(std_params::mix::envelope_parameter());
-
-	plugin->add_manipulator_target(tract_params::throat_index::UUID, tract_params::throat_index::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::throat_diameter::UUID, tract_params::throat_diameter::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::tongue_index::UUID, tract_params::tongue_index::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::tongue_diameter::UUID, tract_params::tongue_diameter::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::quality::UUID, tract_params::quality::envelope_manipulator_target());
-	plugin->add_manipulator_target(std_params::mix::UUID, std_params::mix::envelope_manipulator_target());
 }
 
 } // tract

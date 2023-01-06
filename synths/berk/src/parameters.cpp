@@ -59,17 +59,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());
 	sliders.pan = plugin->add_parameter(params::pan::slider_parameter());
 	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
-
-	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::buzz::UUID, params::buzz::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pitch::UUID, params::pitch::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::fricative_intensity::UUID, tract_params::fricative_intensity::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::quality::UUID, tract_params::quality::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::throat_diameter::UUID, tract_params::throat_diameter::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::throat_index::UUID, tract_params::throat_index::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::tongue_diameter::UUID, tract_params::tongue_diameter::envelope_manipulator_target());
-	plugin->add_manipulator_target(tract_params::tongue_index::UUID, tract_params::tongue_index::envelope_manipulator_target());
 }
 
 } // berk

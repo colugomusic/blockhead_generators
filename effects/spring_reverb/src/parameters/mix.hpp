@@ -19,8 +19,6 @@ auto envelope_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::mix::envelope_manipulator_target(); }
-
 } // mix
 } // params
 } // spring_reverb

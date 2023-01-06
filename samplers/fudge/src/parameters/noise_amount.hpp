@@ -19,8 +19,6 @@ auto inline envelope_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::noise_amount::envelope_manipulator_target(); }
-
 } // noise_amount
 } // params
 } // fudge

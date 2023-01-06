@@ -19,8 +19,6 @@ auto inline envelope_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::pitch::envelope_manipulator_target(); }
-
 } // grain_transpose
 } // params
 } // fudge

@@ -13,11 +13,6 @@ inline auto envelope_parameter()
 	return blink::std_params::harmonics_amount::envelope_parameter();
 }
 
-auto inline envelope_manipulator_target()
-{
-	return blink::std_params::harmonics_amount::envelope_manipulator_target();
-}
-
 } // harmonics_amount
 } // params
 } // resonator

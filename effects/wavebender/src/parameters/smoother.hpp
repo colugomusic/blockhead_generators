@@ -16,6 +16,8 @@ auto envelope_parameter()
 
 	out.uuid = UUID;
 	out.name = "Smoother";
+	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
+	out.override_envelope = blink::std_params::percentage::envelope();
 	out.envelope = blink::std_params::percentage::envelope();
 	out.envelope.default_value = 0.5f;
 	out.clamp_range = { 0.0f, 1.0f };
@@ -24,16 +26,6 @@ auto envelope_parameter()
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 	out.flags |= blink_EnvelopeFlags_HostClamp;
 	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
-
-	return out;
-}
-
-auto inline envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
-	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
-	out.override_envelope = blink::std_params::percentage::envelope();
 
 	return out;
 }

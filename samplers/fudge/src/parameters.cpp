@@ -72,19 +72,6 @@ Parameters::Parameters(Plugin* plugin)
 	sliders.sample_offset = plugin->add_parameter(params::sample_offset::slider_parameter());
 	toggles.loop = plugin->add_parameter(params::loop::toggle());
 	toggles.reverse = plugin->add_parameter(params::reverse::toggle());
-
-	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pitch::UUID, params::pitch::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::speed::UUID, params::speed::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::grain_size::UUID, params::grain_size::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::grain_transpose::UUID, params::grain_transpose::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::grain_uniformity::UUID, params::grain_uniformity::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::harmonics_amount::UUID, params::harmonics_amount::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::harmonics_spread::UUID, params::harmonics_spread::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_amount::UUID, params::noise_amount::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_color::UUID, params::noise_color::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::noise_width::UUID, params::noise_width::envelope_manipulator_target());
 }
 
 } // fudge

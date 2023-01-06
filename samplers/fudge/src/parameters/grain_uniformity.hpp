@@ -16,22 +16,14 @@ inline auto envelope_parameter()
 	out.name = "Grain Uniformity";
 	out.short_name = "Uniformity";
 	out.envelope = blink::std_params::percentage::envelope();
+	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
+	out.override_envelope = blink::std_params::percentage::envelope();
 
 	out.clamp_range = { 0.0f, 1.0f };
 
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
 	out.flags |= blink_EnvelopeFlags_HostClamp;
 	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
-
-	return out;
-}
-
-auto inline envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
-	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
-	out.override_envelope = blink::std_params::percentage::envelope();
 
 	return out;
 }

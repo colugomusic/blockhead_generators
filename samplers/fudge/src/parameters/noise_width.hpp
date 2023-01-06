@@ -17,8 +17,6 @@ auto inline slider_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target() { return blink::std_params::noise_width::envelope_manipulator_target(); }
-
 } // noise_width
 } // params
 } // fudge

@@ -82,13 +82,6 @@ blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 	return bind::parameter(g_plugin->get_parameter(uuid));
 }
 
-blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_EnvelopeManipulatorTarget* out)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	return g_plugin->get_envelope_manipulator_target(uuid, out);
-}
-
 const char* blink_get_error_string(blink_Error error)
 {
 	return blink::get_std_error_string(blink_StdError(error));

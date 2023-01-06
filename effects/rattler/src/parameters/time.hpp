@@ -17,11 +17,6 @@ auto inline envelope_parameter()
 	return out;
 }
 
-auto inline envelope_manipulator_target()
-{
-	return blink::std_params::delay_time::envelope_manipulator_target();
-}
-
 } // time
 } // params
 } // rattler

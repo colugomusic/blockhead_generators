@@ -13,11 +13,6 @@ auto inline envelope_parameter()
 	return blink::std_params::harmonics_spread::envelope_parameter();
 }
 
-auto inline envelope_manipulator_target()
-{
-	return blink::std_params::harmonics_spread::envelope_manipulator_target();
-}
-
 } // harmonics_spread
 } // params
 } // fudge

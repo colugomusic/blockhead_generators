@@ -13,9 +13,6 @@ Parameters::Parameters(blink::Plugin* plugin)
 
 	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());
 	sliders.pan = plugin->add_parameter(params::pan::slider_parameter());
-
-	plugin->add_manipulator_target(params::amp::UUID, params::amp::envelope_manipulator_target());
-	plugin->add_manipulator_target(params::pan::UUID, params::pan::envelope_manipulator_target());
 }
 
 } // gainer

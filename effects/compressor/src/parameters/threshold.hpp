@@ -52,17 +52,9 @@ auto inline envelope_parameter()
 	out.name = "Threshold";
 
 	out.envelope = envelope();
+	out.override_envelope = envelope();
 
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
-
-	return out;
-}
-
-auto inline envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
-	out.override_envelope = envelope();
 
 	return out;
 }

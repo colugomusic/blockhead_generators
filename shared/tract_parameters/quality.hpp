@@ -96,13 +96,6 @@ inline auto envelope_parameter()
 	out.flags |= blink_EnvelopeFlags_HostClamp;
 	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
-	return out;
-}
-
-inline auto envelope_manipulator_target()
-{
-	blink::EnvelopeManipulatorTargetSpec out;
-
 	out.apply_offset = [](float value, float offset)
 	{
 		return value + (offset * 2);

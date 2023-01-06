@@ -18,7 +18,6 @@ inline auto envelope_parameter()
 }
 
 inline auto slider_parameter() { return blink::std_params::pitch::slider_parameter(); }
-inline auto envelope_manipulator_target() { return blink::std_params::pitch::envelope_manipulator_target(); }
 
 } // pitch
 } // params
