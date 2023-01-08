@@ -24,15 +24,15 @@ Parameters::Parameters(Plugin* plugin)
 	env.pan = plugin->add_parameter(params::pan::envelope_parameter());
 	env.pitch = plugin->add_parameter(params::pitch::envelope_parameter());
 
-	auto group_noise = plugin->add_group("Noise");
+	auto group_noise = "Noise";
 	{
 		env.noise.amount = plugin->add_parameter(params::noise_amount::envelope_parameter());
 		env.noise.color = plugin->add_parameter(params::noise_color::envelope_parameter());
 
-		env.noise.amount->set_group_index(group_noise);
-		env.noise.color->set_group_index(group_noise);
-		options.noise_mode->set_group_index(group_noise);
-		sliders.noise_width->set_group_index(group_noise);
+		env.noise.amount->set_group_name(group_noise);
+		env.noise.color->set_group_name(group_noise);
+		options.noise_mode->set_group_name(group_noise);
+		sliders.noise_width->set_group_name(group_noise);
 	}
 
 	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());

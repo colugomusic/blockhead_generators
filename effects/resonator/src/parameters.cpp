@@ -23,16 +23,16 @@ Parameters::Parameters(Plugin* plugin)
 	env.feedback = plugin->add_parameter(params::feedback::envelope_parameter());
 	env.damper = plugin->add_parameter(params::damper::envelope_parameter());
 
-	const auto group_fm = plugin->add_group("FM");
+	const auto group_fm = "FM";
 	{
 		env.fm.amount = plugin->add_parameter(params::fm_amount::envelope_parameter());
 		env.fm.ratio = plugin->add_parameter(params::fm_ratio::envelope_parameter());
 
-		env.fm.amount->set_group_index(group_fm);
-		env.fm.ratio->set_group_index(group_fm);
+		env.fm.amount->set_group_name(group_fm);
+		env.fm.ratio->set_group_name(group_fm);
 	}
 
-	const auto group_harmonics = plugin->add_group("Harmonics");
+	const auto group_harmonics = "Harmonics";
 	{
 		chords.harmonics.scale = plugin->add_parameter(params::harmonics_scale::chord());
 		env.harmonics.amount = plugin->add_parameter(params::harmonics_amount::envelope_parameter());
@@ -40,10 +40,10 @@ Parameters::Parameters(Plugin* plugin)
 		env.harmonics.scale_snap_amount = plugin->add_parameter(params::harmonics_scale_snap_amount::envelope_parameter());
 		env.harmonics.width = plugin->add_parameter(params::harmonics_width::envelope_parameter());
 
-		chords.harmonics.scale->set_group_index(group_harmonics);
-		env.harmonics.amount->set_group_index(group_harmonics);
-		env.harmonics.spread->set_group_index(group_harmonics);
-		env.harmonics.scale_snap_amount->set_group_index(group_harmonics);
+		chords.harmonics.scale->set_group_name(group_harmonics);
+		env.harmonics.amount->set_group_name(group_harmonics);
+		env.harmonics.spread->set_group_name(group_harmonics);
+		env.harmonics.scale_snap_amount->set_group_name(group_harmonics);
 	}
 
 	env.mix = plugin->add_parameter(params::mix::envelope_parameter());

@@ -20,38 +20,38 @@ Parameters::Parameters(blink::Plugin* plugin)
 	env.amp = plugin->add_parameter(params::amp::envelope_parameter());
 	env.pan = plugin->add_parameter(params::pan::envelope_parameter());
 
-	auto group_voice = plugin->add_group("Voice");
+	auto group_voice = "Voice";
 	{
 		env.pitch = plugin->add_parameter(params::pitch::envelope_parameter());
 		env.buzz = plugin->add_parameter(params::buzz::envelope_parameter());
 
-		env.pitch->set_group_index(group_voice);
-		env.buzz->set_group_index(group_voice);
+		env.pitch->set_group_name(group_voice);
+		env.buzz->set_group_name(group_voice);
 	}
 
-	auto group_throat = plugin->add_group("Throat");
+	auto group_throat = "Throat";
 	{
 		env.index = plugin->add_parameter(tract_params::throat_index::envelope_parameter());
 		env.diameter = plugin->add_parameter(tract_params::throat_diameter::envelope_parameter());
 
-		env.index->set_group_index(group_throat);
-		env.diameter->set_group_index(group_throat);
+		env.index->set_group_name(group_throat);
+		env.diameter->set_group_name(group_throat);
 	}
 
-	auto group_tongue = plugin->add_group("Tongue");
+	auto group_tongue = "Tongue";
 	{
 		env.tongue_index = plugin->add_parameter(tract_params::tongue_index::envelope_parameter());
 		env.tongue_diameter = plugin->add_parameter(tract_params::tongue_diameter::envelope_parameter());
 
-		env.tongue_index->set_group_index(group_tongue);
-		env.tongue_diameter->set_group_index(group_tongue);
+		env.tongue_index->set_group_name(group_tongue);
+		env.tongue_diameter->set_group_name(group_tongue);
 	}
 
-	auto group_fricatives = plugin->add_group("Fricatives");
+	auto group_fricatives = "Fricatives";
 	{
 		env.fricative_intensity = plugin->add_parameter(tract_params::fricative_intensity::envelope_parameter());
 
-		env.fricative_intensity->set_group_index(group_fricatives);
+		env.fricative_intensity->set_group_name(group_fricatives);
 	}
 
 	env.quality = plugin->add_parameter(tract_params::quality::envelope_parameter());

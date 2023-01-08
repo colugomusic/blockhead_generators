@@ -54,23 +54,11 @@ blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
 	return g_plugin->destroy_instance(std::move(instance));
 }
 
-int blink_get_num_groups()
-{
-	if (!g_plugin) return 0;
-
-	return g_plugin->get_num_groups();
-}
-
 int blink_get_num_parameters()
 {
 	if (!g_plugin) return 0;
 
 	return g_plugin->get_num_parameters();
-}
-
-blink_Group blink_get_group(blink_Index index)
-{
-	return bind::group(g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
@@ -81,13 +69,6 @@ blink_Parameter blink_get_parameter(blink_Index index)
 blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
 {
 	return bind::parameter(g_plugin->get_parameter(uuid));
-}
-
-blink_Error blink_get_envelope_manipulator_target(blink_UUID uuid, blink_EnvelopeManipulatorTarget* out)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	return g_plugin->get_envelope_manipulator_target(uuid, out);
 }
 
 const char* blink_get_error_string(blink_Error error)

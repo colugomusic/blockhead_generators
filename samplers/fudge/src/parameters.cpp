@@ -32,37 +32,37 @@ Parameters::Parameters(Plugin* plugin)
 	env.pitch = plugin->add_parameter(params::pitch::envelope_parameter());
 	env.speed = plugin->add_parameter(params::speed::envelope_parameter());
 
-	auto group_geometry = plugin->add_group("Geometry");
+	auto group_geometry = "Geometry";
 	{
 		env.grain.size = plugin->add_parameter(params::grain_size::envelope_parameter());
 		env.grain.transpose = plugin->add_parameter(params::grain_transpose::envelope_parameter());
 		env.grain.uniformity = plugin->add_parameter(params::grain_uniformity::envelope_parameter());
 
-		env.grain.size->set_group_index(group_geometry);
-		env.grain.transpose->set_group_index(group_geometry);
-		env.grain.uniformity->set_group_index(group_geometry);
+		env.grain.size->set_group_name(group_geometry);
+		env.grain.transpose->set_group_name(group_geometry);
+		env.grain.uniformity->set_group_name(group_geometry);
 	}
 
-	auto group_harmonics = plugin->add_group("Harmonics");
+	auto group_harmonics = "Harmonics";
 	{
 		chords.scale = plugin->add_parameter(params::harmonics_scale::chord());
 		env.harmonics.amount = plugin->add_parameter(params::harmonics_amount::envelope_parameter());
 		env.harmonics.spread = plugin->add_parameter(params::harmonics_spread::envelope_parameter());
 
-		chords.scale->set_group_index(group_harmonics);
-		env.harmonics.amount->set_group_index(group_harmonics);
-		env.harmonics.spread->set_group_index(group_harmonics);
+		chords.scale->set_group_name(group_harmonics);
+		env.harmonics.amount->set_group_name(group_harmonics);
+		env.harmonics.spread->set_group_name(group_harmonics);
 	}
 
-	auto group_noise = plugin->add_group("Noise");
+	auto group_noise = "Noise";
 	{
 		env.noise.amount = plugin->add_parameter(params::noise_amount::envelope_parameter());
 		env.noise.color = plugin->add_parameter(params::noise_color::envelope_parameter());
 
-		env.noise.amount->set_group_index(group_noise);
-		env.noise.color->set_group_index(group_noise);
-		options.noise_mode->set_group_index(group_noise);
-		sliders.noise_width->set_group_index(group_noise);
+		env.noise.amount->set_group_name(group_noise);
+		env.noise.color->set_group_name(group_noise);
+		options.noise_mode->set_group_name(group_noise);
+		sliders.noise_width->set_group_name(group_noise);
 	}
 
 	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());

@@ -56,23 +56,11 @@ blink_Error blink_destroy_synth_instance(blink_SynthInstance instance)
 	return g_plugin->destroy_instance(std::move(instance));
 }
 
-int blink_get_num_groups()
-{
-	if (!g_plugin) return 0;
-
-	return g_plugin->get_num_groups();
-}
-
 int blink_get_num_parameters()
 {
 	if (!g_plugin) return 0;
 
 	return g_plugin->get_num_parameters();
-}
-
-blink_Group blink_get_group(blink_Index index)
-{
-	return bind::group(g_plugin->get_group(index));
 }
 
 blink_Parameter blink_get_parameter(blink_Index index)
