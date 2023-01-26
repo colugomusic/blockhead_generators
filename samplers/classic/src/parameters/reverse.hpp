@@ -7,8 +7,6 @@ namespace classic {
 namespace params {
 namespace reverse {
 
-static constexpr auto UUID { blink::std_params::reverse::UUID };
-
 auto inline option()
 {
 	return blink::std_params::reverse::option();

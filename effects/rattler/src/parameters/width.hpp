@@ -17,7 +17,6 @@ auto inline envelope_parameter()
 	out.envelope = blink::std_params::percentage::bipolar::envelope();
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }

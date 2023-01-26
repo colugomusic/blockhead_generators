@@ -70,8 +70,8 @@ Parameters::Parameters(Plugin* plugin)
 	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
 	sliders.speed = plugin->add_parameter(params::speed::slider_parameter());
 	sliders.sample_offset = plugin->add_parameter(params::sample_offset::slider_parameter());
-	options.loop = plugin->add_parameter(params::loop::toggle());
-	options.reverse_toggle = plugin->add_parameter(params::reverse::toggle());
+	toggles.loop = plugin->add_parameter(params::loop::toggle());
+	toggles.reverse = plugin->add_parameter(params::reverse::toggle());
 }
 
 } // fudge

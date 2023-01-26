@@ -31,7 +31,7 @@ void Controller::process(
 
 	config.unit_state_id = unit_state.id;
 	config.env.speed = data.envelopes.speed.data;
-	config.option.reverse = data.options.reverse.data;
+	config.option.reverse = data.options.reverse_mode.data;
 	config.sample_offset = data.sliders.sample_offset.value;
 	config.speed = data.sliders.speed.value;
 	config.warp_points = unit_state.warp_points;

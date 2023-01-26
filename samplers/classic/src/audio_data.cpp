@@ -22,7 +22,7 @@ AudioData::Sliders::Sliders(const Plugin& plugin, const blink_ParameterData* par
 
 AudioData::Options::Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
 	: noise_mode { *plugin.params.options.noise_mode, parameter_data }
-	, reverse { *plugin.params.options.reverse, parameter_data }
+	, reverse_mode { *plugin.params.options.reverse, parameter_data }
 {
 }
 

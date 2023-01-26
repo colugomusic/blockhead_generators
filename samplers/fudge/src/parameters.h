@@ -12,7 +12,7 @@ struct Parameters
 	enum class Index
 	{
 		Option_NoiseMode,
-		Option_Reverse,
+		Option_ReverseMode,
 		Sld_NoiseWidth,
 
 		Env_Amp,
@@ -84,9 +84,13 @@ struct Parameters
 	{
 		std::shared_ptr<blink::OptionParameter> noise_mode;
 		std::shared_ptr<blink::OptionParameter> reverse_mode;
-		std::shared_ptr<blink::OptionParameter> loop;
-		std::shared_ptr<blink::OptionParameter> reverse_toggle;
 	} options;
+	
+	struct Toggles
+	{
+		std::shared_ptr<blink::OptionParameter> loop;
+		std::shared_ptr<blink::OptionParameter> reverse;
+	} toggles;
 	
 	Parameters(blink::Plugin* plugin);
 };

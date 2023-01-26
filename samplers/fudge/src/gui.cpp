@@ -4,7 +4,6 @@
 #include <blink/sample_data.hpp>
 #include <blink/slider_data.hpp>
 #include <blink/parameters/option_data.hpp>
-#include <blink/parameters/toggle_data.hpp>
 
 using namespace blink;
 
@@ -34,8 +33,8 @@ struct Data
 		{
 		}
 
-		blink::ToggleData<int(Parameters::Index::Tog_Loop)> loop;
-		blink::ToggleData<int(Parameters::Index::Tog_Reverse)> reverse;
+		blink::OptionData<int(Parameters::Index::Tog_Loop)> loop;
+		blink::OptionData<int(Parameters::Index::Tog_Reverse)> reverse;
 	} toggles;
 
 	struct Envelopes
@@ -53,11 +52,11 @@ struct Data
 	struct Options
 	{
 		Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
-			: reverse { *plugin.params.options.reverse.get(), parameter_data }
+			: reverse { *plugin.params.options.reverse_mode.get(), parameter_data }
 		{
 		}
 
-		blink::OptionData<int(Parameters::Index::Option_Reverse)> reverse;
+		blink::OptionData<int(Parameters::Index::Option_ReverseMode)> reverse;
 	} options;
 
 	const blink_WarpPoints* warp_points;
