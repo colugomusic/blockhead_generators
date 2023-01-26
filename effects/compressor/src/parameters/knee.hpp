@@ -20,7 +20,6 @@ auto inline envelope_parameter()
 	out.envelope = envelope();
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	out.override_envelope = envelope();
 

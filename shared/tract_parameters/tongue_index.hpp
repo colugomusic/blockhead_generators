@@ -22,7 +22,6 @@ inline auto envelope_parameter()
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
 	out.flags |= blink_EnvelopeFlags_HostClamp;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
 	out.override_envelope = blink::std_params::percentage::bipolar::envelope();

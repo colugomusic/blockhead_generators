@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/parameters/option_spec.hpp>
+#include <blink/standard_parameters/search.hpp>
 
 namespace compressor {
 namespace params {

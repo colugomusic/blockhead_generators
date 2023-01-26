@@ -24,7 +24,7 @@ namespace fudge {
 Parameters::Parameters(Plugin* plugin)
 {
 	options.noise_mode = plugin->add_parameter(params::noise_mode::option());
-	options.reverse = plugin->add_parameter(params::reverse::option());
+	options.reverse_mode = plugin->add_parameter(params::reverse::option());
 	sliders.noise_width = plugin->add_parameter(params::noise_width::slider_parameter());
 
 	env.amp = plugin->add_parameter(params::amp::envelope_parameter());
@@ -70,8 +70,8 @@ Parameters::Parameters(Plugin* plugin)
 	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
 	sliders.speed = plugin->add_parameter(params::speed::slider_parameter());
 	sliders.sample_offset = plugin->add_parameter(params::sample_offset::slider_parameter());
-	toggles.loop = plugin->add_parameter(params::loop::toggle());
-	toggles.reverse = plugin->add_parameter(params::reverse::toggle());
+	options.loop = plugin->add_parameter(params::loop::toggle());
+	options.reverse_toggle = plugin->add_parameter(params::reverse::toggle());
 }
 
 } // fudge

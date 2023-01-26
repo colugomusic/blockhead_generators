@@ -83,14 +83,10 @@ struct Parameters
 	struct Options
 	{
 		std::shared_ptr<blink::OptionParameter> noise_mode;
-		std::shared_ptr<blink::OptionParameter> reverse;
+		std::shared_ptr<blink::OptionParameter> reverse_mode;
+		std::shared_ptr<blink::OptionParameter> loop;
+		std::shared_ptr<blink::OptionParameter> reverse_toggle;
 	} options;
-
-	struct Toggles
-	{
-		std::shared_ptr<blink::ToggleParameter> loop;
-		std::shared_ptr<blink::ToggleParameter> reverse;
-	} toggles;
 	
 	Parameters(blink::Plugin* plugin);
 };

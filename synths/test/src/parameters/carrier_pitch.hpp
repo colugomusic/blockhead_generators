@@ -17,7 +17,6 @@ auto inline envelope_parameter()
 	out.short_name = "Pitch";
 	out.flags |= blink_EnvelopeFlags_DefaultActive;
 	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_IsManipulatorTarget;
 
 	return out;
 }

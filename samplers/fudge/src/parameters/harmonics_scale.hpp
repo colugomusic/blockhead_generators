@@ -13,7 +13,6 @@ auto inline chord()
 	auto out { blink::std_params::scale::chord() };
 
 	out.flags |= blink_ChordFlags_CanManipulate;
-	out.flags |= blink_ChordFlags_IsManipulatorTarget;
 	out.flags |= blink_ChordFlags_IconOnly;
 	out.flags |= blink_ChordFlags_AlwaysShowButtonWhenGroupIsVisible;
 

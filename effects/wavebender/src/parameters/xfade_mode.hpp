@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/parameters/option_spec.hpp>
+#include <blink/standard_parameters/search.hpp>
 
 namespace wavebender {
 namespace params {
@@ -20,7 +21,6 @@ inline auto option()
 	out.options.push_back("Dynamic");
 
 	out.flags |= blink_OptionFlags_CanManipulate;
-	out.flags |= blink_OptionFlags_IsManipulatorTarget;
 
 	return out;
 }
