@@ -2,6 +2,7 @@
 
 #include <blink/standard_parameters/reverse.hpp>
 #include <blink/parameters/option_spec.hpp>
+#include "../parameters.h"
 
 namespace classic {
 namespace params {
@@ -14,7 +15,11 @@ auto inline option()
 
 auto inline toggle()
 {
-	return blink::std_params::reverse::toggle();
+	auto out{blink::std_params::reverse::toggle()};
+
+	out.manipulation_delegate = blink_Index(Parameters::Index::Option_ReverseMode);
+
+	return out;
 }
 
 } // reverse
