@@ -20,7 +20,7 @@ auto inline envelope_parameter()
 
 auto inline slider_parameter()
 {
-	auto out { blink::std_params::amp::slider_parameter() };
+	auto out{blink::std_params::amp::slider_parameter()};
 	out.manipulation_delegate = blink_Index(Parameters::Index::Env_Amp);
 	return out;
 }

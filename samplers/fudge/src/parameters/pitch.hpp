@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/standard_parameters/pitch.hpp>
+#include "../parameters.h"
 
 namespace fudge {
 namespace params {
@@ -17,12 +18,10 @@ auto inline envelope_parameter()
 	return out;
 }
 
-auto inline slider_parameter()
-{
-	auto out { blink::std_params::pitch::slider_parameter() };
-
+auto inline slider_parameter() {
+	auto out{blink::std_params::pitch::slider_parameter()};
 	out.flags |= blink_SliderFlags_CanManipulate;
-
+	out.manipulation_delegate = blink_Index(Parameters::Index::Env_Pitch);
 	return out;
 }
 
