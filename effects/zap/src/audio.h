@@ -11,19 +11,16 @@ namespace zap {
 class Plugin;
 class Instance;
 
-class Audio : public blink::EffectUnit
-{
+class Audio : public blink::EffectUnit {
 public:
-
 	Audio(Instance* instance);
-
-	blink_Error process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) override;
-	void reset() override;
-
+	auto process(const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error final;
+	auto reset() -> void final;
+	auto stream_init() -> void final;
 private:
-	
 	const Plugin* plugin_;
 	snd::audio::filter::Filter_2Pole_AllpassArray<2, 32> filter_;
+	std::array<ml::LinearGlide, 2> frequency_glide_;
 };
 
 } // zap
