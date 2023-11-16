@@ -37,8 +37,8 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 {
 	AudioData data(*plugin_, unit_state.parameter_data);
 
-	const auto attack = data.envelopes.attack.search(block_positions());
-	const auto release = data.envelopes.release.search(block_positions());
+	const auto attack = data.envelopes.attack.search(block_positions()) / 1000;
+	const auto release = data.envelopes.release.search(block_positions()) / 1000;
 	auto threshold = data.envelopes.threshold.search_vec(block_positions());
 	auto ratio = data.envelopes.ratio.search_vec(block_positions());
 	const auto knee = data.envelopes.knee.search_vec(block_positions());
