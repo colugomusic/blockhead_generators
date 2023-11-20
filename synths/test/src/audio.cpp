@@ -12,22 +12,22 @@ Audio::Audio(Instance* instance)
 	: SynthUnit(instance)
 	, plugin_(instance->get_plugin())
 {
+	reset();
 }
 
-blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out)
-{
+blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out) {
 	AudioData data(*plugin_, unit_state.parameter_data);
-
-	auto amp = data.envelopes.amp.search_vec(block_positions());
+	auto amp        = data.envelopes.amp.search_vec(block_positions());
  	const auto wave = data.envelopes.wave.search_vec(block_positions());
 	const auto env_carrier_pitch = data.envelopes.p0.search_vec(block_positions());
 	const auto env_modulator_pitch = data.envelopes.p1.search_vec(block_positions());
 	const auto sld_carrier_pitch = data.sliders.carrier_pitch.search_vec(block_positions());
 	const auto fm0 = data.envelopes.fm0.search_vec(block_positions());
 	const auto fm1 = data.envelopes.fm1.search_vec(block_positions());
-	
 	const auto freq0 = blink::math::convert::pitch_to_frequency(60.0f + env_carrier_pitch + sld_carrier_pitch);
 	const auto freq1 = blink::math::convert::pitch_to_frequency(60.0f + env_modulator_pitch);
+
+	amp *= fade_in_(1.0f);
 
 	ml::DSPVector osc_out;
 
@@ -67,6 +67,8 @@ void Audio::reset()
 {
 	oscs_[0].reset();
 	oscs_[1].reset();
+	fade_in_.setGlideTimeInSamples(static_cast<float>(SR()) / 1000);
+	fade_in_.setValue(0.0f);
 }
 
 } // test

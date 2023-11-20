@@ -25,6 +25,7 @@ private:
 	const Plugin* plugin_;
 	std::array<bleat::oscillators::scalar::MultiWaveOsc, 2> oscs_;
 	NoiseGenerator noise_gen_;
+	ml::LinearGlide fade_in_;
 };
 
 } // test
