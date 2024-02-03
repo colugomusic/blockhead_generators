@@ -44,7 +44,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	if (generate_correction_grains)
 	{
-		reverse_correction_.dry_positions(sample_pos, 0, kFloatsPerDSPVector);
+		reverse_correction_.dry_positions(sample_pos, unit_state.scale, 0, kFloatsPerDSPVector);
 	}
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
