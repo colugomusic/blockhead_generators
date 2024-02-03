@@ -38,7 +38,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 	config.outputs.derivatives.warped = false;
 	config.outputs.correction_grains = generate_correction_grains;
 
-	tape_transformer_(config, block_positions(), kFloatsPerDSPVector);
+	tape_transformer_.xform(config, block_positions(), kFloatsPerDSPVector);
 
 	auto sample_pos { tape_transformer_.get_reversed_positions().positions };
 

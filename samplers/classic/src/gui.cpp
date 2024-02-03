@@ -108,7 +108,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 		config.outputs.derivatives.pitch = true;
 		config.outputs.derivatives.warped = true;
 
-		tape_transformer_(config, block_positions, count);
+		tape_transformer_.xform(config, block_positions, count);
 
 		auto sculpted_sample_positions { tape_transformer_.get_pitched_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
 		auto warped_sample_positions { tape_transformer_.get_warped_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
