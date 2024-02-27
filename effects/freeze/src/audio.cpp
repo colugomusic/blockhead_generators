@@ -45,7 +45,7 @@ blink_Error Audio::process(const blink_EffectBuffer& buffer, const blink_EffectU
 		{
 			if (!record_)
 			{
-				const auto local_block_position = block_positions().positions[i] + std::int32_t(unit_state.data_offset);
+				const auto local_block_position = block_positions().positions[i] + std::int32_t(block_positions().data_offset);
 
 				if (local_block_position >= 0)
 				{

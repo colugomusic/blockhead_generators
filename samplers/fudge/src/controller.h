@@ -30,11 +30,10 @@ public:
 		const SampleAnalysis* analysis_data,
 		const blink::Traverser& block_traverser,
 		const blink::BlockPositions& block_positions,
-		int64_t data_offset,
 		blink_SR SR);
 
 	const blink::BlockPositions& block_positions() const { return *block_positions_; }
-	const std::int32_t data_offset() const { return std::int32_t(data_offset_); }
+	const std::int32_t data_offset() const { return std::int32_t(block_positions_->data_offset); }
 	const snd::transport::DSPVectorFramePosition& position() const { return sample_positions_; }
 	const ml::DSPVectorInt& reset() const { return *resets_; }
 
@@ -70,7 +69,6 @@ private:
 
 	blink::SampleData sample_data_;
 	const SampleAnalysis* analysis_data_;
-	int64_t data_offset_ = 0;
 	float frame_increment_ = 1.0f;
 	bool sample_loop_;
 	blink_SR SR_;

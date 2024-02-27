@@ -93,7 +93,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 	{
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
 
-		block_positions(buffer.positions + index, count);
+		block_positions(buffer.positions + index, unit_state.scale, unit_state.data_offset, count);
 
 		transform::Stretch::Config config;
 

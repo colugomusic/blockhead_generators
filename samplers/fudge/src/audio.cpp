@@ -27,7 +27,7 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	const auto analysis_data { buffer.analysis_ready ? plugin_->get_analysis_data(buffer.sample_info->id) : nullptr };
 
-	controller_.process(data, buffer, unit_state, analysis_data, block_traverser_, block_positions(), unit_state.data_offset, SR());
+	controller_.process(data, buffer, unit_state, analysis_data, block_traverser_, block_positions(), SR());
 
 	const auto harmonic_amount { data.envelopes.harmonics_amount.search_vec(block_positions()) };
 
