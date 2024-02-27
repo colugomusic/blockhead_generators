@@ -42,9 +42,8 @@ blink_Error Audio::process(const blink_SamplerBuffer& buffer, const blink_Sample
 
 	auto sample_pos { tape_transformer_.get_reversed_positions().positions };
 
-	if (generate_correction_grains)
-	{
-		reverse_correction_.dry_positions(sample_pos, unit_state.scale, 0, kFloatsPerDSPVector);
+	if (generate_correction_grains) {
+		reverse_correction_.dry_positions(sample_pos, kFloatsPerDSPVector);
 	}
 
 	SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
@@ -99,6 +98,7 @@ ml::DSPVectorArray<2> Audio::apply_correction_grains(
 	{
 		if (reverse_correction_.grain.on)
 		{
+			// TODO: multiply by scale here???
 			reverse_correction_.grain.pos += reverse_correction_.grain.ff;
 			reverse_correction_.grain.vpos += reverse_correction_.grain.vff;
 
