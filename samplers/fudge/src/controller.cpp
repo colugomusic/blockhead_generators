@@ -22,10 +22,12 @@ void Controller::process(
 	const SampleAnalysis* analysis_data,
 	const blink::Traverser& block_traverser,
 	const blink::BlockPositions& block_positions,
+	int64_t data_offset,
 	blink_SR SR)
 {
-	SR_ = SR;
+	SR_              = SR;
 	block_positions_ = &block_positions;
+	data_offset_     = data_offset;
 
 	transform::Stretch::Config config;
 
