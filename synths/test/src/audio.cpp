@@ -67,8 +67,8 @@ void Audio::reset()
 {
 	oscs_[0].reset();
 	oscs_[1].reset();
-	fade_in_.setGlideTimeInSamples(static_cast<float>(SR()) / 1000);
-	fade_in_.setValue(0.0f);
+	fade_in_ = {};
+	fade_in_.setGlideTimeInSamples(static_cast<float>(SR()) * 0.001f);
 }
 
 } // test
