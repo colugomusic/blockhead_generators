@@ -12,7 +12,7 @@ EnvelopeSpec amp()
 {
 	auto out = std_params::envelopes::amp();
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }
@@ -26,7 +26,7 @@ EnvelopeSpec pitch()
 {
 	auto out = std_params::envelopes::pitch();
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }
@@ -35,7 +35,7 @@ EnvelopeSpec speed()
 {
 	auto out = std_params::envelopes::speed();
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }
@@ -48,7 +48,7 @@ blink::SliderParameterSpec<float> noise_width()
 {
 	auto out = std_params::sliders::parameters::noise_width();
 
-	out.flags = blink_SliderFlags_NonGlobal;
+	out.flags = blink_ParamFlags_NonGlobal;
 
 	return out;
 }

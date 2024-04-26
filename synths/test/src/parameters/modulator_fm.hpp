@@ -18,9 +18,9 @@ inline auto envelope_parameter()
 	out.short_name = "FM Amount";
 	out.envelope = blink::std_params::percentage::envelope();
 	out.clamp_range = { 0.0f, 2.0f };
-	out.flags |= blink_EnvelopeFlags_HostClamp;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_HostClamp;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
 	out.override_envelope = blink::std_params::percentage::envelope();

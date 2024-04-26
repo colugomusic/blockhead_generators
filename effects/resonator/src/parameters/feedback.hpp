@@ -12,7 +12,7 @@ inline auto envelope_parameter()
 {
 	auto out { blink::std_params::feedback::envelope_parameter() };
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }

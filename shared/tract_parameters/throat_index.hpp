@@ -15,12 +15,12 @@ inline auto envelope_parameter()
 	out.name = "Throat Position";
 	out.short_name = "Position";
 	out.envelope = blink::std_params::percentage::bipolar::envelope();
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	out.clamp_range = { -1.0f, 1.0f };
 
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_HostClamp;
+	out.flags |= blink_ParamFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_HostClamp;
 
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
 	out.override_envelope = blink::std_params::percentage::bipolar::envelope();

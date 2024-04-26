@@ -20,9 +20,9 @@ inline auto envelope_parameter()
 
 	out.clamp_range = { 0.0f, 1.0f };
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_HostClamp;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_HostClamp;
 
 	out.offset_envelope = blink::std_params::percentage::bipolar::envelope();
 	out.override_envelope = blink::std_params::percentage::envelope();

@@ -13,7 +13,7 @@ EnvelopeSpec example()
 	out.name = "Example Envelope";
 	out.uuid = "4bbded86-953f-4a0d-98e6-99a5b7f6c7c2";
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }

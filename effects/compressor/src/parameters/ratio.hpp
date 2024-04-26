@@ -96,8 +96,8 @@ inline auto envelope_parameter()
 	out.name = "Ratio";
 	out.envelope = envelope();
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	out.override_envelope = envelope();
 

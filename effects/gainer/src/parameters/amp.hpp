@@ -11,8 +11,8 @@ static constexpr auto UUID { blink::std_params::amp::UUID };
 
 auto inline envelope_parameter() {
 	auto out{blink::std_params::amp::envelope_parameter()};
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags &= ~blink_EnvelopeFlags_MovesDisplay;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags &= ~blink_ParamFlags_MovesDisplay;
 	return out;
 }
 

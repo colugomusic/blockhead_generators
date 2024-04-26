@@ -12,9 +12,9 @@ auto inline chord()
 {
 	auto out { blink::std_params::scale::chord() };
 
-	out.flags |= blink_ChordFlags_CanManipulate;
-	out.flags |= blink_ChordFlags_IconOnly;
-	out.flags |= blink_ChordFlags_AlwaysShowButtonWhenGroupIsVisible;
+	out.flags |= blink_ParamFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_IconOnly;
+	out.flags |= blink_ParamFlags_AlwaysShowButtonWhenGroupIsVisible;
 
 	return out;
 }

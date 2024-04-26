@@ -14,7 +14,7 @@ EnvelopeSpec example()
 	out.uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 	out.name = "Example Envelope";
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }

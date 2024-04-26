@@ -16,8 +16,8 @@ auto inline envelope_parameter()
 
 	out.name = "Carrier Pitch";
 	out.short_name = "Pitch";
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	return out;
 }
@@ -28,7 +28,7 @@ auto inline slider_parameter()
 
 	out.name = "Carrier Pitch";
 	out.short_name = "Pitch";
-	out.flags |= blink_SliderFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_CanManipulate;
 	out.manipulation_delegate = blink_Index(Parameters::Index::Env_Carrier_Pitch);
 
 	return out;

@@ -20,7 +20,7 @@ inline auto option()
 	out.options.push_back("Static");
 	out.options.push_back("Dynamic");
 
-	out.flags |= blink_OptionFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	return out;
 }

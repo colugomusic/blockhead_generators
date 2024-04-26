@@ -16,8 +16,8 @@ auto inline envelope_parameter()
 	out.uuid = UUID;
 	out.name = "Modulator Pitch";
 	out.short_name = "Pitch";
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	return out;
 }

@@ -15,8 +15,8 @@ auto inline envelope_parameter()
 	out.uuid = UUID;
 	out.name = "Width";
 	out.envelope = blink::std_params::percentage::bipolar::envelope();
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	return out;
 }
@@ -29,7 +29,7 @@ auto inline slider_parameter()
 	out.name = "Width";
 	out.slider = blink::std_params::percentage::bipolar::slider();
 
-	out.flags |= blink_SliderFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_CanManipulate;
 
 	return out;
 }

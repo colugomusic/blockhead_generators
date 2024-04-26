@@ -11,7 +11,7 @@ static constexpr auto UUID { blink::std_params::wet::UUID };
 
 auto inline envelope_parameter() {
 	auto out { blink::std_params::wet::envelope_parameter() };
-	out.flags |= blink_EnvelopeFlags_DefaultActive; 
+	out.flags |= blink_ParamFlags_DefaultActive; 
 	return out;
 }
 

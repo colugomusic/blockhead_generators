@@ -14,7 +14,7 @@ auto envelope_parameter()
 
 	out.envelope.default_value = 0.5f;
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }

@@ -41,7 +41,7 @@ Parameters::Parameters(Plugin* plugin)
 	{
 		auto spec_sld_noise_width = std_params::noise_width::slider_parameter();
 
-		spec_sld_noise_width.flags = blink_SliderFlags_NonGlobal;
+		spec_sld_noise_width.flags = blink_ParamFlags_NonGlobal;
 
 		auto spec_env_noise_amount = std_params::noise_amount::envelope_parameter();
 		auto spec_env_noise_color = std_params::noise_color::envelope_parameter();

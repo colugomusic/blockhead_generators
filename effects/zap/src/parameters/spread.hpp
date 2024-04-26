@@ -21,9 +21,9 @@ auto envelope_parameter()
 	out.envelope = blink::std_params::percentage::bipolar::envelope();
 	out.clamp_range = { -1.0f, 1.0f };
 
-	out.flags |= blink_EnvelopeFlags_CanManipulate;
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
-	out.flags |= blink_EnvelopeFlags_HostClamp;
+	out.flags |= blink_ParamFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_HostClamp;
 
 	return out;
 }

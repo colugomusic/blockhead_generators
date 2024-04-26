@@ -12,7 +12,7 @@ static constexpr auto UUID { blink::std_params::pitch::UUID };
 inline auto envelope_parameter()
 {
 	auto out{blink::std_params::pitch::envelope_parameter()};
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 	return out;
 }
 

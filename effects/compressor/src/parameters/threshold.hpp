@@ -54,7 +54,7 @@ auto inline envelope_parameter()
 	out.envelope = envelope();
 	out.override_envelope = envelope();
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }

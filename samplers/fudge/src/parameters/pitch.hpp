@@ -13,14 +13,14 @@ auto inline envelope_parameter()
 {
 	auto out { blink::std_params::pitch::envelope_parameter() };
 
-	out.flags |= blink_EnvelopeFlags_DefaultActive;
+	out.flags |= blink_ParamFlags_DefaultActive;
 
 	return out;
 }
 
 auto inline slider_parameter() {
 	auto out{blink::std_params::pitch::slider_parameter()};
-	out.flags |= blink_SliderFlags_CanManipulate;
+	out.flags |= blink_ParamFlags_CanManipulate;
 	out.manipulation_delegate = blink_Index(Parameters::Index::Env_Pitch);
 	return out;
 }
