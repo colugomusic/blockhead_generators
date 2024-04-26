@@ -14,7 +14,7 @@ auto inline chord()
 
 	out.flags |= blink_ParamFlags_CanManipulate;
 	out.flags |= blink_ParamFlags_IconOnly;
-	out.flags |= blink_ParamFlags_AlwaysShowButtonWhenGroupIsVisible;
+	out.flags |= blink_ParamFlags_AlwaysShowWhenGroupVisible;
 
 	return out;
 }
