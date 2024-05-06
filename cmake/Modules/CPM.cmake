@@ -662,7 +662,6 @@ function(CPMAddPackage)
     endif()
   endif()
 
-  message(FATAL_ERROR ${CPM_ARGS_NAME})
   CPMRegisterPackage("${CPM_ARGS_NAME}" "${CPM_ARGS_VERSION}")
 
   if(DEFINED CPM_ARGS_GIT_TAG)
