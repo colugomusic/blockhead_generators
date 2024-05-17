@@ -26,6 +26,7 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 	const auto fm1 = data.envelopes.fm1.search_vec(block_positions());
 	const auto freq0 = blink::math::convert::pitch_to_frequency(60.0f + env_carrier_pitch + sld_carrier_pitch);
 	const auto freq1 = blink::math::convert::pitch_to_frequency(60.0f + env_modulator_pitch);
+	const auto noise_width = data.sliders.noise_width.search(block_positions());
 
 	amp *= fade_in_(1.0f);
 
@@ -49,7 +50,7 @@ blink_Error Audio::process(const blink_SynthBuffer& buffer, const blink_SynthUni
 			float(data.options.noise_mode.value),
 			data.envelopes.noise_amount,
 			data.envelopes.noise_color,
-			data.sliders.noise_width.value,
+			noise_width,
 			block_positions());
 
 	amp *= data.sliders.amp.value;
