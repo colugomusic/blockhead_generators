@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(effect_saturator VERSION 0.4.2)
+project(effect_saturator VERSION 0.4.3)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
