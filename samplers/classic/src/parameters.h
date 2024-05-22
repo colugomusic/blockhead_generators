@@ -7,6 +7,24 @@
 
 namespace classic {
 
+enum ParamIndex {
+	Option_NoiseMode,
+	Option_ReverseMode,
+	Sld_NoiseWidth,
+	Env_Amp,
+	Env_Pan,
+	Env_Pitch,
+	Env_NoiseAmount,
+	Env_NoiseColor,
+	Sld_Amp,
+	Sld_Pan,
+	Sld_Pitch,
+	Sld_SampleOffset,
+	Tog_Loop,
+	Tog_Reverse,
+	PARAM_COUNT
+};
+
 struct Parameters
 {
 	enum class Index

@@ -13,7 +13,7 @@ struct Data
 {
 	struct Sliders
 	{
-		Sliders(const Plugin& plugin, const blink_ParameterData* parameter_data)
+		Sliders(const Plugin& plugin, const blink_ParamData* parameter_data)
 			: amp(plugin.params.sliders.amp->slider, parameter_data)
 			, pitch(plugin.params.sliders.pitch->slider, parameter_data)
 			, sample_offset(plugin.params.sliders.sample_offset->slider, parameter_data)
@@ -27,7 +27,7 @@ struct Data
 
 	struct Toggles
 	{
-		Toggles(const Plugin& plugin, const blink_ParameterData* parameter_data)
+		Toggles(const Plugin& plugin, const blink_ParamData* parameter_data)
 			: loop(*plugin.params.toggles.loop.get(), parameter_data)
 			, reverse(*plugin.params.toggles.reverse.get(), parameter_data)
 		{
@@ -39,7 +39,7 @@ struct Data
 
 	struct Envelopes
 	{
-		Envelopes(const Plugin& plugin, const blink_ParameterData* parameter_data)
+		Envelopes(const Plugin& plugin, const blink_ParamData* parameter_data)
 			: amp(plugin.params.env.amp->envelope, parameter_data)
 			, pitch(plugin.params.env.pitch->envelope, parameter_data)
 		{
@@ -51,7 +51,7 @@ struct Data
 
 	struct Options
 	{
-		Options(const Plugin& plugin, const blink_ParameterData* parameter_data)
+		Options(const Plugin& plugin, const blink_ParamData* parameter_data)
 			: reverse { *plugin.params.options.reverse.get(), parameter_data }
 		{
 		}
@@ -86,7 +86,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 	const auto sample_data { SampleData { buffer.sample_info, unit_state.channel_mode } };
 
-	auto frames_remaining { int64_t(n) };
+	auto frames_remaining = int64_t(n.value);
 	int index = 0;
 
 	BlockPositions block_positions;
@@ -110,9 +110,9 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		tape_transformer_.xform(config, block_positions, count);
 
-		auto sculpted_sample_positions { tape_transformer_.get_pitched_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
-		auto warped_sample_positions { tape_transformer_.get_warped_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
-		auto final_sample_positions { tape_transformer_.get_reversed_positions().positions / (float(buffer.song_rate) / sample_data.get_SR()) };
+		auto sculpted_sample_positions { tape_transformer_.get_pitched_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value) };
+		auto warped_sample_positions { tape_transformer_.get_warped_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value) };
+		auto final_sample_positions { tape_transformer_.get_reversed_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value) };
 
 		if (data.toggles.loop.value)
 		{
@@ -124,7 +124,7 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 
 		if (data.toggles.reverse.value)
 		{
-			final_sample_positions = std::int32_t(sample_data.get_num_frames() - 1) - final_sample_positions;
+			final_sample_positions = std::int32_t(sample_data.get_num_frames().value - 1) - final_sample_positions;
 		}
 
 		if (out->sculpted_block_positions)
