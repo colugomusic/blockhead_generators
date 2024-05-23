@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink/blink_plugin_impl.hpp>
+#include <blink/plugin_impl.hpp>
 
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink/blink_plugin_impl.hpp>
+#include <blink/plugin_impl.hpp>
 #include <blink/transform/tape.hpp>
 #include "shared/noise_generator.h"
 
@@ -31,15 +31,19 @@ struct Params {
 
 struct ReverseCorrection {
 	struct Grain {
-		bool on {};
-		float beg {};
-		float pos {};
-		float ff {};
-		float vpos {};
-		float vend {};
-		float vff {};
+		bool on    = false;
+		float beg  = 0.0f;
+		float pos  = 0.0f;
+		float ff   = 0.0f;
+		float vpos = 0.0f;
+		float vend = 0.0f;
+		float vff  = 0.0f;
 	} grain;
 	blink::BlockPositions dry_positions;
+};
+
+struct DrawState {
+	blink::transform::Tape tape_transformer;
 };
 
 struct UnitDSP {
@@ -49,15 +53,12 @@ struct UnitDSP {
 	ReverseCorrection reverse_correction;
 };
 
-namespace ent {
-
 using Instance = blink::ent::Instance<>;
 using Unit     = blink::ent::Unit<UnitDSP>;
 
-} // ent
-
 struct Model {
 	blink::Plugin plugin;
-	blink::Entities<::ent::Instance, ::ent::Unit> entities;
+	blink::Entities<Instance, Unit> entities;
+	DrawState draw;
 	Params params;
 };
