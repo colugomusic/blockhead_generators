@@ -3,7 +3,7 @@ project(effect_splatter VERSION 0.1.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(blink_plugin)
+include(blink_lib)
 
 list(APPEND SRC
     ./src/audio.h

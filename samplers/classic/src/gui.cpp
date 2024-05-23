@@ -1,3 +1,4 @@
+/* TODELETE:
 #include "gui.h"
 #include "plugin.h"
 #include <blink/envelope_data.hpp>
@@ -184,3 +185,4 @@ blink_Error GUI::draw(const Plugin& plugin, const blink_SamplerBuffer& buffer, c
 }
 
 } // classic
+*/

@@ -1,13 +1,18 @@
 #define BLINK_EXPORT
-#include <blink/blink_plugin_impl.hpp>
-//#include <blink/bind_sampler.hpp>
-//#include <blink/errors.hpp>
 
-//namespace classic { Plugin* g_plugin {}; }
+#include <blink_sampler.h>
+#include <blink/blink_plugin_sampler_impl.hpp>
+#include "draw.hpp"
+#include "dsp.hpp"
+#include "model.h"
 
-static blink::Plugin plugin;
+static Model model;
 
 using namespace blink;
+
+auto blink_get_error_string(blink_Error error) -> blink_TempString {
+	return {blink::get_std_error_string(static_cast<blink_StdError>(error))};
+}
 
 auto blink_get_plugin_info() -> blink_PluginInfo {
 	blink_PluginInfo out = {0};
@@ -25,26 +30,56 @@ auto blink_get_sampler_info() -> blink_SamplerInfo {
 	return out;
 }
 
-auto blink_init() -> blink_Error {
-	//if (model) return blink_StdError_AlreadyInitialized;
-	//model = std::make_unique<Model>();
+auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
+	blink::init(&model.plugin, plugin_idx, host);
+	model.params.option.noise_mode       = blink::add::param::option(&model.plugin, {BLINK_STD_UUID_NOISE_MODE});
+	model.params.slider_real.noise_width = blink::add::param::slider_real(&model.plugin, {BLINK_STD_UUID_NOISE_WIDTH});
+	model.params.option.reverse_mode     = blink::add::param::option(&model.plugin, {BLINK_STD_UUID_REVERSE_MODE});
+	model.params.env.amp                 = blink::add::param::env(&model.plugin, {BLINK_STD_UUID_AMP});
+	model.params.env.pan                 = blink::add::param::env(&model.plugin, {BLINK_STD_UUID_PAN});
+	model.params.env.pitch               = blink::add::param::env(&model.plugin, {BLINK_STD_UUID_PITCH});
+	model.params.env.noise_amount        = blink::add::param::env(&model.plugin, {BLINK_STD_UUID_NOISE_AMOUNT});
+	model.params.env.noise_color         = blink::add::param::env(&model.plugin, {BLINK_STD_UUID_NOISE_COLOR});
+	model.params.slider_real.amp         = blink::add::param::slider_real(&model.plugin, {BLINK_STD_UUID_AMP});
+	model.params.slider_real.pan         = blink::add::param::slider_real(&model.plugin, {BLINK_STD_UUID_PAN});
+	model.params.slider_real.pitch       = blink::add::param::slider_real(&model.plugin, {BLINK_STD_UUID_PITCH});
+	model.params.slider_int.samp_offs    = blink::add::param::slider_int(&model.plugin, {BLINK_STD_UUID_SAMPLE_OFFSET});
+	model.params.option.loop             = blink::add::param::option(&model.plugin, {BLINK_STD_UUID_LOOP});
+	model.params.option.reverse_toggle   = blink::add::param::option(&model.plugin, {BLINK_STD_UUID_REVERSE_TOGGLE});
+	blink::write::param::add_flags(&model.plugin, model.params.env.amp, blink_ParamFlags_DefaultActive);
+	blink::write::param::add_flags(&model.plugin, model.params.env.pitch, blink_ParamFlags_DefaultActive);
+	blink::write::param::manip_delegate(&model.plugin, model.params.slider_real.amp, model.params.env.amp);
+	blink::write::param::manip_delegate(&model.plugin, model.params.slider_real.pan, model.params.env.pan);
+	blink::write::param::manip_delegate(&model.plugin, model.params.slider_real.pitch, model.params.env.pitch);
+	blink::write::param::manip_delegate(&model.plugin, model.params.option.reverse_toggle, model.params.option.reverse_mode);
+	blink::write::param::add_subparam(&model.plugin, model.params.env.noise_amount, model.params.slider_real.noise_width);
+	blink::write::param::add_subparam(&model.plugin, model.params.env.noise_amount, model.params.option.noise_mode);
+	blink::write::param::add_subparam(&model.plugin, model.params.env.noise_color, model.params.slider_real.noise_width);
+	blink::write::param::add_subparam(&model.plugin, model.params.env.noise_color, model.params.option.noise_mode);
+	blink::write::param::group(&model.plugin, model.params.env.noise_amount, {"Noise"});
+	blink::write::param::group(&model.plugin, model.params.env.noise_color, {"Noise"});
+	blink::write::param::group(&model.plugin, model.params.option.noise_mode, {"Noise"});
+	blink::write::param::group(&model.plugin, model.params.slider_real.noise_width, {"Noise"});
 	return BLINK_OK;
 }
 
-auto blink_terminate() -> blink_Error {
-	//if (!model) return blink_StdError_NotInitialized; 
-	//model.reset();
+auto blink_instance_destroy(blink_InstanceIdx instance_idx) -> blink_Error {
+	return blink::destroy_instance(&model.entities, instance_idx);
+}
+
+auto blink_instance_make() -> blink_InstanceIdx {
+	return blink::make_instance(&model.entities);
+}
+
+auto blink_instance_reset(blink_InstanceIdx instance_idx, blink_SR SR) -> blink_Error {
 	return BLINK_OK;
 }
 
-auto blink_make_instance() -> blink_InstanceIndex {
-	///if (!model) return {-1};
+auto blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
+	//if (!model) return blink_StdError_NotInitialized;
 	// TODO:
-}
-
-auto blink_destroy_instance(blink_InstanceIndex instance_idx) -> blink_Error {
-	///if (!model) return blink_StdError_NotInitialized;
-	// TODO:
+	//return draw(*model, *buffer, *unit_state, n, out);
+	return BLINK_OK;
 }
 
 auto blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_Error {
@@ -55,73 +90,21 @@ auto blink_sampler_sample_deleted(blink_ID sample_id) -> blink_Error {
 	return blink_StdError_NotImplemented;
 }
 
-auto blink_get_num_parameters() -> size_t {
-	///if (!model) return 0;
-	return plugin.param.uuid.size();
+auto blink_sampler_process(blink_UnitIdx unit_idx, const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, float* out) -> blink_Error {
+	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	return dsp::process(&model, &unit_dsp, *buffer, *unit_state, out);
 }
 
-auto blink_get_parameter_uuid(blink_ParamIndex index) -> blink_UUID {
-	return plugin.param.uuid[index.value];
+auto blink_terminate() -> blink_Error {
+	return blink::terminate(&model.entities);
 }
 
-auto blink_get_parameter_by_uuid(blink_UUID uuid) -> blink_ParamIndex {
-	const auto pos = std::find(plugin.param.uuid.begin(), plugin.param.uuid.end(), uuid);
-	if (pos == plugin.param.uuid.end()) {
-		return {-1};
-	}
-	const auto index = std::distance(plugin.param.uuid.begin(), pos);
-	return {static_cast<int32_t>(index)};
+auto blink_unit_add(blink_InstanceIdx instance_idx) -> blink_UnitIdx {
+	return blink::add_unit(&model.entities, instance_idx);
 }
 
-auto blink_get_error_string(blink_Error error) -> blink_TempString {
-	// TODO:
-	//return get_std_error_string(*model, blink_StdError(error));
-}
-
-auto blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
-	//if (!model) return blink_StdError_NotInitialized;
-	// TODO:
-	//return draw(*model, *buffer, *unit_state, n, out);
+auto blink_unit_reset(blink_UnitIdx unit_idx) -> blink_Error {
+	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	dsp::reset(&model, &unit_dsp);
 	return BLINK_OK;
-}
-
-auto blink_sampler_process(blink_UnitIndex unit_idx, const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, float* out) -> blink_Error {
-	auto unit_process_fn = [](const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out) -> blink_Error {
-		// TODO:
-	};
-	auto unit_reset_fn = []() -> void {
-		// TODO:
-	};
-	auto instance_reset_fn = []() -> void {
-		// TODO:
-	};
-	return blink::sampler_process(&plugin, unit_idx, *buffer, unit_state, out, unit_process_fn, unit_reset_fn, instance_reset_fn);
-}
-
-auto blink_int_slider_from_string(blink_IntSliderIndex sld_idx, const char* str, int64_t* out) -> blink_Bool {
-	return blink::from_string(plugin, sld_idx, str, out);
-}
-
-auto blink_int_slider_to_string(blink_IntSliderIndex sld_idx, int64_t value) -> blink_TempString {
-	return blink::to_string(plugin, sld_idx, value);
-}
-
-auto blink_int_slider_constrain(blink_IntSliderIndex sld_idx, int64_t value) -> int64_t {
-	return blink::constrain(plugin, sld_idx, value);
-}
-
-auto blink_int_slider_decrement(blink_IntSliderIndex sld_idx, int64_t value, blink_Bool precise) -> int64_t {
-	return blink::decrement(plugin, sld_idx, value, precise);
-}
-
-auto blink_int_slider_drag(blink_IntSliderIndex sld_idx, int64_t start_value, int64_t amount, blink_Bool precise) -> int64_t {
-	return blink::drag(plugin, sld_idx, start_value, amount, precise);
-}
-
-auto blink_int_slider_get_default_value(blink_IntSliderIndex sld_idx) -> int64_t {
-	return blink::get_default_value(plugin, sld_idx);
-}
-
-auto blink_int_slider_increment(blink_IntSliderIndex sld_idx, int64_t value, blink_Bool precise) -> int64_t {
-	return blink::increment(plugin, sld_idx, value, precise);
 }

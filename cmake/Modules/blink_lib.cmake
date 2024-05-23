@@ -26,8 +26,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
 	list(APPEND extra_include_dirs ${sse2neon_SOURCE_DIR})
 endif()
 
-if (NOT TARGET blink_plugin)
-	add_subdirectory(${blink_SOURCE_DIR}/plugin/blink blink_plugin)
+if (NOT TARGET blink_lib)
+	add_subdirectory(${blink_SOURCE_DIR}/lib blink_lib)
 endif()
 
 function(blink_plugin_get_base_filename out_var name type)
@@ -47,7 +47,7 @@ function(blink_plugin_add name type src resources)
 	cmrc_add_resource_library(${target_name}_resources ALIAS ${target_name}::rc NAMESPACE ${namespace} ${resources})
 
 	add_library(${target_name} SHARED ${src})
-	target_link_libraries(${target_name} PRIVATE blink_plugin ${target_name}::rc)
+	target_link_libraries(${target_name} PRIVATE blink_lib ${target_name}::rc)
 	target_include_directories(${target_name} PRIVATE ${extra_include_dirs})
 
 	set_target_properties(${target_name} PROPERTIES
