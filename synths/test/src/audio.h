@@ -1,9 +1,9 @@
+/* TODELETE:
 #pragma once
 
 #define _USE_MATH_DEFINES
 
 #include <blink/synth_unit.hpp>
-#include <bleat/oscillators/scalar/multi_wave.hpp>
 #include "shared/noise_generator.h"
 
 namespace test {
@@ -23,9 +23,7 @@ public:
 private:
 	
 	const Plugin* plugin_;
-	std::array<bleat::oscillators::scalar::MultiWaveOsc, 2> oscs_;
-	NoiseGenerator noise_gen_;
-	ml::LinearGlide fade_in_;
 };
 
 } // test
+*/

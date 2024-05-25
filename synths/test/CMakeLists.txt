@@ -10,23 +10,11 @@ CPMAddPackage("gh:colugomusic/bleat#master")
 cpm_export_variables(bleat)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
-    ./src/audio_data.h
-    ./src/audio_data.cpp
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/parameters/amp.hpp
-    ./src/parameters/carrier_fm.hpp
-    ./src/parameters/carrier_pitch.hpp
-    ./src/parameters/carrier_waveform.hpp
-    ./src/parameters/modulator_fm.hpp
-    ./src/parameters/modulator_pitch.hpp
-    ./src/parameters/pan.hpp
-    ./src/plugin.h
-    ./src/plugin.cpp
+	./src/dsp.hpp
+	./src/model.h
+	./src/audio.h
+	./src/audio.cpp
+	./src/plugin.cpp
 	../../shared/noise_generator.h
 	../../shared/noise_generator.cpp
 )
