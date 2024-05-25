@@ -7,13 +7,10 @@ include(CPM)
 include(blink_lib)
 
 CPMAddPackage("gh:colugomusic/bleat#master")
-cpm_export_variables(bleat)
 
 list(APPEND SRC
 	./src/dsp.hpp
 	./src/model.h
-	./src/audio.h
-	./src/audio.cpp
 	./src/plugin.cpp
 	../../shared/noise_generator.h
 	../../shared/noise_generator.cpp

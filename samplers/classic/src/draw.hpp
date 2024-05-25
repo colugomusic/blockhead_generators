@@ -46,27 +46,27 @@ auto calculate_amp(const DrawData& data, const blink::BlockPositions& block_posi
 
 [[nodiscard]]
 auto draw(Model* model, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
-	const auto data        = make_draw_data(*model, unit_state.param_data);
+	const auto data        = make_draw_data(*model, unit_state.unit.param_data);
 	const auto sample_data = blink::SampleData{buffer.sample_info, unit_state.channel_mode};
 	auto frames_remaining = int64_t(n.value);
 	int index = 0;
 	blink::BlockPositions block_positions;
 	while (frames_remaining > 0) {
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining));
-		block_positions.add(buffer.positions + index, count);
+		block_positions.add(buffer.unit.positions + index, count);
 		blink::transform::Tape::Config config;
-		config.unit_state_id              = unit_state.id;
+		config.unit_state_id              = unit_state.unit.id;
 		config.env.pitch                  = data.env.pitch.data;
 		config.option.reverse             = data.option.reverse_mode.data;
 		config.sample_offset              = data.slider.sample_offset.value;
 		config.transpose                  = data.slider.pitch.value;
-		config.warp_points                = unit_state.warp_points;
+		config.warp_points                = unit_state.unit.warp_points;
 		config.outputs.derivatives.pitch  = true;
 		config.outputs.derivatives.warped = true;
 		model->draw.tape_transformer.xform(config, block_positions, count);
-		auto sculpted_sample_positions = model->draw.tape_transformer.get_pitched_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value);
-		auto warped_sample_positions = model->draw.tape_transformer.get_warped_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value);
-		auto final_sample_positions = model->draw.tape_transformer.get_reversed_positions().positions / (float(buffer.song_rate.value) / sample_data.get_SR().value);
+		auto sculpted_sample_positions = model->draw.tape_transformer.get_pitched_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
+		auto warped_sample_positions = model->draw.tape_transformer.get_warped_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
+		auto final_sample_positions = model->draw.tape_transformer.get_reversed_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
 		if (data.toggle.loop.value) {
 			for (int i = 0; i < count; i++) {
 				final_sample_positions.set(i, sample_data.get_loop_pos(final_sample_positions[i]));

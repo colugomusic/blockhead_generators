@@ -85,7 +85,7 @@ auto process_sample(
 	const blink::SampleData& sample_data,
 	snd::transport::DSPVectorFramePosition sample_pos) -> ml::DSPVectorArray<2>
 {
-	sample_pos /= float(buffer.song_rate.value) / buffer.sample_info->SR.value;
+	sample_pos /= float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
 	if (data.toggle.reverse.value) {
 		sample_pos = std::int32_t(buffer.sample_info->num_frames.value - 1) - sample_pos;
 	} 
@@ -127,8 +127,8 @@ auto apply_correction_grains(
 				reverse_correction->grain.on = true;
 				const auto beg = i == 0 ? reverse_correction->dry_positions.prev_pos : reverse_correction->dry_positions[i - 1];
 				// i hate math
-				const auto a = float(buffer.song_rate.value) / buffer.sample_info->SR.value;
-				const auto b = float(buffer.sample_info->SR.value) / buffer.SR.value;
+				const auto a = float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
+				const auto b = float(buffer.sample_info->SR.value) / buffer.unit.SR.value;
 				reverse_correction->grain.beg = beg;
 				reverse_correction->grain.pos = beg;
 				reverse_correction->grain.ff = grain_info.ff[i] * a * b;
@@ -147,16 +147,16 @@ auto apply_correction_grains(
 }
 
 auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.param_data);
-	const auto generate_correction_grains = unit_state.smooth_transitions.value && data.option.reverse_mode.data->points.count > 1;
+	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+	const auto generate_correction_grains = unit_state.unit.smooth_transitions.value && data.option.reverse_mode.data->points.count > 1;
 	blink::transform::Tape::Config config;
-	config.unit_state_id              = unit_state.id;
+	config.unit_state_id              = unit_state.unit.id;
 	config.env.pitch                  = data.env.pitch.data;
 	config.option.reverse             = data.option.reverse_mode.data;
 	config.sample_offset              = data.slider.sample_offset.value;
 	config.transpose                  = data.slider.pitch.value;
-	config.warp_points                = unit_state.warp_points;
+	config.warp_points                = unit_state.unit.warp_points;
 	config.outputs.derivatives.pitch  = false;
 	config.outputs.derivatives.warped = false;
 	config.outputs.correction_grains  = generate_correction_grains;

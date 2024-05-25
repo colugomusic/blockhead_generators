@@ -56,8 +56,8 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 }
 
 auto process(Model* model, UnitDSP* unit_dsp, const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.positions, BLINK_VECTOR_SIZE);
-	const auto data                = make_audio_data(*model, unit_state.param_data);
+	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
+	const auto data                = make_audio_data(*model, unit_state.unit.param_data);
 	auto amp                       = blink::search::vec(data.env.amp, unit_dsp->block_positions);
  	const auto wave                = blink::search::vec(data.env.carrier.waveform, unit_dsp->block_positions);
 	const auto env_carrier_pitch   = blink::search::vec(data.env.carrier.pitch, unit_dsp->block_positions);
@@ -73,8 +73,8 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_SynthBuffer& buffer, c
 	for (int i = 0; i < kFloatsPerDSPVector; i++) {
 		const auto fm0_freq = std::max(((fm0[i] * fm0[i] * 20000.0f) * unit_dsp->oscs[1].value()) + freq0[i], 0.0f);
 		const auto fm1_freq = std::max(((fm1[i] * fm1[i] * 20000.0f) * unit_dsp->oscs[0].value()) + freq1[i], 0.0f);
-		osc_out[i] = unit_dsp->oscs[0](fm0_freq / buffer.SR.value, 0.5f, wave[i]);
-		unit_dsp->oscs[1](fm1_freq / buffer.SR.value, 0.5f, bleat::oscillators::scalar::MultiWaveOsc::WAVE_SINE);
+		osc_out[i] = unit_dsp->oscs[0](fm0_freq / buffer.unit.SR.value, 0.5f, wave[i]);
+		unit_dsp->oscs[1](fm1_freq / buffer.unit.SR.value, 0.5f, bleat::oscillators::scalar::MultiWaveOsc::WAVE_SINE);
 	}
 	auto out_vec = ml::repeatRows<2>(osc_out);
 	out_vec =
