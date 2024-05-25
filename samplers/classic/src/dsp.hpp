@@ -104,6 +104,7 @@ auto apply_correction_grains(
 	const AudioData& data,
 	const blink_SamplerBuffer& buffer,
 	const blink::SampleData& sample_data,
+	blink_SR SR,
 	const blink::transform::CorrectionGrains& grain_info) -> ml::DSPVectorArray<2>
 {
 	if (!reverse_correction->grain.on && grain_info.count < 1) {
@@ -128,7 +129,7 @@ auto apply_correction_grains(
 				const auto beg = i == 0 ? reverse_correction->dry_positions.prev_pos : reverse_correction->dry_positions[i - 1];
 				// i hate math
 				const auto a = float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
-				const auto b = float(buffer.sample_info->SR.value) / buffer.unit.SR.value;
+				const auto b = float(buffer.sample_info->SR.value) / SR.value;
 				reverse_correction->grain.beg = beg;
 				reverse_correction->grain.pos = beg;
 				reverse_correction->grain.ff = grain_info.ff[i] * a * b;
@@ -174,6 +175,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer,
 			data, 
 			buffer, 
 			sample_data, 
+			unit_dsp->SR,
 			unit_dsp->tape_transformer.get_correction_grains());
 	}
 	out_vec =

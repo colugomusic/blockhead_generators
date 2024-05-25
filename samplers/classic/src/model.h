@@ -47,6 +47,7 @@ struct DrawState {
 };
 
 struct UnitDSP {
+	blink_SR SR;
 	blink::BlockPositions block_positions;
 	blink::transform::Tape tape_transformer;
 	NoiseGenerator noise_gen;
