@@ -25,6 +25,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
 	list(APPEND extra_include_dirs ${sse2neon_SOURCE_DIR})
 endif()
 
+if (NOT TARGET blink_lib)
+	add_subdirectory(${blink_SOURCE_DIR}/lib blink_lib)
+endif()
+
 function(blink_plugin_get_base_filename out_var name type)
 	set(${out_var} ${type}.${name}.v${PROJECT_VERSION}.${PLATFORM_DIR}$<${debug_build}:.dbg> PARENT_SCOPE)
 endfunction()

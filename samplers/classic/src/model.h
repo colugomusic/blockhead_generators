@@ -54,8 +54,8 @@ struct UnitDSP {
 	ReverseCorrection reverse_correction;
 };
 
-using Instance = blink::ent::Instance<>;
-using Unit     = blink::ent::Unit<UnitDSP>;
+using Instance = blink::Instance<>;
+using Unit     = blink::Unit<UnitDSP>;
 
 struct Model {
 	blink::Plugin plugin;

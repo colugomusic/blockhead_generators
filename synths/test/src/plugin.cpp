@@ -72,7 +72,7 @@ auto add_param_env_modulator_fm(const blink::Plugin& plugin) -> blink_ParamIdx {
 }
 
 auto add_param_env_modulator_pitch(const blink::Plugin& plugin) -> blink_ParamIdx {
-	const auto idx = blink::add::param::env(plugin, {BLINK_STD_UUID_PITCH});
+	const auto idx = blink::add::param::env(plugin, {"fc48a5e2-48a6-4021-8467-c196b215938d"});
 	const auto flags = blink_ParamFlags_DefaultActive | blink_ParamFlags_CanManipulate;
 	blink::write::param::group(plugin, idx, {"Modulator"});
 	blink::write::param::name(plugin, idx, {"Modulator Pitch"});
