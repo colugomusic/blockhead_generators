@@ -13,7 +13,6 @@ CPMAddPackage(
 	NAME blink
 	GITHUB_REPOSITORY colugomusic/blink
 	GIT_TAG master
-	DOWNLOAD_ONLY YES
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
@@ -24,10 +23,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
 		DOWNLOAD_ONLY YES
 	)
 	list(APPEND extra_include_dirs ${sse2neon_SOURCE_DIR})
-endif()
-
-if (NOT TARGET blink_lib)
-	add_subdirectory(${blink_SOURCE_DIR}/lib blink_lib)
 endif()
 
 function(blink_plugin_get_base_filename out_var name type)
