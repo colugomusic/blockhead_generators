@@ -9,6 +9,14 @@ static Model model;
 
 using namespace blink;
 
+[[nodiscard]] static
+auto make_sampler_info() -> blink_SamplerInfo {
+	blink_SamplerInfo out = {0};
+	out.baked_waveform_could_be_different = {false};
+	out.requires_preprocessing            = {false};
+	return out;
+}
+
 auto blink_get_error_string(blink_Error error) -> blink_TempString {
 	return {blink::get_std_error_string(static_cast<blink_StdError>(error))};
 }
@@ -22,15 +30,8 @@ auto blink_get_plugin_info() -> blink_PluginInfo {
 	return out;
 }
 
-auto blink_get_sampler_info() -> blink_SamplerInfo {
-	blink_SamplerInfo out = {0};
-	out.baked_waveform_could_be_different = {false};
-	out.requires_preprocessing            = {false};
-	return out;
-}
-
 auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
-	blink::init(&model.plugin, plugin_idx, host);
+	blink::init(&model.plugin, plugin_idx, host, make_sampler_info());
 	model.params.env.amp                 = blink::add::param::env(model.plugin, {BLINK_STD_UUID_AMP});
 	model.params.env.noise_amount        = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_AMOUNT});
 	model.params.env.noise_color         = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_COLOR});
