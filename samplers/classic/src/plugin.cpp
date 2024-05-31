@@ -56,11 +56,6 @@ auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	blink::write::param::manip_delegate(model.plugin, model.params.slider_real.amp, model.params.env.amp);
 	blink::write::param::manip_delegate(model.plugin, model.params.slider_real.pan, model.params.env.pan);
 	blink::write::param::manip_delegate(model.plugin, model.params.slider_real.pitch, model.params.env.pitch);
-	// TODO: This should be default so not necessary
-	//blink::write::param::group(&model.plugin, model.params.env.noise_amount, {"Noise"});
-	//blink::write::param::group(&model.plugin, model.params.env.noise_color, {"Noise"});
-	//blink::write::param::group(&model.plugin, model.params.option.noise_mode, {"Noise"});
-	//blink::write::param::group(&model.plugin, model.params.slider_real.noise_width, {"Noise"});
 	return BLINK_OK;
 }
 
