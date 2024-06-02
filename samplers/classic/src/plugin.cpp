@@ -33,19 +33,19 @@ auto blink_get_plugin_info() -> blink_PluginInfo {
 auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	blink::init(&model.plugin, plugin_idx, host, make_sampler_info());
 	model.params.env.amp                 = blink::add::param::env(model.plugin, {BLINK_STD_UUID_AMP});
-	model.params.env.noise_amount        = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_AMOUNT});
-	model.params.env.noise_color         = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_COLOR});
 	model.params.env.pan                 = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.env.pitch               = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PITCH});
+	model.params.env.noise_amount        = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_AMOUNT});
+	model.params.env.noise_color         = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_COLOR});
 	model.params.option.loop             = blink::add::param::option(model.plugin, {BLINK_STD_UUID_LOOP});
-	model.params.option.noise_mode       = blink::add::param::option(model.plugin, {BLINK_STD_UUID_NOISE_MODE});
 	model.params.option.reverse_mode     = blink::add::param::option(model.plugin, {BLINK_STD_UUID_REVERSE_MODE});
 	model.params.option.reverse_toggle   = blink::add::param::option(model.plugin, {BLINK_STD_UUID_REVERSE_TOGGLE});
-	model.params.slider_int.samp_offs    = blink::add::param::slider_int(model.plugin, {BLINK_STD_UUID_SAMPLE_OFFSET});
-	model.params.slider_real.amp         = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
+	model.params.option.noise_mode       = blink::add::param::option(model.plugin, {BLINK_STD_UUID_NOISE_MODE});
 	model.params.slider_real.noise_width = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_NOISE_WIDTH});
+	model.params.slider_real.amp         = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
 	model.params.slider_real.pan         = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.slider_real.pitch       = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});
+	model.params.slider_int.samp_offs    = blink::add::param::slider_int(model.plugin, {BLINK_STD_UUID_SAMPLE_OFFSET});
 	blink::write::param::add_flags(model.plugin, model.params.env.amp, blink_ParamFlags_DefaultActive);
 	blink::write::param::add_flags(model.plugin, model.params.env.pitch, blink_ParamFlags_DefaultActive);
 	blink::write::param::add_subparam(model.plugin, model.params.env.noise_amount, model.params.option.noise_mode);
