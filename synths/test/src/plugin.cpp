@@ -154,6 +154,7 @@ auto blink_unit_reset(blink_UnitIdx unit_idx) -> blink_Error {
 auto blink_unit_stream_init(blink_UnitIdx unit_idx, blink_SR SR) -> blink_Error {
 	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
 	unit_dsp.SR = SR;
+	dsp::reset(&model, &unit_dsp);
 	return BLINK_OK;
 }
 

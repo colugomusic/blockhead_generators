@@ -108,6 +108,8 @@ auto quality(const blink::Plugin& plugin) -> blink_EnvIdx {
 	const auto slider_min = blink::add::slider::empty_real(plugin.host);
 	const auto slider_value = blink::add::slider::empty_real(plugin.host);
 	blink_TweakerReal tweaker = tweak::quality::tweaker();
+	blink::write::env::default_max(plugin, env_idx, 2.0f);
+	blink::write::env::default_min(plugin, env_idx, 0.0f);
 	blink::write::env::default_value(plugin, env_idx, 1.0f);
 	blink::write::env::fns(plugin, env_idx, tweak::quality::fns());
 	blink::write::env::max_slider(plugin, env_idx, slider_max);
