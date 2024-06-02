@@ -28,7 +28,7 @@ add_dependencies(all_plugins
     #effect_wavebender
     #effect_zap
     sampler_classic
-    #sampler_fudge
-    #synth_berk
+    sampler_fudge
+    synth_berk
     synth_test
 )

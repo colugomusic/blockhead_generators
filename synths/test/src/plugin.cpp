@@ -21,6 +21,15 @@ auto blink_get_plugin_info() -> blink_PluginInfo {
 	return out;
 }
 
+auto add_param_env_amp(const blink::Plugin& plugin) -> blink_ParamIdx {
+	const auto param_idx = blink::add::param::env(plugin, {BLINK_STD_UUID_AMP});
+	const auto flags = blink_ParamFlags_DefaultActive;
+	const auto env_idx = blink::read::env(model.plugin, param_idx);
+	blink::write::env::default_value(model.plugin, env_idx, 0.5f);
+	blink::write::param::add_flags(model.plugin, param_idx, blink_ParamFlags_DefaultActive);
+	return param_idx;
+}
+
 auto add_param_env_carrier_fm(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto idx = blink::add::param::env(plugin, {"05ffbc42-d2aa-4746-905e-44d4373b4345"});
 	const auto flags = blink_ParamFlags_HostClamp | blink_ParamFlags_DefaultActive | blink_ParamFlags_CanManipulate;
@@ -83,7 +92,7 @@ auto add_param_env_modulator_pitch(const blink::Plugin& plugin) -> blink_ParamId
 
 auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	blink::init(&model.plugin, plugin_idx, host);
-	model.params.env.amp                   = blink::add::param::env(model.plugin, {BLINK_STD_UUID_AMP});
+	model.params.env.amp                   = add_param_env_amp(model.plugin);
 	model.params.env.pan                   = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.env.carrier.pitch         = add_param_env_carrier_pitch(model.plugin);
 	model.params.env.carrier.fm            = add_param_env_carrier_fm(model.plugin);
@@ -97,7 +106,6 @@ auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	model.params.slider_real.amp           = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
 	model.params.slider_real.pan           = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.slider_real.carrier_pitch = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});
-	blink::write::param::add_flags(model.plugin, model.params.env.amp, blink_ParamFlags_DefaultActive);
 	blink::write::param::add_subparam(model.plugin, model.params.env.noise.amount, model.params.option.noise_mode);
 	blink::write::param::add_subparam(model.plugin, model.params.env.noise.amount, model.params.slider_real.noise_width);
 	blink::write::param::add_subparam(model.plugin, model.params.env.noise.color, model.params.option.noise_mode);

@@ -10,33 +10,17 @@ CPMAddPackage("gh:colugomusic/bleat#master")
 cpm_export_variables(bleat)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
-    ./src/audio_data.h
-    ./src/audio_data.cpp
+    ./src/dsp.hpp
     ./src/glottis.h
     ./src/glottis.cpp
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/parameters/amp.hpp
-    ./src/parameters/buzz.hpp
-    ./src/parameters/pan.hpp
-    ./src/parameters/pitch.hpp
-    ./src/plugin.h
+    ./src/model.h
     ./src/plugin.cpp
     ./src/simplexnoise1234.h
     ./src/simplexnoise1234.cpp
 	../../shared/resampler.h
 	../../shared/tract.h
 	../../shared/tract.cpp
-	../../shared/tract_parameters/fricative_intensity.hpp
-	../../shared/tract_parameters/quality.hpp
-	../../shared/tract_parameters/throat_diameter.hpp
-	../../shared/tract_parameters/throat_index.hpp
-	../../shared/tract_parameters/tongue_diameter.hpp
-	../../shared/tract_parameters/tongue_index.hpp
+	../../shared/tract_params.hpp
 )
 
 list(APPEND RES
