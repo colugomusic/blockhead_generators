@@ -1,3 +1,6 @@
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
 #include "particle.h"
 #include "controller.h"
 #include "sample_analysis.h"
@@ -79,7 +82,7 @@ ml::DSPVectorArray<2> Particle::process(const ml::DSPVector& amp)
 
 			if (overall_amp > 0.f)
 			{
-				if (controller_->sample_info().num_channels > 1)
+				if (controller_->sample_info().num_channels.value > 1)
 				{
 					const auto LR = read_stereo_frame(grain);
 
@@ -117,7 +120,7 @@ float Particle::read_mono_frame(const Grain& grain) const
 {
 	const auto pos = grain.pos[0] + grain.frame;
 
-	return pos < 0.f ? 0.f : controller_->sample_data().read_frame_interp(0, pos);
+	return pos < 0.f ? 0.f : controller_->sample_data().read_frame_interp({0}, pos);
 }
 
 std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
@@ -135,8 +138,8 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 			const auto pos_L = grain.pos[0] + grain.frame;
 			const auto pos_R = grain.pos[1] + grain.frame;
 
-			L = pos_L < 0.f ? 0.f : data.read_frame_interp(0, pos_L);
-			R = pos_R < 0.f ? 0.f : data.read_frame_interp(1, pos_R);
+			L = pos_L < 0.f ? 0.f : data.read_frame_interp({0}, pos_L);
+			R = pos_R < 0.f ? 0.f : data.read_frame_interp({1}, pos_R);
 
 			break;
 		}
@@ -146,8 +149,8 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 			const auto pos_L = grain.pos[0] + grain.frame;
 			const auto pos_R = grain.pos[1] + grain.frame;
 
-			R = pos_L < 0.f ? 0.f : data.read_frame_interp(0, pos_L);
-			L = pos_R < 0.f ? 0.f : data.read_frame_interp(1, pos_R);
+			R = pos_L < 0.f ? 0.f : data.read_frame_interp({0}, pos_L);
+			L = pos_R < 0.f ? 0.f : data.read_frame_interp({1}, pos_R);
 
 			break;
 		}
@@ -156,7 +159,7 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 		{
 			const auto pos = grain.pos[0] + grain.frame;
 
-			L = pos < 0.f ? 0.f : data.read_frame_interp(0, pos);
+			L = pos < 0.f ? 0.f : data.read_frame_interp({0}, pos);
 			R = L;
 
 			break;
@@ -166,7 +169,7 @@ std::array<float, 2> Particle::read_stereo_frame(const Grain& grain) const
 		{
 			const auto pos = grain.pos[1] + grain.frame;
 
-			R = pos < 0.f ? 0.f : data.read_frame_interp(1, pos);
+			R = pos < 0.f ? 0.f : data.read_frame_interp({1}, pos);
 			L = R;
 
 			break;
@@ -194,7 +197,7 @@ float Particle::adjust_channel_pos(int index, int channel, float pos) const
 
 	const auto num_frames = controller_->sample_info().num_frames;
 
-	if (pos > num_frames) return pos;
+	if (pos > num_frames.value) return pos;
 
 	const auto analysis_data = controller_->analysis_data();
 
@@ -225,7 +228,7 @@ float Particle::adjust_channel_pos(int index, int channel, float pos) const
 		adjusted_pos = (other_pos + other.frame) - (a * other_wavecycle);
 	}
 
-	if (adjusted_pos > num_frames)
+	if (adjusted_pos > num_frames.value)
 	{
 		adjusted_pos = pos;
 	}
@@ -274,7 +277,7 @@ std::array<float, 2> Particle::get_stereo_positions(int index, float pos, bool a
 		}
 	}
 
-	if (std::abs(pos_R - pos_L) < 0.01f * controller_->SR())
+	if (std::abs(pos_R - pos_L) < 0.01f * controller_->SR().value)
 	{
 		pos_R = pos_L;
 	}
@@ -295,7 +298,7 @@ void Particle::trigger_next_grain(int index, bool adjust)
 	float pos_L;
 	float pos_R;
 
-	if (controller_->sample_info().num_channels > 1)
+	if (controller_->sample_info().num_channels.value > 1)
 	{
 		const auto positions = get_stereo_positions(index, pos, adjust);
 

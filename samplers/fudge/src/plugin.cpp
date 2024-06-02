@@ -1,163 +1,101 @@
 #define BLINK_EXPORT
-#include "plugin.h"
-#include <blink/bind_sampler.hpp>
-#include <blink/errors.hpp>
 
-namespace fudge {
+#include <blink_std.h>
+#include "draw.hpp"
+#include "dsp.hpp"
+#include "model.h"
 
-GUI& Plugin::gui()
-{
-	return gui_;
-}
-
-const SampleAnalysis* Plugin::get_analysis_data(blink_ID sample_id) const
-{
-	const auto pos = sample_analysis_.find(sample_id);
-
-	if (pos == sample_analysis_.end()) return nullptr;
-
-	return pos->second.get();
-}
-
-void Plugin::preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
-{
-	auto pos = sample_analysis_.find(sample_info->id);
-
-	if (pos != sample_analysis_.end()) return;
- 
-	auto analysis = std::make_shared<SampleAnalysis>();
-
-	if (analyze(host, callbacks, *sample_info, analysis.get()))
-	{
-		sample_analysis_[sample_info->id] = analysis;
-	}
-}
-
-void Plugin::on_sample_deleted(blink_ID id)
-{
-	const auto pos = sample_analysis_.find(id);
-
-	if (pos == sample_analysis_.end()) return;
-
-	sample_analysis_.erase(pos);
-}
-
-Plugin* g_plugin {};
-
-}
+static Model model;
 
 using namespace blink;
-using namespace fudge;
 
-blink_PluginInfo blink_get_plugin_info()
-{
-	blink_PluginInfo out {0};
-
-	out.uuid = "795c8dc6-3b81-4397-abac-071bab83b10f";
-	out.name = "Fudge";
-	out.version = PLUGIN_VERSION;
-
+[[nodiscard]] static
+auto make_sampler_info() -> blink_SamplerInfo {
+	blink_SamplerInfo out = {0};
+	out.baked_waveform_could_be_different = {false};
+	out.requires_preprocessing            = {true};
 	return out;
 }
 
-blink_SamplerInfo blink_get_sampler_info()
-{
-	blink_SamplerInfo out{ 0 };
+auto blink_get_error_string(blink_Error error) -> blink_TempString {
+	return {blink::get_std_error_string(static_cast<blink_StdError>(error))};
+}
 
-	out.baked_waveform_could_be_different = true;
-	out.enable_warp_markers = true;
-	out.requires_preprocessing = true;
-
+auto blink_get_plugin_info() -> blink_PluginInfo {
+	blink_PluginInfo out = {0};
+	out.uuid                = {"795c8dc6-3b81-4397-abac-071bab83b10f"};
+	out.name                = {"Fudge"};
+	out.version             = {PLUGIN_VERSION};
+	out.enable_warp_markers = {true};
 	return out;
 }
 
-blink_Error blink_init()
-{
-	if (g_plugin) return blink_StdError_AlreadyInitialized;
-
-    g_plugin = new fudge::Plugin();
-
+auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
+	blink::init(&model.plugin, plugin_idx, host, make_sampler_info());
+	// TODO:
 	return BLINK_OK;
 }
 
-blink_Error blink_terminate()
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
+auto blink_instance_destroy(blink_InstanceIdx instance_idx) -> blink_Error {
+	return blink::destroy_instance(&model.entities, instance_idx);
+}
 
-	delete g_plugin;
+auto blink_instance_make() -> blink_InstanceIdx {
+	return blink::make_instance(&model.entities);
+}
 
+auto blink_instance_reset(blink_InstanceIdx instance_idx) -> blink_Error {
 	return BLINK_OK;
 }
 
-blink_SamplerInstance blink_make_sampler_instance()
-{
-	if (!g_plugin) return blink_SamplerInstance{ 0 };
-
-	return bind::sampler_instance(g_plugin->add_instance());
-}
-
-blink_Error blink_destroy_sampler_instance(blink_SamplerInstance instance)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	return g_plugin->destroy_instance(std::move(instance));
-}
-
-blink_Bool blink_sampler_enable_warp_markers()
-{
-	return BLINK_TRUE;
-}
-
-blink_Bool blink_sampler_requires_preprocessing()
-{
-	return BLINK_TRUE;
-}
-
-blink_Error blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-    g_plugin->preprocess_sample(host, callbacks, sample_info);
-
+auto blink_instance_stream_init(blink_InstanceIdx instance_idx, blink_SR SR) -> blink_Error {
 	return BLINK_OK;
 }
 
-blink_Error blink_sampler_sample_deleted(blink_ID sample_id)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-    g_plugin->on_sample_deleted(sample_id);
-
+auto blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_Error {
+	auto pos = model.sample_analysis.find(sample_info->id);
+	if (pos != model.sample_analysis.end()) {
+		return BLINK_OK;
+	}
+	auto analysis = std::make_shared<SampleAnalysis>();
+	if (analyze(host, callbacks, *sample_info, analysis.get())) {
+		model.sample_analysis[sample_info->id] = analysis;
+	}
 	return BLINK_OK;
 }
 
-int blink_get_num_parameters()
-{
-	if (!g_plugin) return 0;
-
-	return g_plugin->get_num_parameters();
+auto blink_sampler_sample_deleted(blink_ID sample_id) -> blink_Error {
+	const auto pos = model.sample_analysis.find(sample_id);
+	if (pos == model.sample_analysis.end()) return BLINK_OK;
+	model.sample_analysis.erase(pos);
+	return BLINK_OK;
 }
 
-blink_Parameter blink_get_parameter(blink_Index index)
-{
-	return bind::parameter(g_plugin->get_parameter(index));
+auto blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
+	return draw(&model, *buffer, *unit_state, n, out);
 }
 
-blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
-{
-	return bind::parameter(g_plugin->get_parameter(uuid));
+auto blink_sampler_process(blink_UnitIdx unit_idx, const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, float* out) -> blink_Error {
+	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	return dsp::process(&model, &unit_dsp, *buffer, *unit_state, out);
 }
 
-const char* blink_get_error_string(blink_Error error)
-{
-	return blink::get_std_error_string(blink_StdError(error));
+auto blink_terminate() -> blink_Error {
+	return blink::terminate(&model.entities);
 }
 
-blink_Error blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
+auto blink_unit_add(blink_InstanceIdx instance_idx) -> blink_UnitIdx {
+	return blink::add_unit(&model.entities, instance_idx);
+}
 
-    g_plugin->gui().draw(*g_plugin, *buffer, *unit_state, n, out);
+auto blink_unit_reset(blink_UnitIdx unit_idx) -> blink_Error {
+	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	dsp::reset(&model, &unit_dsp);
+	return BLINK_OK;
+}
 
+auto blink_unit_stream_init(blink_UnitIdx unit_idx, blink_SR SR) -> blink_Error {
+	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	unit_dsp.SR = SR;
 	return BLINK_OK;
 }

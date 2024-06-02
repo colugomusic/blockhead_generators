@@ -7,41 +7,17 @@ include(CPM)
 include(blink_lib)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
     ./src/audio_data.h
-    ./src/audio_data.cpp
     ./src/controller.h
     ./src/controller.cpp
     ./src/convert.h
+    ./src/draw.hpp
+    ./src/dsp.hpp
     ./src/grain.h
-    ./src/gui.h
-    ./src/gui.cpp
-    ./src/instance.h
-    ./src/instance.cpp
     ./src/limits.h
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/parameters/amp.hpp
-    ./src/parameters/grain_size.hpp
-    ./src/parameters/grain_transpose.hpp
-    ./src/parameters/grain_uniformity.hpp
-    ./src/parameters/harmonics_amount.hpp
-    ./src/parameters/harmonics_scale.hpp
-    ./src/parameters/harmonics_spread.hpp
-    ./src/parameters/loop.hpp
-    ./src/parameters/noise_amount.hpp
-    ./src/parameters/noise_color.hpp
-    ./src/parameters/noise_mode.hpp
-    ./src/parameters/noise_width.hpp
-    ./src/parameters/pan.hpp
-    ./src/parameters/pitch.hpp
-    ./src/parameters/reverse.hpp
-    ./src/parameters/sample_offset.hpp
-    ./src/parameters/speed.hpp
+    ./src/model.h
     ./src/particle.h
     ./src/particle.cpp
-    ./src/plugin.h
     ./src/plugin.cpp
 	./src/sample_analysis.h
 	./src/sample_analysis.cpp

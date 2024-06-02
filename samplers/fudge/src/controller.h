@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blink_sampler.h>
+#include <blink.h>
 #include <blink/traverser.hpp>
 #include <blink/sample_data.hpp>
 #include <blink/block_positions.hpp>
@@ -10,18 +10,14 @@
 #include <DSP/MLDSPOps.h>
 #pragma warning(pop)
 
+struct AudioData;
 struct SampleAnalysis;
 
 namespace fudge {
 
-struct AudioData;
-class Plugin;
-
 class Controller
 {
 public:
-
-	Controller(const Plugin* plugin);
 
 	void process(
 		const AudioData& data,
@@ -54,8 +50,6 @@ public:
 private:
 
 	float snap_ratio_to_scale(int index, float ff) const;
-
-	const Plugin* plugin_;
 
 	const blink_SamplerBuffer* buffer_;
 	const blink::BlockPositions* block_positions_;
