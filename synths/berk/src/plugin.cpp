@@ -116,8 +116,8 @@ auto blink_unit_stream_init(blink_UnitIdx unit_idx, blink_SR SR) -> blink_Error 
 	return BLINK_OK;
 }
 
-CMRC_DECLARE(test);
+CMRC_DECLARE(berk);
 
 auto blink_get_resource_data(const char* path) -> blink_ResourceData {
-	return blink::get_resource_data(&model.plugin, cmrc::test::get_filesystem(), path);
+	return blink::get_resource_data(&model.plugin, cmrc::berk::get_filesystem(), path);
 }

@@ -170,20 +170,21 @@ auto throat_position(const blink::Plugin& plugin) -> blink_ParamIdx {
 	blink::write::param::env(plugin, param_idx, env_idx);
 	blink::write::param::offset_env(plugin, param_idx, env_idx);
 	blink::write::param::override_env(plugin, param_idx, env_idx);
+	return param_idx;
 }
 
 auto tongue_diameter(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto param_idx = blink::add::param::env(plugin, {"a14bfe06-b84d-4778-b50c-7290478cb6b3"});
 	const auto env_idx   = add::env::tongue_diameter(plugin);
 	const auto flags     = blink_ParamFlags_DefaultActive | blink_ParamFlags_CanManipulate | blink_ParamFlags_HostClamp;
-	write::param::name(plugin, param_idx, {"Tongue Diameter"});
-	write::param::short_name(plugin, param_idx, {"Diameter"});
-	write::param::group(plugin, param_idx, {"Tongue"});
-	write::param::clamp_range(plugin, param_idx, {0.0f, 1.0f});
-	write::param::add_flags(plugin, param_idx, flags);
-	write::param::env(plugin, param_idx, env_idx);
-	write::param::offset_env(plugin, param_idx, blink::add::env::percentage_bipolar(plugin.host));
-	write::param::override_env(plugin, param_idx, env_idx);
+	blink::write::param::name(plugin, param_idx, {"Tongue Diameter"});
+	blink::write::param::short_name(plugin, param_idx, {"Diameter"});
+	blink::write::param::group(plugin, param_idx, {"Tongue"});
+	blink::write::param::clamp_range(plugin, param_idx, {0.0f, 1.0f});
+	blink::write::param::add_flags(plugin, param_idx, flags);
+	blink::write::param::env(plugin, param_idx, env_idx);
+	blink::write::param::offset_env(plugin, param_idx, blink::add::env::percentage_bipolar(plugin.host));
+	blink::write::param::override_env(plugin, param_idx, env_idx);
 	return param_idx;
 }
 

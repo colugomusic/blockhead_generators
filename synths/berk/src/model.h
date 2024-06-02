@@ -1,6 +1,13 @@
 #pragma once
 
+#include "glottis.h"
+#include "shared/tract.h"
+#include "shared/resampler.h"
 #include <blink/plugin_impl.hpp>
+#pragma warning(push, 0)
+#include <DSP/MLDSPFilters.h>
+#include <DSP/MLDSPGens.h>
+#pragma warning(pop)
 
 struct Params {
 	struct {
@@ -29,6 +36,12 @@ struct Params {
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
+	ml::Bandpass aspirate_filter;
+	ml::Bandpass fricative_filter;
+	ml::NoiseGen noise;
+	Glottis glottis;
+	Tract tract;
+	Resampler<1> resampler;
 };
 
 using Instance = blink::Instance<>;
