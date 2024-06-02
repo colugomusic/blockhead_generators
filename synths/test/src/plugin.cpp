@@ -28,10 +28,10 @@ auto add_param_env_carrier_fm(const blink::Plugin& plugin) -> blink_ParamIdx {
 	blink::write::param::name(plugin, idx, {"Carrier FM Amount"});
 	blink::write::param::short_name(plugin, idx, {"FM Amount"});
 	blink::write::param::add_flags(plugin, idx, flags);
-	blink::write::param::env_env_idx(plugin, idx, blink::add::env::percentage(plugin.host));
-	blink::write::param::env_clamp_range(plugin, idx, {0.0f, 2.0f});
-	blink::write::param::env_offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
-	blink::write::param::env_override_env(plugin, idx, blink::add::env::percentage(plugin.host));
+	blink::write::param::env(plugin, idx, blink::add::env::percentage(plugin.host));
+	blink::write::param::clamp_range(plugin, idx, {0.0f, 2.0f});
+	blink::write::param::offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
+	blink::write::param::override_env(plugin, idx, blink::add::env::percentage(plugin.host));
 	return idx;
 }
 
@@ -51,9 +51,9 @@ auto add_param_env_carrier_waveform(const blink::Plugin& plugin) -> blink_ParamI
 	blink::write::param::group(plugin, idx, {"Carrier"});
 	blink::write::param::name(plugin, idx, {"Waveform"});
 	blink::write::param::add_flags(plugin, idx, flags);
-	blink::write::param::env_clamp_range(plugin, idx, {0.0f, 1.0f});
-	blink::write::param::env_offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
-	blink::write::param::env_override_env(plugin, idx, blink::add::env::percentage(plugin.host));
+	blink::write::param::clamp_range(plugin, idx, {0.0f, 1.0f});
+	blink::write::param::offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
+	blink::write::param::override_env(plugin, idx, blink::add::env::percentage(plugin.host));
 	return idx;
 }
 
@@ -64,10 +64,10 @@ auto add_param_env_modulator_fm(const blink::Plugin& plugin) -> blink_ParamIdx {
 	blink::write::param::name(plugin, idx, {"Modulator FM Amount"});
 	blink::write::param::short_name(plugin, idx, {"FM Amount"});
 	blink::write::param::add_flags(plugin, idx, flags);
-	blink::write::param::env_env_idx(plugin, idx, blink::add::env::percentage(plugin.host));
-	blink::write::param::env_clamp_range(plugin, idx, {0.0f, 2.0f});
-	blink::write::param::env_offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
-	blink::write::param::env_override_env(plugin, idx, blink::add::env::percentage(plugin.host));
+	blink::write::param::env(plugin, idx, blink::add::env::percentage(plugin.host));
+	blink::write::param::clamp_range(plugin, idx, {0.0f, 2.0f});
+	blink::write::param::offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
+	blink::write::param::override_env(plugin, idx, blink::add::env::percentage(plugin.host));
 	return idx;
 }
 
