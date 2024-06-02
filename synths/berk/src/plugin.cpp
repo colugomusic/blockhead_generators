@@ -60,41 +60,18 @@ auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	model.params.env.pan = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.env.pitch = add_param_env_pitch(model.plugin);
 	model.params.env.buzz = add_param_env_buzz(model.plugin);
-	model.params.env.position = tract::add_param_env_position(model.plugin);
-	model.params.env.diameter = tract::add_param_env_diameter(model.plugin);
-	// TODO:
-	/*
-	auto group_throat = "Throat";
-	{
-		env.index = plugin->add_parameter(tract_params::throat_index::envelope_parameter());
-		env.diameter = plugin->add_parameter(tract_params::throat_diameter::envelope_parameter());
-
-		env.index->set_group_name(group_throat);
-		env.diameter->set_group_name(group_throat);
-	}
-
-	auto group_tongue = "Tongue";
-	{
-		env.tongue_index = plugin->add_parameter(tract_params::tongue_index::envelope_parameter());
-		env.tongue_diameter = plugin->add_parameter(tract_params::tongue_diameter::envelope_parameter());
-
-		env.tongue_index->set_group_name(group_tongue);
-		env.tongue_diameter->set_group_name(group_tongue);
-	}
-
-	auto group_fricatives = "Fricatives";
-	{
-		env.fricative_intensity = plugin->add_parameter(tract_params::fricative_intensity::envelope_parameter());
-
-		env.fricative_intensity->set_group_name(group_fricatives);
-	}
-
-	env.quality = plugin->add_parameter(tract_params::quality::envelope_parameter());
-
-	sliders.amp = plugin->add_parameter(params::amp::slider_parameter());
-	sliders.pan = plugin->add_parameter(params::pan::slider_parameter());
-	sliders.pitch = plugin->add_parameter(params::pitch::slider_parameter());
-	*/
+	model.params.env.throat.position = tract::add_param_env_throat_position(model.plugin);
+	model.params.env.throat.diameter = tract::add_param_env_throat_diameter(model.plugin);
+	model.params.env.tongue.position = tract::add_param_env_tongue_position(model.plugin);
+	model.params.env.tongue.diameter = tract::add_param_env_tongue_diameter(model.plugin);
+	model.params.env.fricative_intensity = tract::add_param_env_fricative_intensity(model.plugin);
+	model.params.env.quality = tract::add_param_env_quality(model.plugin);
+	model.params.slider.amp = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
+	model.params.slider.pan = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PAN});
+	model.params.slider.pitch = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});
+	blink::write::param::manip_delegate(model.plugin, model.params.slider.amp, model.params.env.amp);
+	blink::write::param::manip_delegate(model.plugin, model.params.slider.pan, model.params.env.pan);
+	blink::write::param::manip_delegate(model.plugin, model.params.slider.pitch, model.params.env.pitch);
 	return BLINK_OK;
 }
 

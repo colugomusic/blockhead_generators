@@ -16,14 +16,14 @@ struct Params {
 		} throat;
 		struct {
 			blink_ParamIdx diameter;
-			blink_ParamIdx index;
+			blink_ParamIdx position;
 		} tongue;
 	} env;
 	struct {
 		blink_ParamIdx amp;
 		blink_ParamIdx pan;
 		blink_ParamIdx pitch;
-	} slider_real;
+	} slider;
 };
 
 struct UnitDSP {
