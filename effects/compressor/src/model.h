@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/plugin_impl.hpp>
+#include <snd/audio/env_follower.hpp>
 
 struct Params {
 	struct {
@@ -19,6 +20,14 @@ struct Params {
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
+	struct {
+		snd::audio::EnvFollowerAR<1> env_follower_0;
+		snd::audio::EnvFollower<1> env_follower_1;
+	} mono;
+	struct {
+		snd::audio::EnvFollowerAR<2> env_follower_0;
+		snd::audio::EnvFollower<2> env_follower_1;
+	} stereo;
 };
 
 using Instance = blink::Instance<>;

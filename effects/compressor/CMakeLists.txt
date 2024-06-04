@@ -9,9 +9,9 @@ CPMAddPackage("gh:colugomusic/snd#master")
 cpm_export_variables(snd)
 
 list(APPEND SRC
+	./src/convert.h
 	./src/dsp.hpp
 	./src/model.h
-	./src/plugin.h
 	./src/plugin.cpp
 )
 
