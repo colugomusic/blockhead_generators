@@ -13,12 +13,12 @@ namespace fudge {
 auto other_grain(Particle* p, int idx) -> Grain& { return p->grains[idx == 0 ? 1 : 0]; }
 
 [[nodiscard]] static
-auto adjust_channel_pos(Particle* p, int index, int channel, float pos) -> float {
-	const auto adjust_amount = 1.0f - p->controller->uniformity()[index]; 
+auto adjust_channel_pos(Particle* p, Controller* controller, int index, int channel, float pos) -> float {
+	const auto adjust_amount = 1.0f - controller->uniformity()[index]; 
 	if (adjust_amount < 0.000001f) return pos; 
-	const auto num_frames = p->controller->sample_info().num_frames; 
+	const auto num_frames = controller->sample_info().num_frames; 
 	if (pos > num_frames.value) return pos; 
-	const auto analysis_data = p->controller->analysis_data(); 
+	const auto analysis_data = controller->analysis_data(); 
 	if (!analysis_data) return pos;
 	if (!analysis_data->done) return pos; 
 	const auto& other = other_grain(p, p->flip_flop);
@@ -44,68 +44,68 @@ auto adjust_channel_pos(Particle* p, int index, int channel, float pos) -> float
 }
 
 [[nodiscard]] static
-auto get_mono_position(Particle* p, int index, float pos, bool adjust) -> float {
+auto get_mono_position(Particle* p, Controller* controller, int index, float pos, bool adjust) -> float {
 	if (!adjust) return pos;
 	if (pos <= 0.0f) return pos; 
-	return adjust_channel_pos(p, index, 0, pos);
+	return adjust_channel_pos(p, controller, index, 0, pos);
 }
 
 [[nodiscard]] static
-auto get_stereo_positions(Particle* p, int index, float pos, bool adjust) -> std::array<float, 2> {
+auto get_stereo_positions(Particle* p, Controller* controller, int index, float pos, bool adjust) -> std::array<float, 2> {
 	if (!adjust) return { pos, pos };
 	if (pos <= 0.0f) return { pos, pos };
 	float pos_L;
 	float pos_R;
-	switch (p->controller->sample_data().get_channel_mode()) {
+	switch (controller->sample_data().get_channel_mode()) {
 		default:
 		case blink_ChannelMode_Stereo: {
-			pos_L = adjust_channel_pos(p, index, 0, pos);
-			pos_R = adjust_channel_pos(p, index, 1, pos);
+			pos_L = adjust_channel_pos(p, controller, index, 0, pos);
+			pos_R = adjust_channel_pos(p, controller, index, 1, pos);
 			break;
 		} 
 		case blink_ChannelMode_Left: {
-			pos_L = adjust_channel_pos(p, index, 0, pos);
-			pos_R = adjust_channel_pos(p, index, 0, pos);
+			pos_L = adjust_channel_pos(p, controller, index, 0, pos);
+			pos_R = adjust_channel_pos(p, controller, index, 0, pos);
 			break;
 		} 
 		case blink_ChannelMode_Right: {
-			pos_L = adjust_channel_pos(p, index, 1, pos);
-			pos_R = adjust_channel_pos(p, index, 1, pos);
+			pos_L = adjust_channel_pos(p, controller, index, 1, pos);
+			pos_R = adjust_channel_pos(p, controller, index, 1, pos);
 			break;
 		}
 	} 
-	if (std::abs(pos_R - pos_L) < 0.01f * p->controller->SR().value) {
+	if (std::abs(pos_R - pos_L) < 0.01f * controller->SR().value) {
 		pos_R = pos_L;
 	} 
 	return { pos_L, pos_R };
 }
 
 static
-auto trigger_next_grain(Particle* p, int index, bool adjust) -> void {
+auto trigger_next_grain(Particle* p, Controller* controller, int index, bool adjust) -> void {
 	constexpr auto MIN_GRAIN_SIZE = 3.0f;
 	constexpr auto MAX_WINDOW_SIZE = 4096.0f;
 	p->flip_flop = p->flip_flop == 0 ? 1 : 0;
-	const auto pos = p->controller->position()[index];
+	const auto pos = controller->position()[index];
 	const auto fade_in = pos > 0;
 	float pos_L;
 	float pos_R;
-	if (p->controller->sample_info().num_channels.value > 1) {
-		const auto positions = get_stereo_positions(p, index, pos, adjust);
+	if (controller->sample_info().num_channels.value > 1) {
+		const auto positions = get_stereo_positions(p, controller, index, pos, adjust);
 		pos_L = positions[0];
 		pos_R = positions[1];
 	}
 	else {
-		pos_L = get_mono_position(p, index, pos, adjust);
+		pos_L = get_mono_position(p, controller, index, pos, adjust);
 		pos_R = pos_L;
 	}
-	auto ratio = p->harmonic > 0 ? p->controller->get_harmonic_ratio(index, p->harmonic) : 1.0f;
-	auto ff = p->controller->ff()[index];
-	auto size = std::max(MIN_GRAIN_SIZE, p->controller->size()[index] * ff);
+	auto ratio = p->harmonic > 0 ? controller->get_harmonic_ratio(index, p->harmonic) : 1.0f;
+	auto ff = controller->ff()[index];
+	auto size = std::max(MIN_GRAIN_SIZE, controller->size()[index] * ff);
 	p->grains[p->flip_flop].on = true;
 	p->grains[p->flip_flop].fade_in = fade_in;
 	p->grains[p->flip_flop].pos[0] = pos_L;
 	p->grains[p->flip_flop].pos[1] = pos_R;
-	p->grains[p->flip_flop].ff = p->controller->frame_increment() * ff * ratio;
+	p->grains[p->flip_flop].ff = controller->frame_increment() * ff * ratio;
 	p->grains[p->flip_flop].size = size;
 	p->grains[p->flip_flop].window = std::min(MAX_WINDOW_SIZE, std::floor(size / 3));
 	p->grains[p->flip_flop].frame = 0.f;
@@ -114,26 +114,26 @@ auto trigger_next_grain(Particle* p, int index, bool adjust) -> void {
 }
 
 static
-auto reset(Particle* p, int index) -> void {
+auto reset(Particle* p, Controller* controller, int index) -> void {
 	p->grains[0].on = false;
 	p->grains[1].on = false;
 	p->trig_primed = false;
 	p->trigger_timer = 0.0f;
-	trigger_next_grain(p, index, false);
+	trigger_next_grain(p, controller, index, false);
 }
 
 [[nodiscard]] static
-auto read_mono_frame(const Particle& p, const Grain& grain) -> float {
+auto read_mono_frame(const Particle& p, const Controller& controller, const Grain& grain) -> float {
 	const auto pos = grain.pos[0] + grain.frame;
-	return pos < 0.f ? 0.f : p.controller->sample_data().read_frame_interp({0}, pos);
+	return pos < 0.f ? 0.f : controller.sample_data().read_frame_interp({0}, pos);
 }
 
 [[nodiscard]] static
-auto read_stereo_frame(const Particle& p, const Grain& grain) -> std::array<float, 2> {
+auto read_stereo_frame(const Particle& p, const Controller& controller, const Grain& grain) -> std::array<float, 2> {
 	float L;
 	float R; 
-	const auto& data = p.controller->sample_data(); 
-	switch (p.controller->sample_data().get_channel_mode()) {
+	const auto& data = controller.sample_data(); 
+	switch (controller.sample_data().get_channel_mode()) {
 		default:
 		case blink_ChannelMode_Stereo: {
 			const auto pos_L = grain.pos[0] + grain.frame;
@@ -165,32 +165,31 @@ auto read_stereo_frame(const Particle& p, const Grain& grain) -> std::array<floa
 	return { L, R };
 }
 
-auto init(Particle* p, const Controller* controller, int harmonic) -> void {
-	p->controller = controller;
-	p->harmonic   = harmonic;
+auto init(Particle* p, int harmonic) -> void {
+	p->harmonic = harmonic;
 }
 
-auto process(Particle* p, const ml::DSPVector& amp) -> ml::DSPVectorArray<2> {
+auto process(Particle* p, Controller* controller, const ml::DSPVector& amp) -> ml::DSPVectorArray<2> {
 	ml::DSPVector vec_L;
 	ml::DSPVector vec_R;
 	for (int j = 0; j < kFloatsPerDSPVector; j++) {
-		auto block_pos = p->controller->block_positions().positions[j];
-		auto local_block_pos = block_pos + p->controller->data_offset();
+		auto block_pos = controller->block_positions().positions[j];
+		auto local_block_pos = block_pos + controller->data_offset();
 		if (p->trig_primed && local_block_pos >= 0) {
-			reset(p, j);
+			reset(p, controller, j);
 		}
 		else {
-			if (p->controller->reset()[j]) {
+			if (controller->reset()[j]) {
 				if (local_block_pos < 0) {
 					p->trig_primed = true;
 				}
 				else {
-					reset(p, j);
+					reset(p, controller, j);
 				}
 			}
 			else if(p->trigger_timer >= std::floor(p->grains[p->flip_flop].size / 2)) {
 				p->trigger_timer = 0.f;
-				trigger_next_grain(p, j, true);
+				trigger_next_grain(p, controller, j, true);
 			}
 		}
 		for (int g = 0; g < 2; g++) {
@@ -212,13 +211,13 @@ auto process(Particle* p, const ml::DSPVector& amp) -> ml::DSPVectorArray<2> {
 			auto final_duck = std::min(grain.duck, self_duck);
 			auto overall_amp = grain.frame_amp * final_duck * amp[j]; 
 			if (overall_amp > 0.f) {
-				if (p->controller->sample_info().num_channels.value > 1) {
-					const auto LR = read_stereo_frame(*p, grain); 
+				if (controller->sample_info().num_channels.value > 1) {
+					const auto LR = read_stereo_frame(*p, *controller, grain); 
 					L = LR[0];
 					R = LR[1];
 				}
 				else {
-					L = read_mono_frame(*p, grain);
+					L = read_mono_frame(*p, *controller, grain);
 					R = L;
 				} 
 				L *= overall_amp;

@@ -43,14 +43,14 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data, cons
 	out.toggle.loop = blink::make_option_data(model.plugin, param_data, model.params.toggle.loop);
 	out.toggle.reverse = blink::make_option_data(model.plugin, param_data, model.params.toggle.reverse);
 	out.warp_points = &warp_points;
-	return {};
+	return out;
 }
 
 auto init(Model* model, UnitDSP* unit_dsp) -> void {
-	fudge::init(&unit_dsp->particles[0], &unit_dsp->controller, 0);
-	fudge::init(&unit_dsp->particles[1], &unit_dsp->controller, 1);
-	fudge::init(&unit_dsp->particles[2], &unit_dsp->controller, 2);
-	fudge::init(&unit_dsp->particles[3], &unit_dsp->controller, 3);
+	fudge::init(&unit_dsp->particles[0], 0);
+	fudge::init(&unit_dsp->particles[1], 1);
+	fudge::init(&unit_dsp->particles[2], 2);
+	fudge::init(&unit_dsp->particles[3], 3);
 }
 
 auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out) -> blink_Error {
@@ -72,7 +72,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer,
 			amp = ml::clamp(harmonic_amount - float(i - 1), ml::DSPVector(0.0f), ml::DSPVector(1.0f));
 		} 
 		total_amp += amp;
-		out_vec += fudge::process(&unit_dsp->particles[i], amp);
+		out_vec += fudge::process(&unit_dsp->particles[i], &unit_dsp->controller, amp);
 	}
 	out_vec /= ml::repeatRows<2>(total_amp);
 	out_vec =

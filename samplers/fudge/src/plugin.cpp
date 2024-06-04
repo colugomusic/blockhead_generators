@@ -120,6 +120,13 @@ auto add_param_env_amp(const blink::Plugin& plugin) -> blink_ParamIdx {
 }
 
 [[nodiscard]] static
+auto add_param_env_pitch(const blink::Plugin& plugin) -> blink_ParamIdx {
+	const auto idx = blink::add::param::env(plugin, {BLINK_STD_UUID_PITCH});
+	blink::write::param::add_flags(plugin, idx, blink_ParamFlags_DefaultActive);
+	return idx;
+}
+
+[[nodiscard]] static
 auto add_slider_grain_size(const blink::Plugin& plugin) -> blink_SliderRealIdx {
 	const auto sld_idx = blink::add::slider::empty_real(plugin.host);
 	blink::write::slider::default_value(plugin, sld_idx, 0.5f);
@@ -210,16 +217,18 @@ auto blink_get_plugin_info() -> blink_PluginInfo {
 
 auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	blink::init(&model.plugin, plugin_idx, host, make_sampler_info());
-	model.params.chord.harmonics_scale = add::param::chord::harmonics_scale(model.plugin);
 	model.params.env.amp               = add_param_env_amp(model.plugin);
+	model.params.env.pan               = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PAN});
+	model.params.env.pitch             = add_param_env_pitch(model.plugin);
+	model.params.env.speed             = add_param_env_speed(model.plugin);
 	model.params.env.grain.size        = add_param_env_grain_size(model.plugin);
 	model.params.env.grain.transpose   = add_param_env_grain_transpose(model.plugin);
 	model.params.env.grain.uniformity  = add_param_env_grain_uniformity(model.plugin);
+	model.params.chord.harmonics_scale = add::param::chord::harmonics_scale(model.plugin);
 	model.params.env.harmonics.amount  = add::param::env::harmonics_amount(model.plugin);
 	model.params.env.harmonics.spread  = add::param::env::harmonics_spread(model.plugin);
 	model.params.env.noise.amount      = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_AMOUNT});
 	model.params.env.noise.color       = blink::add::param::env(model.plugin, {BLINK_STD_UUID_NOISE_COLOR});
-	model.params.env.speed             = add_param_env_speed(model.plugin);
 	model.params.slider.amp            = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
 	model.params.slider.pan            = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.slider.pitch          = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});

@@ -28,7 +28,7 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(
 	const blink::BlockPositions& block_positions)
 {
 	constexpr auto MIN_AMOUNT = 0.0001f; 
-	if (env_amount.data->points.count < 1) {
+	if (!env_amount.data || env_amount.data->points.count < 1) {
 		return in;
 	} 
 	const auto amount = blink::search::vec(env_amount, block_positions);

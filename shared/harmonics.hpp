@@ -184,8 +184,9 @@ auto harmonics_amount(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto param_idx = blink::add::param::env(plugin, {"a8a6e4fa-6713-48bb-a888-65ac437384b7"});
 	const auto env_idx   = add::env::harmonics_amount(plugin);
 	const auto flags = blink_ParamFlags_CanManipulate | blink_ParamFlags_HostClamp;
-	blink::write::param::name(plugin, param_idx, {"Amount"});
-	blink::write::param::short_name(plugin, param_idx, {"Harmonics Amount"});
+	blink::write::param::name(plugin, param_idx, {"Harmonics Amount"});
+	blink::write::param::short_name(plugin, param_idx, {"Amount"});
+	blink::write::param::group(plugin, param_idx, {"Harmonics"});
 	blink::write::param::add_flags(plugin, param_idx, flags);
 	blink::write::param::clamp_range(plugin, param_idx, {0.0f, 3.0f});
 	blink::write::param::env(plugin, param_idx, env_idx);
@@ -201,6 +202,7 @@ auto harmonics_spread(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto flags = blink_ParamFlags_CanManipulate | blink_ParamFlags_HostClamp;
 	blink::write::param::name(plugin, param_idx, {"Harmonics Spread"});
 	blink::write::param::short_name(plugin, param_idx, {"Spread"});
+	blink::write::param::group(plugin, param_idx, {"Harmonics"});
 	blink::write::param::env(plugin, param_idx, env_idx);
 	blink::write::param::override_env(plugin, param_idx, env_idx);
 	blink::write::param::offset_env(plugin, param_idx, blink::add::env::percentage_bipolar(plugin.host));
