@@ -20,7 +20,7 @@ add_dependencies(all_plugins
 	effect_gainer
 	effect_lofi
 	effect_rattler
-	#effect_resonator
+	effect_resonator
 	#effect_ring_modulator
 	#effect_saturator
 	#effect_spring_reverb

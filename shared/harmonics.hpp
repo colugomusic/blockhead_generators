@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blink/tweak.hpp>
+#include <blink_std.h>
 
 namespace tweak {
 namespace harmonics_amount {
