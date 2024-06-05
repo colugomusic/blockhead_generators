@@ -13,7 +13,7 @@ add_subdirectory(resonator)
 add_subdirectory(ring_modulator)
 add_subdirectory(saturator)
 add_subdirectory(spring_reverb)
-# add_subdirectory(tract)
+add_subdirectory(tract)
 # add_subdirectory(wavebender)
 # add_subdirectory(zap)
 
