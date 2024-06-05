@@ -4,10 +4,12 @@
 
 struct Params {
 	struct {
+		blink_ParamIdx amp;
+		blink_ParamIdx pan;
 	} env;
 	struct {
-	} option;
-	struct {
+		blink_ParamIdx amp;
+		blink_ParamIdx pan;
 	} slider;
 };
 
