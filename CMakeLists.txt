@@ -13,7 +13,7 @@ add_subdirectory(synths)
 add_custom_target(all_plugins)
 add_dependencies(all_plugins
     effect_compressor
-    #effect_filter.bandpass
+    effect_filter.bandpass
     #effect_filter.highpass
     #effect_filter.lowpass
     #effect_freeze
