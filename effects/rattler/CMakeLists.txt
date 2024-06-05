@@ -6,19 +6,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 include(blink_lib)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
-    ./src/audio_data.h
-    ./src/audio_data.cpp
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-	./src/parameters/dry.hpp
-	./src/parameters/feedback.hpp
-	./src/parameters/time.hpp
-	./src/parameters/wet.hpp
-    ./src/plugin.h
+    ./src/dsp.hpp
+    ./src/model.h
     ./src/plugin.cpp
 )
 
