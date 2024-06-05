@@ -165,16 +165,16 @@ auto add_param_env_damper(const blink::Plugin& plugin) -> blink_ParamIdx {
 [[nodiscard]]
 auto add_param_env_fm_amount(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto param_idx = blink::add::param::env(plugin, {"d1b4d493-35f9-408b-982c-4474517a968c"});
-	const auto env_id    = blink::add::env::percentage(plugin.host);
+	const auto env_idx   = blink::add::env::percentage(plugin.host);
 	const auto flags     = blink_ParamFlags_CanManipulate | blink_ParamFlags_DefaultActive | blink_ParamFlags_HostClamp;
 	blink::write::param::name(plugin, param_idx, {"FM Amount"});
 	blink::write::param::short_name(plugin, param_idx, {"Amount"});
 	blink::write::param::group(plugin, param_idx, {"FM"});
-	blink::write::param::env(plugin, param_idx, env_id);
+	blink::write::param::env(plugin, param_idx, env_idx);
 	blink::write::param::add_flags(plugin, param_idx, flags);
 	blink::write::param::clamp_range(plugin, param_idx, {0.0f, 2.0f});
 	blink::write::param::offset_env(plugin, param_idx, blink::add::env::percentage_bipolar(plugin.host));
-	blink::write::param::override_env(plugin, param_idx, env_id);
+	blink::write::param::override_env(plugin, param_idx, env_idx);
 	return param_idx;
 }
 
