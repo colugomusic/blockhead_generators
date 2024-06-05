@@ -26,7 +26,7 @@ add_dependencies(all_plugins
 	effect_spring_reverb
 	effect_tract
 	effect_wavebender
-	#effect_zap
+	effect_zap
 	sampler_classic
 	sampler_fudge
 	synth_berk
