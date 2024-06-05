@@ -16,7 +16,7 @@ add_dependencies(all_plugins
 	effect_filter.bandpass
 	effect_filter.highpass
 	effect_filter.lowpass
-	#effect_freeze
+	effect_freeze
 	#effect_gainer
 	#effect_lofi
 	#effect_rattler

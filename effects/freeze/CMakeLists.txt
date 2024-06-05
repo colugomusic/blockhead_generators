@@ -7,21 +7,9 @@ include(CPM)
 include(blink_lib)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio_data.h
-    ./src/audio_data.cpp
-    ./src/audio.cpp
+    ./src/dsp.hpp
+    ./src/model
     ./src/buffer.h
-    ./src/controller.h
-    ./src/controller.cpp
-    ./src/grain.h
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/particle.h
-    ./src/particle.cpp
-    ./src/plugin.h
     ./src/plugin.cpp
 )
 

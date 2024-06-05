@@ -1,84 +1,94 @@
 #define BLINK_EXPORT
-#include "plugin.h"
 
-#include <blink/bind_effect.hpp>
-#include <blink/errors.hpp>
+#include "dsp.hpp"
+#include "model.h"
+#include <blink_std.h>
 
-namespace freeze { Plugin* g_plugin {}; }
+static Model model;
 
-using namespace blink;
-using namespace freeze;
+auto blink_get_error_string(blink_Error error) -> blink_TempString {
+	return {blink::get_std_error_string(static_cast<blink_StdError>(error))};
+}
 
-blink_PluginInfo blink_get_plugin_info()
-{
-	blink_PluginInfo out = blink_PluginInfo();
+auto blink_effect_get_info(blink_InstanceIdx instance_idx) -> blink_EffectInstanceInfo {
+	return {0};
+}
 
-	out.uuid = "cde37ae4-a943-4b2c-b792-3eeba8107a6b";
-	out.name = "Freeze";
-	out.category = BLINK_STD_CATEGORY_DESTRUCTION;
-	out.version = PLUGIN_VERSION;
-	out.has_icon = true;
-
+auto blink_get_plugin_info() -> blink_PluginInfo {
+	blink_PluginInfo out = {0};
+	out.uuid     = {"cde37ae4-a943-4b2c-b792-3eeba8107a6b"};
+	out.name     = {"Freeze"};
+	out.category = {BLINK_STD_CATEGORY_DESTRUCTION};
+	out.version  = {PLUGIN_VERSION};
+	out.has_icon = {true};
 	return out;
 }
 
-blink_Error blink_init()
-{
-	if (g_plugin) return blink_StdError_AlreadyInitialized;
-
-	g_plugin = new freeze::Plugin();
-
+auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
+	blink::init(&model.plugin, plugin_idx, host);
+	model.params.env.pitch    = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PITCH});
+	model.params.env.formant  = blink::add::param::env(model.plugin, {BLINK_STD_UUID_FORMANT});
+	model.params.env.mix      = blink::add::param::env(model.plugin, {BLINK_STD_UUID_MIX});
+	model.params.slider.pitch = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});
+	blink::write::param::add_flags(model.plugin, model.params.env.pitch, {blink_ParamFlags_DefaultActive});
+	blink::write::param::add_flags(model.plugin, model.params.env.formant, {blink_ParamFlags_DefaultActive});
+	blink::write::param::add_flags(model.plugin, model.params.env.mix, {blink_ParamFlags_DefaultActive});
+	blink::write::param::manip_delegate(model.plugin, model.params.slider.pitch, model.params.env.pitch);
 	return BLINK_OK;
 }
 
-blink_Error blink_terminate()
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
+auto blink_instance_destroy(blink_InstanceIdx instance_idx) -> blink_Error {
+	return blink::destroy_instance(&model.entities, instance_idx);
+}
 
-	delete g_plugin;
+auto blink_instance_make() -> blink_InstanceIdx {
+	return blink::make_instance(&model.entities);
+}
 
+auto blink_instance_reset(blink_InstanceIdx instance_idx) -> blink_Error {
+	auto& instance_dsp = model.entities.instance.get<InstanceDSP>(instance_idx.value);
+	dsp::instance_reset(&model, &instance_dsp);
 	return BLINK_OK;
 }
 
-blink_EffectInstance blink_make_effect_instance()
-{
-	if (!g_plugin) return blink_EffectInstance{ 0 };
-
-	return bind::effect_instance(g_plugin->add_instance());
+auto blink_instance_stream_init(blink_InstanceIdx instance_idx, blink_SR SR) -> blink_Error {
+	return BLINK_OK;
 }
 
-blink_Error blink_destroy_effect_instance(blink_EffectInstance instance)
-{
-	if (!g_plugin) return blink_StdError_NotInitialized;
-
-	return g_plugin->destroy_instance(std::move(instance));
+auto blink_effect_process(blink_UnitIdx unit_idx, const blink_EffectBuffer* buffer, const blink_EffectUnitState* unit_state, const float* in, float* out) -> blink_Error {
+	const auto instance_idx = model.entities.unit.get<blink_InstanceIdx>(unit_idx.value);
+	auto& instance_dsp      = model.entities.instance.get<InstanceDSP>(instance_idx.value);
+	auto& unit_dsp          = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	return dsp::process(&model, unit_idx, &instance_dsp, &unit_dsp, *buffer, *unit_state, in, out);
 }
 
-int blink_get_num_parameters()
-{
-	if (!g_plugin) return 0;
-
-	return g_plugin->get_num_parameters();
+auto blink_terminate() -> blink_Error {
+	return blink::terminate(&model.entities);
 }
 
-blink_Parameter blink_get_parameter(blink_Index index)
-{
-	return bind::parameter(g_plugin->get_parameter(index));
+auto blink_unit_add(blink_InstanceIdx instance_idx) -> blink_UnitIdx {
+	return blink::add_unit(&model.entities, instance_idx);
 }
 
-blink_Parameter blink_get_parameter_by_uuid(blink_UUID uuid)
-{
-	return bind::parameter(g_plugin->get_parameter(uuid));
+auto blink_unit_reset(blink_UnitIdx unit_idx) -> blink_Error {
+	const auto instance_idx = model.entities.unit.get<blink_InstanceIdx>(unit_idx.value);
+	auto& instance_dsp      = model.entities.instance.get<InstanceDSP>(instance_idx.value);
+	auto& unit_dsp          = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	dsp::unit_reset(&model, &instance_dsp, &unit_dsp);
+	return BLINK_OK;
 }
 
-const char* blink_get_error_string(blink_Error error)
-{
-	return blink::get_std_error_string(blink_StdError(error));
+auto blink_unit_stream_init(blink_UnitIdx unit_idx, blink_SR SR) -> blink_Error {
+	const auto instance_idx = model.entities.unit.get<blink_InstanceIdx>(unit_idx.value);
+	auto& instance_dsp      = model.entities.instance.get<InstanceDSP>(instance_idx.value);
+	auto& unit_dsp          = model.entities.unit.get<UnitDSP>(unit_idx.value);
+	unit_dsp.SR = SR;
+	dsp::unit_reset(&model, &instance_dsp, &unit_dsp);
+	return BLINK_OK;
 }
 
-CMRC_DECLARE(freeze);
+CMRC_DECLARE(plugin);
 
-blink_ResourceData blink_get_resource_data(const char* path)
-{
-	return g_plugin->get_resource_data(cmrc::freeze::get_filesystem(), path);
+auto blink_get_resource_data(const char* path) -> blink_ResourceData {
+	return blink::get_resource_data(&model.plugin, cmrc::plugin::get_filesystem(), path);
 }
