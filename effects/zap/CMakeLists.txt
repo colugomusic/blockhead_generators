@@ -10,19 +10,8 @@ CPMAddPackage("gh:colugomusic/snd#master")
 cpm_export_variables(snd)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
-    ./src/audio_data.h
-    ./src/audio_data.cpp
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/parameters/frequency.hpp
-    ./src/parameters/mix.hpp
-    ./src/parameters/resonance.hpp
-    ./src/parameters/spread.hpp
-    ./src/plugin.h
+    ./src/dsp.hpp
+    ./src/model.h
     ./src/plugin.cpp
 )
 

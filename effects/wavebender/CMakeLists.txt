@@ -7,22 +7,8 @@ include(CPM)
 include(blink_lib)
 
 list(APPEND SRC
-    ./src/audio.h
-    ./src/audio.cpp
-    ./src/audio_data.h
-    ./src/audio_data.cpp
-    ./src/instance.h
-    ./src/instance.cpp
-    ./src/parameters.h
-    ./src/parameters.cpp
-    ./src/parameters/bubble.hpp
-    ./src/parameters/mix.hpp
-    ./src/parameters/pitch.hpp
-    ./src/parameters/smoother.hpp
-    ./src/parameters/tilt.hpp
-    ./src/parameters/xfade_mode.hpp
-    ./src/parameters/xfade_size.hpp
-    ./src/plugin.h
+    ./src/dsp.hpp
+    ./src/model.h
     ./src/plugin.cpp
 )
 

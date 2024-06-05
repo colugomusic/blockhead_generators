@@ -25,7 +25,7 @@ add_dependencies(all_plugins
 	effect_saturator
 	effect_spring_reverb
 	effect_tract
-	#effect_wavebender
+	effect_wavebender
 	#effect_zap
 	sampler_classic
 	sampler_fudge
