@@ -12,23 +12,23 @@ add_subdirectory(synths)
 
 add_custom_target(all_plugins)
 add_dependencies(all_plugins
-    effect_compressor
-    effect_filter.bandpass
-    #effect_filter.highpass
-    #effect_filter.lowpass
-    #effect_freeze
-    #effect_gainer
-    #effect_lofi
-    #effect_rattler
-    #effect_resonator
-    #effect_ring_modulator
-    #effect_saturator
-    #effect_spring_reverb
-    #effect_tract
-    #effect_wavebender
-    #effect_zap
-    sampler_classic
-    sampler_fudge
-    synth_berk
-    synth_test
+	effect_compressor
+	effect_filter.bandpass
+	effect_filter.highpass
+	effect_filter.lowpass
+	#effect_freeze
+	#effect_gainer
+	#effect_lofi
+	#effect_rattler
+	#effect_resonator
+	#effect_ring_modulator
+	#effect_saturator
+	#effect_spring_reverb
+	#effect_tract
+	#effect_wavebender
+	#effect_zap
+	sampler_classic
+	sampler_fudge
+	synth_berk
+	synth_test
 )

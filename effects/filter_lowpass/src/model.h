@@ -16,7 +16,7 @@ struct Params {
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
-	std::array<ml::Bandpass, 2> filter;
+	std::array<ml::Lopass, 2> filter;
 };
 
 using Instance = blink::Instance<>;

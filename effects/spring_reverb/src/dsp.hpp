@@ -9,6 +9,7 @@ struct AudioData {
 	struct {
 	} env;
 	struct {
+		blink::OptionData stereo;
 	} option;
 	struct {
 	} slider;
