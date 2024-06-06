@@ -7,14 +7,14 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData sr;
-		blink::EnvData br;
-		blink::EnvData mix;
+		blink::uniform::Env sr;
+		blink::uniform::Env br;
+		blink::uniform::Env mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.sr = blink::make_env_data(model.plugin, param_data, model.params.env.sr);
 	out.env.br = blink::make_env_data(model.plugin, param_data, model.params.env.br);
@@ -22,9 +22,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	const auto sr = blink::search::vec(data.env.sr, unit_dsp->block_positions);
 	const auto br = blink::search::vec(data.env.br, unit_dsp->block_positions);
 	const auto mix = blink::search::vec(data.env.mix, unit_dsp->block_positions);

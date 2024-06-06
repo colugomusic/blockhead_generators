@@ -16,12 +16,12 @@ struct ParticleSettings {
 
 struct AudioData {
 	struct {
-		blink::EnvData pitch;
-		blink::EnvData formant;
-		blink::EnvData mix;
+		blink::uniform::Env pitch;
+		blink::uniform::Env formant;
+		blink::uniform::Env mix;
 	} env;
 	struct {
-		blink::SliderRealData pitch;
+		blink::uniform::SliderReal pitch;
 	} slider;
 };
 
@@ -136,7 +136,7 @@ auto buffer_read(const InstanceDSP& instance_dsp, int vector_index, std::size_t 
 }
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.pitch = blink::make_env_data(model.plugin, param_data, model.params.env.pitch);
 	out.env.formant = blink::make_env_data(model.plugin, param_data, model.params.env.formant);
@@ -157,9 +157,9 @@ auto make_particle_settings(const AudioData& data, const freeze::FreezeBuffer& b
 	return out;
 }
 
-auto process(Model* model, blink_UnitIdx unit_idx, InstanceDSP* instance_dsp, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, blink_UnitIdx unit_idx, InstanceDSP* instance_dsp, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	if (!instance_dsp->master_unit) {
 		instance_dsp->master_unit = unit_idx;
 		unit_dsp->record = false;
@@ -174,7 +174,7 @@ auto process(Model* model, blink_UnitIdx unit_idx, InstanceDSP* instance_dsp, Un
 	for (int i = 0; i < kFloatsPerDSPVector; i++) {
 		if (*instance_dsp->master_unit == unit_idx) {
 			if (!unit_dsp->record) {
-				const auto local_block_position = unit_dsp->block_positions.positions[i] + int32_t(unit_state.unit.data_offset); 
+				const auto local_block_position = unit_dsp->block_positions.positions[i] + int32_t(uniform.data_offset); 
 				if (local_block_position >= 0) {
 					unit_dsp->record = true;
 					unit_dsp->particle.queue_reset = true;

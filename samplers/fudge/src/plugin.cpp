@@ -286,13 +286,13 @@ auto blink_sampler_sample_deleted(blink_ID sample_id) -> blink_Error {
 	return BLINK_OK;
 }
 
-auto blink_sampler_draw(const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
-	return draw(&model, *buffer, *unit_state, n, out);
+auto blink_sampler_draw(const blink_SamplerVaryingData* varying, const blink_SamplerUniformData* uniform, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
+	return draw(&model, *varying, *uniform, n, out);
 }
 
-auto blink_sampler_process(blink_UnitIdx unit_idx, const blink_SamplerBuffer* buffer, const blink_SamplerUnitState* unit_state, float* out) -> blink_Error {
+auto blink_sampler_process(blink_UnitIdx unit_idx, const blink_SamplerVaryingData* varying, const blink_SamplerUniformData* uniform, float* out) -> blink_Error {
 	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
-	return dsp::process(&model, &unit_dsp, *buffer, *unit_state, out);
+	return dsp::process(&model, &unit_dsp, *varying, *uniform, out);
 }
 
 auto blink_terminate() -> blink_Error {

@@ -21,8 +21,8 @@ public:
 
 	void process(
 		const AudioData& data,
-		const blink_SamplerBuffer& buffer,
-		const blink_SamplerUnitState& unit_state,
+		const blink_SamplerVaryingData& varying,
+		const blink_SamplerUniformData& uniform,
 		const SampleAnalysis* analysis_data,
 		const blink::Traverser& block_traverser,
 		const blink::BlockPositions& block_positions,
@@ -40,10 +40,10 @@ public:
 
 	const SampleAnalysis* analysis_data() const { return analysis_data_; }
 	float frame_increment() const { return frame_increment_; }
-	const blink_SampleInfo& sample_info() const { return *(buffer_->sample_info); }
+	const blink_SampleInfo& sample_info() const { return *(varying_->sample_info); }
 	const blink::SampleData& sample_data() const { return sample_data_; }
 	bool sample_loop() const { return sample_loop_; }
-	const blink_SamplerBuffer& buffer() const { return *buffer_; }
+	const blink_SamplerVaryingData& varying() const { return *varying_; }
 	float get_harmonic_ratio(int index, int harmonic) const;
 	blink_SR SR() const { return SR_; }
 
@@ -51,7 +51,7 @@ private:
 
 	float snap_ratio_to_scale(int index, float ff) const;
 
-	const blink_SamplerBuffer* buffer_;
+	const blink_SamplerVaryingData* varying_;
 	const blink::BlockPositions* block_positions_;
 	snd::transport::DSPVectorFramePosition sample_positions_;
 	const ml::DSPVectorInt* resets_;

@@ -22,8 +22,8 @@ ml::DSPVectorArray<2> NoiseGenerator::operator()(const ml::DSPVectorArray<2>& in
 ml::DSPVectorArray<2> NoiseGenerator::operator()(
 	const ml::DSPVectorArray<2>& in,
 	float mode, // 0: multiply, 1: mix
-	const blink::EnvData& env_amount,
-	const blink::EnvData& env_color,
+	const blink::uniform::Env& env_amount,
+	const blink::uniform::Env& env_color,
 	float width,
 	const blink::BlockPositions& block_positions)
 {

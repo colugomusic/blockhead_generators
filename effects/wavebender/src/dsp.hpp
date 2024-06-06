@@ -10,20 +10,20 @@ static constexpr auto INIT = 4;
 
 struct AudioData {
 	struct {
-		blink::EnvData tilt;
-		blink::EnvData xfade_size;
-		blink::EnvData pitch;
-		blink::EnvData bubble;
-		blink::EnvData smoother;
-		blink::EnvData mix;
+		blink::uniform::Env tilt;
+		blink::uniform::Env xfade_size;
+		blink::uniform::Env pitch;
+		blink::uniform::Env bubble;
+		blink::uniform::Env smoother;
+		blink::uniform::Env mix;
 	} env;
 	struct {
-		blink::OptionData xfade_mode;
+		blink::uniform::Option xfade_mode;
 	} option;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.bubble = blink::make_env_data(model.plugin, param_data, model.params.env.bubble);
 	out.env.mix = blink::make_env_data(model.plugin, param_data, model.params.env.mix);
@@ -221,9 +221,9 @@ auto reset(Model* model, UnitDSP* unit_dsp) -> void {
 	}
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	auto bubble = blink::search::vec(data.env.bubble, unit_dsp->block_positions);
 	auto tilt = blink::search::vec(data.env.tilt, unit_dsp->block_positions) * 8.0f;
 	auto pitch = blink::math::convert::p_to_ff(blink::search::vec(data.env.pitch, unit_dsp->block_positions));

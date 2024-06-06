@@ -4,36 +4,36 @@
 
 struct AudioData {
 	struct {
-		blink::ChordData scale;
+		blink::uniform::Chord scale;
 	} chord;
 	struct {
-		blink::EnvData amp;
-		blink::EnvData pan;
-		blink::EnvData pitch;
-		blink::EnvData speed;
-		blink::EnvData grain_size;
-		blink::EnvData grain_transpose;
-		blink::EnvData grain_uniformity;
-		blink::EnvData harmonics_amount;
-		blink::EnvData harmonics_spread;
-		blink::EnvData noise_amount;
-		blink::EnvData noise_color;
+		blink::uniform::Env amp;
+		blink::uniform::Env pan;
+		blink::uniform::Env pitch;
+		blink::uniform::Env speed;
+		blink::uniform::Env grain_size;
+		blink::uniform::Env grain_transpose;
+		blink::uniform::Env grain_uniformity;
+		blink::uniform::Env harmonics_amount;
+		blink::uniform::Env harmonics_spread;
+		blink::uniform::Env noise_amount;
+		blink::uniform::Env noise_color;
 	} env;
 	struct {
-		blink::SliderRealData amp;
-		blink::SliderRealData pan;
-		blink::SliderRealData pitch;
-		blink::SliderRealData speed;
-		blink::SliderRealData noise_width;
-		blink::SliderIntData sample_offset;
+		blink::uniform::SliderReal amp;
+		blink::uniform::SliderReal pan;
+		blink::uniform::SliderReal pitch;
+		blink::uniform::SliderReal speed;
+		blink::uniform::SliderReal noise_width;
+		blink::uniform::SliderInt sample_offset;
 	} slider;
 	struct {
-		blink::OptionData noise_mode;
-		blink::OptionData reverse_mode;
+		blink::uniform::Option noise_mode;
+		blink::uniform::Option reverse_mode;
 	} option;
 	struct {
-		blink::OptionData loop;
-		blink::OptionData reverse;
+		blink::uniform::Option loop;
+		blink::uniform::Option reverse;
 	} toggle;
 	const blink_WarpPoints* warp_points;
 };

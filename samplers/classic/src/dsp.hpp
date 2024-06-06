@@ -10,31 +10,31 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData amp;
-		blink::EnvData pan;
-		blink::EnvData pitch;
-		blink::EnvData noise_amount;
-		blink::EnvData noise_color;
+		blink::uniform::Env amp;
+		blink::uniform::Env pan;
+		blink::uniform::Env pitch;
+		blink::uniform::Env noise_amount;
+		blink::uniform::Env noise_color;
 	} env;
 	struct {
-		blink::SliderRealData amp;
-		blink::SliderRealData pan;
-		blink::SliderRealData pitch;
-		blink::SliderRealData noise_width;
-		blink::SliderIntData sample_offset;
+		blink::uniform::SliderReal amp;
+		blink::uniform::SliderReal pan;
+		blink::uniform::SliderReal pitch;
+		blink::uniform::SliderReal noise_width;
+		blink::uniform::SliderInt sample_offset;
 	} slider;
 	struct {
-		blink::OptionData noise_mode;
-		blink::OptionData reverse_mode;
+		blink::uniform::Option noise_mode;
+		blink::uniform::Option reverse_mode;
 	} option;
 	struct {
-		blink::OptionData loop;
-		blink::OptionData reverse;
+		blink::uniform::Option loop;
+		blink::uniform::Option reverse;
 	} toggle;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.amp              = blink::make_env_data(model.plugin, param_data, model.params.env.amp);
 	out.env.pan              = blink::make_env_data(model.plugin, param_data, model.params.env.pan);
@@ -81,15 +81,16 @@ auto process_mono_sample(const blink::SampleData& sample_data, const snd::transp
 [[nodiscard]]
 auto process_sample(
 	const AudioData& data,
-	const blink_SamplerBuffer& buffer,
+	const blink_SamplerVaryingData& varying,
+	const blink_SamplerUniformData& uniform,
 	const blink::SampleData& sample_data,
 	snd::transport::DSPVectorFramePosition sample_pos) -> ml::DSPVectorArray<2>
 {
-	sample_pos /= float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
+	sample_pos /= float(uniform.base.song_rate.value) / varying.sample_info->SR.value;
 	if (data.toggle.reverse.value) {
-		sample_pos = std::int32_t(buffer.sample_info->num_frames.value - 1) - sample_pos;
+		sample_pos = std::int32_t(varying.sample_info->num_frames.value - 1) - sample_pos;
 	} 
-	if (buffer.sample_info->num_channels.value > 1) {
+	if (varying.sample_info->num_channels.value > 1) {
 		return process_stereo_sample(sample_data, sample_pos, data.toggle.loop.value);
 	}
 	else
@@ -102,7 +103,8 @@ auto apply_correction_grains(
 	ReverseCorrection* reverse_correction,
 	const ml::DSPVectorArray<2>& dry,
 	const AudioData& data,
-	const blink_SamplerBuffer& buffer,
+	const blink_SamplerVaryingData& varying,
+	const blink_SamplerUniformData& uniform,
 	const blink::SampleData& sample_data,
 	blink_SR SR,
 	const blink::transform::CorrectionGrains& grain_info) -> ml::DSPVectorArray<2>
@@ -128,8 +130,8 @@ auto apply_correction_grains(
 				reverse_correction->grain.on = true;
 				const auto beg = i == 0 ? reverse_correction->dry_positions.prev_pos : reverse_correction->dry_positions[i - 1];
 				// i hate math
-				const auto a = float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
-				const auto b = float(buffer.sample_info->SR.value) / SR.value;
+				const auto a = float(uniform.base.song_rate.value) / varying.sample_info->SR.value;
+				const auto b = float(varying.sample_info->SR.value) / SR.value;
 				reverse_correction->grain.beg = beg;
 				reverse_correction->grain.pos = beg;
 				reverse_correction->grain.ff = grain_info.ff[i] * a * b;
@@ -143,21 +145,21 @@ auto apply_correction_grains(
 		}
 	}
 	ml::DSPVectorArray<2> out;
-	const auto wet = process_sample(data, buffer, sample_data, grain_positions);
+	const auto wet = process_sample(data, varying, uniform, sample_data, grain_positions);
 	return ml::lerp(wet, dry, ml::repeatRows<2>(xfade));
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
-	const auto generate_correction_grains = unit_state.unit.smooth_transitions.value && data.option.reverse_mode.data->points.count > 1;
+auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerVaryingData& varying, const blink_SamplerUniformData& uniform, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.base.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.base.param_data);
+	const auto generate_correction_grains = uniform.base.smooth_transitions.value && data.option.reverse_mode.data->points.count > 1;
 	blink::transform::Tape::Config config;
-	config.unit_state_id              = unit_state.unit.id;
+	config.unit_state_id              = uniform.base.id;
 	config.env.pitch                  = data.env.pitch.data;
 	config.option.reverse             = data.option.reverse_mode.data;
 	config.sample_offset              = data.slider.sample_offset.value;
 	config.transpose                  = data.slider.pitch.value;
-	config.warp_points                = unit_state.unit.warp_points;
+	config.warp_points                = uniform.base.warp_points;
 	config.outputs.derivatives.pitch  = false;
 	config.outputs.derivatives.warped = false;
 	config.outputs.correction_grains  = generate_correction_grains;
@@ -166,14 +168,15 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer,
 	if (generate_correction_grains) {
 		unit_dsp->reverse_correction.dry_positions.add(sample_pos, BLINK_VECTOR_SIZE);
 	}
-	blink::SampleData sample_data(buffer.sample_info, unit_state.channel_mode);
-	auto out_vec = process_sample(data, buffer, sample_data, sample_pos);
+	blink::SampleData sample_data(varying.sample_info, uniform.channel_mode);
+	auto out_vec = process_sample(data, varying, uniform, sample_data, sample_pos);
 	if (generate_correction_grains) {
 		out_vec = apply_correction_grains(
 			&unit_dsp->reverse_correction,
 			out_vec, 
 			data, 
-			buffer, 
+			varying,
+			uniform,
 			sample_data, 
 			unit_dsp->SR,
 			unit_dsp->tape_transformer.get_correction_grains());

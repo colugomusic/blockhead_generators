@@ -17,8 +17,8 @@ struct NoiseGenerator {
 	ml::DSPVectorArray<2> operator()(
 		const ml::DSPVectorArray<2>& in,
 		float mode,
-		const blink::EnvData& env_amount,
-		const blink::EnvData& env_color,
+		const blink::uniform::Env& env_amount,
+		const blink::uniform::Env& env_color,
 		float width,
 		const blink::BlockPositions& block_positions);
 private:

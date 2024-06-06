@@ -18,7 +18,7 @@ auto get_analysis_data(const Model& model, blink_ID sample_id) -> const SampleAn
 }
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data, const blink_WarpPoints& warp_points) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data, const blink_WarpPoints& warp_points) -> AudioData {
 	AudioData out;
 	out.chord.scale = blink::make_chord_data(model.plugin, param_data, model.params.chord.harmonics_scale);
 	out.env.amp = blink::make_env_data(model.plugin, param_data, model.params.env.amp);
@@ -53,12 +53,12 @@ auto init(Model* model, UnitDSP* unit_dsp) -> void {
 	fudge::init(&unit_dsp->particles[3], 3);
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data, *unit_state.unit.warp_points);
-	unit_dsp->block_traverser.generate(unit_state.unit.id, unit_dsp->block_positions, kFloatsPerDSPVector);
-	const auto analysis_data = buffer.analysis_ready.value ? get_analysis_data(*model, buffer.sample_info->id) : nullptr;
-	unit_dsp->controller.process(data, buffer, unit_state, analysis_data, unit_dsp->block_traverser, unit_dsp->block_positions, unit_state.unit.data_offset, unit_dsp->SR);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerVaryingData& varying, const blink_SamplerUniformData& uniform, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.base.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.base.param_data, *uniform.base.warp_points);
+	unit_dsp->block_traverser.generate(uniform.base.id, unit_dsp->block_positions, kFloatsPerDSPVector);
+	const auto analysis_data = varying.analysis_ready.value ? get_analysis_data(*model, varying.sample_info->id) : nullptr;
+	unit_dsp->controller.process(data, varying, uniform, analysis_data, unit_dsp->block_traverser, unit_dsp->block_positions, uniform.base.data_offset, unit_dsp->SR);
 	const auto harmonic_amount = blink::search::vec(data.env.harmonics_amount, unit_dsp->block_positions);
 	ml::DSPVectorArray<2> out_vec;
 	ml::DSPVector total_amp;

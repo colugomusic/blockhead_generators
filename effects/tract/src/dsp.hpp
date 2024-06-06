@@ -11,20 +11,20 @@ static constexpr auto ROWS = 2;
 struct AudioData {
 	struct {
 		struct {
-			blink::EnvData position;
-			blink::EnvData diameter;
+			blink::uniform::Env position;
+			blink::uniform::Env diameter;
 		} throat;
 		struct {
-			blink::EnvData position;
-			blink::EnvData diameter;
+			blink::uniform::Env position;
+			blink::uniform::Env diameter;
 		} tongue;
-		blink::EnvData quality;
-		blink::EnvData mix;
+		blink::uniform::Env quality;
+		blink::uniform::Env mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.throat.position = blink::make_env_data(model.plugin, param_data, model.params.env.throat.position);
 	out.env.throat.diameter = blink::make_env_data(model.plugin, param_data, model.params.env.throat.diameter);
@@ -44,9 +44,9 @@ auto is_silent(const ml::DSPVectorArray<ROWS>& x) -> bool {
 	return true;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	const auto index = blink::search::vec(data.env.throat.position, unit_dsp->block_positions);
 	const auto diameter = blink::search::vec(data.env.throat.diameter, unit_dsp->block_positions);
 	const auto tongue_index = blink::search::vec(data.env.tongue.position, unit_dsp->block_positions);

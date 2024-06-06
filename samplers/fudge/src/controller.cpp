@@ -11,8 +11,8 @@ namespace fudge {
 
 void Controller::process(
 	const AudioData& data,
-	const blink_SamplerBuffer& buffer,
-	const blink_SamplerUnitState& unit_state,
+	const blink_SamplerVaryingData& varying,
+	const blink_SamplerUniformData& uniform,
 	const SampleAnalysis* analysis_data,
 	const blink::Traverser& block_traverser,
 	const blink::BlockPositions& block_positions,
@@ -25,34 +25,34 @@ void Controller::process(
 
 	transform::Stretch::Config config;
 
-	config.unit_state_id = unit_state.unit.id;
+	config.unit_state_id = uniform.base.id;
 	config.env.speed = data.env.speed.data;
 	config.option.reverse = data.option.reverse_mode.data;
 	config.sample_offset = data.slider.sample_offset.value;
 	config.speed = data.slider.speed.value;
-	config.warp_points = unit_state.unit.warp_points;
+	config.warp_points = uniform.base.warp_points;
 	config.outputs.derivatives.sped = false;
 	config.outputs.derivatives.warped = false;
 
 	stretch_transformer_(config, block_positions, kFloatsPerDSPVector);
 
 	sample_positions_ = stretch_transformer_.get_reversed_positions().positions;
-	sample_positions_ /= float(buffer.unit.song_rate.value) / buffer.sample_info->SR.value;
+	sample_positions_ /= float(uniform.base.song_rate.value) / varying.sample_info->SR.value;
 
-	sample_data_ = blink::SampleData(buffer.sample_info, unit_state.channel_mode);
+	sample_data_ = blink::SampleData(varying.sample_info, uniform.channel_mode);
 
 	if (data.toggle.reverse.value)
 	{
-		sample_positions_ = std::int32_t(buffer.sample_info->num_frames.value - 1) - sample_positions_;
+		sample_positions_ = std::int32_t(varying.sample_info->num_frames.value - 1) - sample_positions_;
 	}
 
 	if (data.toggle.loop.value)
 	{
-		sample_positions_ = blink::math::wrap(sample_positions_, float(buffer.sample_info->num_frames.value));
+		sample_positions_ = blink::math::wrap(sample_positions_, float(varying.sample_info->num_frames.value));
 	}
 
-	buffer_ = &buffer;
-	frame_increment_ = float(buffer.sample_info->SR.value) / SR.value;
+	varying_ = &varying;
+	frame_increment_ = float(varying.sample_info->SR.value) / SR.value;
 	sample_loop_ = data.toggle.loop.value;
 	analysis_data_ = analysis_data;
 	resets_ = &block_traverser.get_resets();
@@ -63,7 +63,7 @@ void Controller::process(
 	ff_ = blink::math::convert::p_to_ff(pitch);
 
 	const auto size_in_ms      = convert::linear_to_ms(blink::search::vec(data.env.grain_size, *block_positions_));
-	const auto size_in_samples = convert::ms_to_samples(size_in_ms, buffer_->sample_info->SR.value);
+	const auto size_in_samples = convert::ms_to_samples(size_in_ms, varying.sample_info->SR.value);
 
 	size_ = blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose);
 	uniformity_ = blink::search::vec(data.env.grain_uniformity, *block_positions_);

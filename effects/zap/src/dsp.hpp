@@ -11,15 +11,15 @@ static constexpr auto MAX_FREQ = 4000.0f;
 
 struct AudioData {
 	struct {
-		blink::EnvData frequency;
-		blink::EnvData resonance;
-		blink::EnvData spread;
-		blink::EnvData mix;
+		blink::uniform::Env frequency;
+		blink::uniform::Env resonance;
+		blink::uniform::Env spread;
+		blink::uniform::Env mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.frequency = blink::make_env_data(model.plugin, param_data, model.params.env.frequency);
 	out.env.resonance = blink::make_env_data(model.plugin, param_data, model.params.env.resonance);
@@ -28,9 +28,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	auto base_freq  = blink::search::one(data.env.frequency, unit_dsp->block_positions);
 	auto spread     = blink::search::one(data.env.spread, unit_dsp->block_positions);
 	const auto res  = blink::search::vec(data.env.resonance, unit_dsp->block_positions);

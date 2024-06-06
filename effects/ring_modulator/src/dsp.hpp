@@ -7,21 +7,21 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData pitch, mix;
+		blink::uniform::Env pitch, mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.pitch = blink::make_env_data(model.plugin, param_data, model.params.env.pitch);
 	out.env.mix   = blink::make_env_data(model.plugin, param_data, model.params.env.mix);
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data  = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data  = make_audio_data(*model, uniform.param_data);
 	const auto pitch = blink::search::vec(data.env.pitch, unit_dsp->block_positions) + 60.0f;
 	const auto mix   = blink::search::vec(data.env.mix, unit_dsp->block_positions);
 	const auto omega = blink::math::convert::pitch_to_frequency(pitch) / float(unit_dsp->SR.value);

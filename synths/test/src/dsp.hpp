@@ -8,35 +8,35 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData amp;
-		blink::EnvData pan;
+		blink::uniform::Env amp;
+		blink::uniform::Env pan;
 		struct {
-			blink::EnvData fm;
-			blink::EnvData pitch;
-			blink::EnvData waveform;
+			blink::uniform::Env fm;
+			blink::uniform::Env pitch;
+			blink::uniform::Env waveform;
 		} carrier;
 		struct {
-			blink::EnvData fm;
-			blink::EnvData pitch;
+			blink::uniform::Env fm;
+			blink::uniform::Env pitch;
 		} modulator;
 		struct {
-			blink::EnvData amount;
-			blink::EnvData color;
+			blink::uniform::Env amount;
+			blink::uniform::Env color;
 		} noise;
 	} env;
 	struct {
-		blink::SliderRealData amp;
-		blink::SliderRealData carrier_pitch;
-		blink::SliderRealData noise_width;
-		blink::SliderRealData pan;
+		blink::uniform::SliderReal amp;
+		blink::uniform::SliderReal carrier_pitch;
+		blink::uniform::SliderReal noise_width;
+		blink::uniform::SliderReal pan;
 	} slider;
 	struct {
-		blink::OptionData noise_mode;
+		blink::uniform::Option noise_mode;
 	} option;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.amp = blink::make_env_data(model.plugin, param_data, model.params.env.amp);
 	out.env.pan = blink::make_env_data(model.plugin, param_data, model.params.env.pan);
@@ -55,9 +55,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data                = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data                = make_audio_data(*model, uniform.param_data);
 	auto amp                       = blink::search::vec(data.env.amp, unit_dsp->block_positions);
  	const auto wave                = blink::search::vec(data.env.carrier.waveform, unit_dsp->block_positions);
 	const auto env_carrier_pitch   = blink::search::vec(data.env.carrier.pitch, unit_dsp->block_positions);

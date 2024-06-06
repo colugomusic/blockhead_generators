@@ -17,25 +17,25 @@ static const ml::DSPVector MAX_TONGUE_DIAMETER(3.5f);
 
 struct AudioData {
 	struct {
-		blink::EnvData amp;
-		blink::EnvData pan;
-		blink::EnvData pitch;
-		blink::EnvData buzz;
-		blink::EnvData fricative_intensity;
-		blink::EnvData quality;
+		blink::uniform::Env amp;
+		blink::uniform::Env pan;
+		blink::uniform::Env pitch;
+		blink::uniform::Env buzz;
+		blink::uniform::Env fricative_intensity;
+		blink::uniform::Env quality;
 		struct {
-			blink::EnvData diameter;
-			blink::EnvData position;
+			blink::uniform::Env diameter;
+			blink::uniform::Env position;
 		} throat;
 		struct {
-			blink::EnvData diameter;
-			blink::EnvData position;
+			blink::uniform::Env diameter;
+			blink::uniform::Env position;
 		} tongue;
 	} env;
 	 struct {
-		blink::SliderRealData amp;
-		blink::SliderRealData pan;
-		blink::SliderRealData pitch;
+		blink::uniform::SliderReal amp;
+		blink::uniform::SliderReal pan;
+		blink::uniform::SliderReal pitch;
 	} slider;
 };
 
@@ -64,7 +64,7 @@ struct InputValues {
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData& param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData& param_data) -> AudioData {
 	AudioData out;
 	out.env.amp = blink::make_env_data(model.plugin, &param_data, model.params.env.amp);
 	out.env.buzz = blink::make_env_data(model.plugin, &param_data, model.params.env.buzz);
@@ -83,7 +83,7 @@ auto make_audio_data(const Model& model, const blink_ParamData& param_data) -> A
 }
 
 [[nodiscard]]
-auto make_input_values(const Model& model, const blink_ParamData& param_data, const blink::BlockPositions& positions) -> InputValues {
+auto make_input_values(const Model& model, const blink_UniformParamData& param_data, const blink::BlockPositions& positions) -> InputValues {
 	const auto audio_data = make_audio_data(model, param_data);
 	InputValues input_values;
 	input_values.env.amp = blink::search::vec(audio_data.env.amp, positions);
@@ -102,11 +102,11 @@ auto make_input_values(const Model& model, const blink_ParamData& param_data, co
 	return input_values;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_SynthBuffer& buffer, const blink_SynthUnitState& unit_state, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto input_values = make_input_values(*model, *unit_state.unit.param_data, unit_dsp->block_positions);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto input_values = make_input_values(*model, *uniform.param_data, unit_dsp->block_positions);
 	const auto min_position = ml::min(ml::intToFloat(unit_dsp->block_positions.positions.pos));
-	const auto gate = min_position >= -unit_state.unit.data_offset;
+	const auto gate = min_position >= -uniform.data_offset;
 	const auto model_SR = int(std::pow(2.0f, input_values.env.quality - 1.0f) * 44100.0f);
 	const auto speed = float(model_SR) / unit_dsp->SR.value;
 	auto source = [&]() {

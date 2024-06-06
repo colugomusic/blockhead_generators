@@ -9,15 +9,15 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData attack;
-		blink::EnvData release;
-		blink::EnvData threshold;
-		blink::EnvData ratio;
-		blink::EnvData knee;
-		blink::EnvData mix;
+		blink::uniform::Env attack;
+		blink::uniform::Env release;
+		blink::uniform::Env threshold;
+		blink::uniform::Env ratio;
+		blink::uniform::Env knee;
+		blink::uniform::Env mix;
 	} env;
 	struct {
-		blink::OptionData stereo;
+		blink::uniform::Option stereo;
 	} option;
 };
 
@@ -37,7 +37,7 @@ auto db_to_linear(ml::DSPVectorArray<ROWS> x) -> ml::DSPVectorArray<ROWS> {
 }
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.attack = blink::make_env_data(model.plugin, param_data, model.params.env.attack);
 	out.env.release = blink::make_env_data(model.plugin, param_data, model.params.env.release);
@@ -49,9 +49,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data                = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data                = make_audio_data(*model, uniform.param_data);
 	const auto attack = convert::linear_to_attack(blink::search::one(data.env.attack, unit_dsp->block_positions)) / 1000;
 	const auto release = convert::linear_to_release(blink::search::one(data.env.release, unit_dsp->block_positions)) / 1000;
 	const auto threshold = linear_to_db(blink::search::vec(data.env.threshold, unit_dsp->block_positions));

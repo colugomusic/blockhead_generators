@@ -78,9 +78,9 @@ auto blink_instance_stream_init(blink_InstanceIdx instance_idx, blink_SR SR) -> 
 	return BLINK_OK;
 }
 
-auto blink_effect_process(blink_UnitIdx unit_idx, const blink_EffectBuffer* buffer, const blink_EffectUnitState* unit_state, const float* in, float* out) -> blink_Error {
+auto blink_effect_process(blink_UnitIdx unit_idx, const blink_VaryingData* varying, const blink_UniformData* uniform, const float* in, float* out) -> blink_Error {
 	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
-	return dsp::process(&model, &unit_dsp, *buffer, *unit_state, in, out);
+	return dsp::process(&model, &unit_dsp, *varying, *uniform, in, out);
 }
 
 auto blink_terminate() -> blink_Error {

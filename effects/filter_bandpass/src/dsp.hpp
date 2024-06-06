@@ -7,14 +7,14 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData freq;
-		blink::EnvData res;
-		blink::EnvData mix;
+		blink::uniform::Env freq;
+		blink::uniform::Env res;
+		blink::uniform::Env mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.freq = blink::make_env_data(model.plugin, param_data, model.params.env.frequency);
 	out.env.res = blink::make_env_data(model.plugin, param_data, model.params.env.resonance);
@@ -22,9 +22,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	const auto freq = blink::search::one(data.env.freq, unit_dsp->block_positions);
 	auto res = blink::search::one(data.env.res, unit_dsp->block_positions); 
 	res = ml::lerp(1.0f, 0.1f, res); 

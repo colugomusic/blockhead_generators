@@ -11,20 +11,20 @@ static inline const std::array<float, 4> PAN_VECTORS = {-0.5f, 0.5f, -1.0f, 1.0f
 struct AudioData {
 	struct {
 		struct {
-			blink::ChordData scale;
+			blink::uniform::Chord scale;
 		} harmonics;
 	} chord;
 	struct {
-		blink::EnvData pitch, feedback, damper, mix;
+		blink::uniform::Env pitch, feedback, damper, mix;
 		struct {
-			blink::EnvData amount, ratio;
+			blink::uniform::Env amount, ratio;
 		} fm;
 		struct {
-			blink::EnvData amount, spread, scale_snap_amount, width;
+			blink::uniform::Env amount, spread, scale_snap_amount, width;
 		} harmonics;
 	} env;
 	struct {
-		blink::SliderRealData pitch;
+		blink::uniform::SliderReal pitch;
 	} slider;
 };
 
@@ -43,7 +43,7 @@ struct InputValues {
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.chord.harmonics.scale           = blink::make_chord_data(model.plugin, param_data, model.params.chord.harmonics.scale);
 	out.env.damper                      = blink::make_env_data(model.plugin, param_data, model.params.env.damper);
@@ -61,7 +61,7 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 }
 
 [[nodiscard]]
-auto make_input_values(const Model& model, const blink_ParamData* param_data, const blink::BlockPositions& block_positions) -> InputValues {
+auto make_input_values(const Model& model, const blink_UniformParamData* param_data, const blink::BlockPositions& block_positions) -> InputValues {
 	InputValues out;
 	const auto data = make_audio_data(model, param_data);
 	out.chord.harmonics.scale           = blink::search::vec(data.chord.harmonics.scale, block_positions);
@@ -85,10 +85,10 @@ auto dampener(Resonator* r, const ml::DSPVectorArray<2>& dry, blink_SR SR, const
 	return ml::lerp(dry, r->filter.lp(), mix);
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
 	static constexpr auto EPSILON = 0.0000001f;
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto input_values = make_input_values(*model, unit_state.unit.param_data, unit_dsp->block_positions);
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto input_values = make_input_values(*model, uniform.param_data, unit_dsp->block_positions);
 	const auto damper_mix = ml::repeatRows<2>(input_values.env.damper);
 	const auto damper_freq = ml::repeatRows<2>(blink::math::convert::linear_to_filter_hz<5, 30000>(1.0f - blink::math::ease::quadratic::in(input_values.env.damper)));
 	const auto base_pitch = input_values.env.pitch + input_values.slider.pitch + 60.0f;

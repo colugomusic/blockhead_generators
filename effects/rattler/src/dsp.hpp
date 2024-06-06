@@ -7,16 +7,16 @@ namespace dsp {
 
 struct AudioData {
 	struct {
-		blink::EnvData time;
-		blink::EnvData feedback;
-		blink::EnvData width;
-		blink::EnvData dry;
-		blink::EnvData wet;
+		blink::uniform::Env time;
+		blink::uniform::Env feedback;
+		blink::uniform::Env width;
+		blink::uniform::Env dry;
+		blink::uniform::Env wet;
 	} env;
 	struct {
-		blink::SliderRealData width;
-		blink::SliderRealData dry;
-		blink::SliderRealData wet;
+		blink::uniform::SliderReal width;
+		blink::uniform::SliderReal dry;
+		blink::uniform::SliderReal wet;
 	} slider;
 };
 
@@ -36,7 +36,7 @@ struct InputValues {
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.dry = blink::make_env_data(model.plugin, param_data, model.params.env.dry);
 	out.env.feedback = blink::make_env_data(model.plugin, param_data, model.params.env.feedback);
@@ -50,7 +50,7 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 }
 
 [[nodiscard]]
-auto make_input_values(const Model& model, const blink_ParamData* param_data, const blink::BlockPositions& block_positions) -> InputValues {
+auto make_input_values(const Model& model, const blink_UniformParamData* param_data, const blink::BlockPositions& block_positions) -> InputValues {
 	InputValues out;
 	AudioData data = make_audio_data(model, param_data);
 	out.env.dry = blink::search::vec(data.env.dry, block_positions);
@@ -64,9 +64,9 @@ auto make_input_values(const Model& model, const blink_ParamData* param_data, co
 	return out;
 }
 
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto input_values = make_input_values(*model, unit_state.unit.param_data, unit_dsp->block_positions);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto input_values = make_input_values(*model, uniform.param_data, unit_dsp->block_positions);
 	const auto dry      = input_values.env.dry * input_values.slider.dry;
 	const auto wet      = input_values.env.wet * input_values.slider.wet;
 	const auto feedback = input_values.env.feedback;

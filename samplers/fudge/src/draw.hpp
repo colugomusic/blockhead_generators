@@ -8,26 +8,26 @@
 
 struct DrawData {
 	struct {
-		blink::EnvData amp;
-		blink::EnvData speed;
+		blink::uniform::Env amp;
+		blink::uniform::Env speed;
 	} env;
 	struct {
-		blink::SliderRealData amp;
-		blink::SliderRealData speed;
-		blink::SliderIntData sample_offset;
+		blink::uniform::SliderReal amp;
+		blink::uniform::SliderReal speed;
+		blink::uniform::SliderInt sample_offset;
 	} slider;
 	struct {
-		blink::OptionData reverse_mode;
+		blink::uniform::Option reverse_mode;
 	} option;
 	struct {
-		blink::OptionData loop;
-		blink::OptionData reverse;
+		blink::uniform::Option loop;
+		blink::uniform::Option reverse;
 	} toggle;
 	const blink_WarpPoints* warp_points;
 };
 
 [[nodiscard]]
-auto make_draw_data(const Model& model, const blink_ParamData* param_data, const blink_WarpPoints& warp_points) -> DrawData {
+auto make_draw_data(const Model& model, const blink_UniformParamData* param_data, const blink_WarpPoints& warp_points) -> DrawData {
 	DrawData data;
 	data.env.amp = blink::make_env_data(model.plugin, param_data, model.params.env.amp);
 	data.env.speed = blink::make_env_data(model.plugin, param_data, model.params.env.speed);
@@ -48,17 +48,17 @@ auto calculate_amp(const DrawData& data, const blink::BlockPositions& block_posi
 }
 
 [[nodiscard]]
-auto draw(Model* model, const blink_SamplerBuffer& buffer, const blink_SamplerUnitState& unit_state, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
-	const auto data        = make_draw_data(*model, unit_state.unit.param_data, *unit_state.unit.warp_points);
-	const auto sample_data = blink::SampleData{buffer.sample_info, unit_state.channel_mode};
+auto draw(Model* model, const blink_SamplerVaryingData& varying, const blink_SamplerUniformData& uniform, blink_FrameCount n, blink_SamplerDrawInfo* out) -> blink_Error {
+	const auto data        = make_draw_data(*model, uniform.base.param_data, *uniform.base.warp_points);
+	const auto sample_data = blink::SampleData{varying.sample_info, uniform.channel_mode};
 	auto frames_remaining = int64_t(n.value);
 	int index = 0;
 	blink::BlockPositions block_positions;
 	while (frames_remaining > 0) {
 		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining)); 
-		block_positions.add(buffer.unit.positions + index, count); 
+		block_positions.add(varying.base.positions + index, count); 
 		blink::transform::Stretch::Config config; 
-		config.unit_state_id = unit_state.unit.id;
+		config.unit_state_id = uniform.base.id;
 		config.env.speed = data.env.speed.data;
 		config.option.reverse = data.option.reverse_mode.data;
 		config.sample_offset = data.slider.sample_offset.value;
@@ -67,9 +67,9 @@ auto draw(Model* model, const blink_SamplerBuffer& buffer, const blink_SamplerUn
 		config.outputs.derivatives.sped = true;
 		config.outputs.derivatives.warped = true;
 		model->draw.stretch_transformer(config, block_positions, count);
-		auto sculpted_sample_positions = model->draw.stretch_transformer.get_sped_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
-		auto warped_sample_positions = model->draw.stretch_transformer.get_warped_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
-		auto final_sample_positions = model->draw.stretch_transformer.get_reversed_positions().positions / (float(buffer.unit.song_rate.value) / sample_data.get_SR().value);
+		auto sculpted_sample_positions = model->draw.stretch_transformer.get_sped_positions().positions / (float(uniform.base.song_rate.value) / sample_data.get_SR().value);
+		auto warped_sample_positions = model->draw.stretch_transformer.get_warped_positions().positions / (float(uniform.base.song_rate.value) / sample_data.get_SR().value);
+		auto final_sample_positions = model->draw.stretch_transformer.get_reversed_positions().positions / (float(uniform.base.song_rate.value) / sample_data.get_SR().value);
 		if (data.toggle.loop.value) {
 			for (int i = 0; i < count; i++) {
 				final_sample_positions.set(i, sample_data.get_loop_pos(final_sample_positions[i]));

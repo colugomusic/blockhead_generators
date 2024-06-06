@@ -11,14 +11,14 @@ static const auto UNITY_TO_DECAY = ml::Projection(ml::projections::intervalMap({
 
 struct AudioData {
 	struct {
-		blink::EnvData size;
-		blink::EnvData decay;
-		blink::EnvData mix;
+		blink::uniform::Env size;
+		blink::uniform::Env decay;
+		blink::uniform::Env mix;
 	} env;
 };
 
 [[nodiscard]]
-auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> AudioData {
+auto make_audio_data(const Model& model, const blink_UniformParamData* param_data) -> AudioData {
 	AudioData out;
 	out.env.decay = blink::make_env_data(model.plugin, param_data, model.params.env.decay);
 	out.env.size  = blink::make_env_data(model.plugin, param_data, model.params.env.size);
@@ -27,9 +27,9 @@ auto make_audio_data(const Model& model, const blink_ParamData* param_data) -> A
 }
 
 // This is adapted from code taken from madronalib. Thank you Randy!
-auto process(Model* model, UnitDSP* unit_dsp, const blink_EffectBuffer& buffer, const blink_EffectUnitState& unit_state, const float* in, float* out) -> blink_Error {
-	unit_dsp->block_positions.add(buffer.unit.positions, BLINK_VECTOR_SIZE);
-	const auto data = make_audio_data(*model, unit_state.unit.param_data);
+auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
+	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
+	const auto data = make_audio_data(*model, uniform.param_data);
 	unit_dsp->glide_size.setGlideTimeInSamples(0.1f * unit_dsp->SR.value);
 	unit_dsp->glide_decay.setGlideTimeInSamples(0.1f * unit_dsp->SR.value);
 	const auto size  = blink::search::one(data.env.size, unit_dsp->block_positions);
