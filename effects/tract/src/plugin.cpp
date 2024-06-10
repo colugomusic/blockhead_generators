@@ -12,7 +12,7 @@ auto blink_get_error_string(blink_Error error) -> blink_TempString {
 }
 
 auto blink_effect_get_info(blink_InstanceIdx instance_idx) -> blink_EffectInstanceInfo {
-	return {0};
+	return model.entities.instance.get<InstanceInfo>(instance_idx.value).info;
 }
 
 auto blink_get_plugin_info() -> blink_PluginInfo {
@@ -49,6 +49,12 @@ auto blink_instance_reset(blink_InstanceIdx instance_idx) -> blink_Error {
 }
 
 auto blink_instance_stream_init(blink_InstanceIdx instance_idx, blink_SR SR) -> blink_Error {
+	blink_EffectInstanceInfo info = {-1, -1, -1, -1};
+	const auto MIN_MODEL_SR = dsp::BASE_MODEL_SR / 2;
+	const auto MAX_MODEL_SR = dsp::BASE_MODEL_SR * 2;
+	info.min_delay = int((float(SR.value) / MAX_MODEL_SR) * kFloatsPerDSPVector);
+	info.max_delay = int((float(SR.value) / MIN_MODEL_SR) * kFloatsPerDSPVector);
+	model.entities.instance.get<InstanceInfo>(instance_idx.value) = InstanceInfo{info};
 	return BLINK_OK;
 }
 

@@ -22,6 +22,10 @@ struct Params {
 	} env;
 };
 
+struct InstanceInfo {
+	blink_EffectInstanceInfo info;
+};
+
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
@@ -31,7 +35,7 @@ struct UnitDSP {
 	Resampler<2> input_resampler;
 };
 
-using Instance = blink::Instance<>;
+using Instance = blink::Instance<InstanceInfo>;
 using Unit     = blink::Unit<UnitDSP>;
 
 struct Model {
