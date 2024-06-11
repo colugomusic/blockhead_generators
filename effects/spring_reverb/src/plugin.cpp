@@ -41,7 +41,7 @@ auto blink_get_error_string(blink_Error error) -> blink_TempString {
 }
 
 auto blink_effect_get_info(blink_InstanceIdx instance_idx) -> blink_EffectInstanceInfo {
-	return {0};
+	return {-1, -1, -1, -1};
 }
 
 auto blink_get_plugin_info() -> blink_PluginInfo {
