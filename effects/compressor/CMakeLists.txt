@@ -3,7 +3,7 @@ project(effect_compressor VERSION 0.4.2)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(blink_lib)
+include(plugin)
 
 CPMAddPackage("gh:colugomusic/snd#master")
 cpm_export_variables(snd)

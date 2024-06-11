@@ -3,8 +3,7 @@ project(effect_filter_bandpass VERSION 0.4.1)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(CPM)
-include(blink_lib)
+include(plugin)
 
 list(APPEND SRC
 	./src/dsp.hpp

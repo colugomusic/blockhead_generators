@@ -4,7 +4,7 @@ project(effect_wavebender VERSION 0.3.1)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
 include(CPM)
-include(blink_lib)
+include(plugin)
 
 list(APPEND SRC
     ./src/dsp.hpp

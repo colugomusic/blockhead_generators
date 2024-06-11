@@ -3,7 +3,7 @@ project(effect_gainer VERSION 0.2.2)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(blink_lib)
+include(plugin)
 
 list(APPEND SRC
     ./src/dsp.hpp
