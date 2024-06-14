@@ -55,7 +55,7 @@ auto draw(Model* model, const blink_SamplerVaryingData& varying, const blink_Sam
 	int index = 0;
 	blink::BlockPositions block_positions;
 	while (frames_remaining > 0) {
-		auto count = std::min(kFloatsPerDSPVector, int(frames_remaining)); 
+		auto count = std::min(int(kFloatsPerDSPVector), int(frames_remaining)); 
 		block_positions.add(varying.base.positions + index, count); 
 		blink::transform::Stretch::Config config; 
 		config.unit_state_id = uniform.base.id;

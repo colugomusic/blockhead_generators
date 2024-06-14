@@ -238,7 +238,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	ml::DSPVectorArray<2> out_vec;
 	ml::DSPVectorArray<2> filtered_input; 
 	for (int c = 0; c < 2; c++) {
-		unit_dsp->channels[c].write.filter.mCoeffs = ml::Lopass::coeffs(smoother, 1.0f);
+		unit_dsp->channels[c].write.filter._coeffs = ml::Lopass::makeCoeffs(smoother, 1.0f);
 		filtered_input.row(c) = unit_dsp->channels[c].write.filter(in_vec.constRow(c));
 	} 
 	const auto& block_pos = unit_dsp->block_positions; 

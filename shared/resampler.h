@@ -57,8 +57,8 @@ private:
 	
 	std::array<float, ROWS> read_source_block_frame(Source source, std::uint32_t index)
 	{
-		const auto block_index = index / kFloatsPerDSPVector;
-		const auto local_index = index % kFloatsPerDSPVector;
+		const auto block_index = index / int(kFloatsPerDSPVector);
+		const auto local_index = index % int(kFloatsPerDSPVector);
 
 		assert(block_index >= curr_block_index_ - 1);
 		assert(block_index <= curr_block_index_ + 1);

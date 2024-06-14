@@ -29,9 +29,9 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	auto res = blink::search::one(data.env.res, unit_dsp->block_positions);
 	res = ml::lerp(1.0f, 0.1f, res);
 	const auto omega = blink::math::convert::linear_to_filter_hz(freq) / unit_dsp->SR.value;
-	const auto coeffs = ml::Lopass::coeffs(omega, res);
-	unit_dsp->filter[0].mCoeffs = coeffs;
-	unit_dsp->filter[1].mCoeffs = coeffs; 
+	const auto coeffs = ml::Lopass::makeCoeffs(omega, res);
+	unit_dsp->filter[0]._coeffs = coeffs;
+	unit_dsp->filter[1]._coeffs = coeffs; 
 	const ml::DSPVectorArray<2> in_vec(in); 
 	const auto L = unit_dsp->filter[0](in_vec.constRow(0));
 	const auto R = unit_dsp->filter[1](in_vec.constRow(1)); 
