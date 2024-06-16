@@ -5,9 +5,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
 include(plugin)
 
-CPMAddPackage("gh:colugomusic/snd#master")
-cpm_export_variables(snd)
-
 list(APPEND SRC
 	./src/convert.h
 	./src/dsp.hpp

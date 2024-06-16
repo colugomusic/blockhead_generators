@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bleat/oscillators/scalar/multi_wave.hpp>
+#include <snd/audio/oscillators.hpp>
 #include <blink/plugin_impl.hpp>
 #include "shared/noise_generator.h"
 

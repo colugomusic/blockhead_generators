@@ -6,9 +6,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 include(CPM)
 include(plugin)
 
-CPMAddPackage("gh:colugomusic/bleat#master")
-cpm_export_variables(bleat)
-
 list(APPEND SRC
     ./src/dsp.hpp
     ./src/glottis.h
