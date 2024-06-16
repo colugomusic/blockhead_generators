@@ -71,10 +71,10 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	amp *= unit_dsp->fade_in(1.0f);
 	ml::DSPVector osc_out;
 	for (int i = 0; i < kFloatsPerDSPVector; i++) {
-		const auto fm0_freq = std::max(((fm0[i] * fm0[i] * 20000.0f) * unit_dsp->oscs[1].value()) + freq0[i], 0.0f);
-		const auto fm1_freq = std::max(((fm1[i] * fm1[i] * 20000.0f) * unit_dsp->oscs[0].value()) + freq1[i], 0.0f);
-		osc_out[i] = unit_dsp->oscs[0](fm0_freq / unit_dsp->SR.value, 0.5f, wave[i]);
-		unit_dsp->oscs[1](fm1_freq / unit_dsp->SR.value, 0.5f, snd::osc::scalar::MultiWaveOsc::WAVE_SINE);
+		const auto fm0_freq = std::max(((fm0[i] * fm0[i] * 20000.0f) * unit_dsp->oscs[1].value) + freq0[i], 0.0f);
+		const auto fm1_freq = std::max(((fm1[i] * fm1[i] * 20000.0f) * unit_dsp->oscs[0].value) + freq1[i], 0.0f);
+		osc_out[i] = snd::osc::scalar::process(&unit_dsp->oscs[0], fm0_freq / unit_dsp->SR.value, 0.5f, wave[i]);
+		snd::osc::scalar::process(&unit_dsp->oscs[1], fm1_freq / unit_dsp->SR.value, 0.5f, snd::osc::scalar::MULTIWAVE_SINE);
 	}
 	auto out_vec = ml::repeatRows<2>(osc_out);
 	out_vec =
@@ -94,8 +94,8 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 }
 
 auto reset(Model* model, UnitDSP* unit_dsp) -> void {
-	unit_dsp->oscs[0].reset();
-	unit_dsp->oscs[1].reset();
+	snd::osc::scalar::reset(&unit_dsp->oscs[0]);
+	snd::osc::scalar::reset(&unit_dsp->oscs[1]);
 	unit_dsp->fade_in = {};
 	unit_dsp->fade_in.setGlideTimeInSamples(static_cast<float>(unit_dsp->SR.value) * 0.001f);
 }

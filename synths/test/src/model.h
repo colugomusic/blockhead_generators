@@ -36,7 +36,7 @@ struct Params {
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
-	std::array<bleat::oscillators::scalar::MultiWaveOsc, 2> oscs;
+	std::array<snd::osc::scalar::MultiWaveOsc, 2> oscs;
 	ml::LinearGlide fade_in;
 	NoiseGenerator noise_gen;
 };
