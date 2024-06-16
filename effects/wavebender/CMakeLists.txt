@@ -7,9 +7,9 @@ include(CPM)
 include(plugin)
 
 list(APPEND SRC
-    ./src/dsp.hpp
-    ./src/model.h
-    ./src/plugin.cpp
+	./src/dsp.hpp
+	./src/model.h
+	./src/plugin.cpp
 )
 
 list(APPEND RES
