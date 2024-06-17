@@ -47,7 +47,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	auto xfade_size  = blink::search::vec(data.env.xfade_size, unit_dsp->block_positions);
 	auto smoother    = blink::math::convert::linear_to_filter_hz(1.0f - blink::search::one(data.env.smoother, unit_dsp->block_positions)) / unit_dsp->SR.value;
 	const auto mix   = blink::search::vec(data.env.mix, unit_dsp->block_positions); 
-	xfade_size       = ml::lerp(ml::DSPVector(1.0f), ml::DSPVector(32.0f), xfade_size * xfade_size); 
+	xfade_size       = ml::lerp(ml::DSPVector(2.0f), ml::DSPVector(32.0f), xfade_size * xfade_size); 
 	auto bubble_int  = ml::roundFloatToInt(bubble * bubble * 64.0f);
 	const auto spike = ml::clamp(ml::abs(tilt * 0.25f) - 1.0f, ml::DSPVector(0.0f), ml::DSPVector(1.0f)); 
 	tilt = ml::clamp(tilt, ml::DSPVector(-4.0f), ml::DSPVector(4.0f)); 
