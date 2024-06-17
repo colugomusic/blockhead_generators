@@ -72,8 +72,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 				spike[i],
 				tilt[i],
 				pitch[i],
-				xfade_size[i],
-				mix[i]);
+				xfade_size[i]);
 		}
 	} 
 	ml::validate(out_vec.constRow(0)); 
