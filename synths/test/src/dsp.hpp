@@ -73,8 +73,8 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	for (int i = 0; i < kFloatsPerDSPVector; i++) {
 		const auto fm0_freq = std::max(((fm0[i] * fm0[i] * 20000.0f) * unit_dsp->oscs[1].value) + freq0[i], 0.0f);
 		const auto fm1_freq = std::max(((fm1[i] * fm1[i] * 20000.0f) * unit_dsp->oscs[0].value) + freq1[i], 0.0f);
-		osc_out[i] = snd::osc::scalar::process(&unit_dsp->oscs[0], fm0_freq / unit_dsp->SR.value, 0.5f, wave[i]);
-		snd::osc::scalar::process(&unit_dsp->oscs[1], fm1_freq / unit_dsp->SR.value, 0.5f, snd::osc::scalar::MULTIWAVE_SINE);
+		osc_out[i] = snd::osc::scalar::process(&unit_dsp->oscs[0], fm0_freq / unit_dsp->SR.value, 0.5f, wave[i], snd::osc::scalar::NO_SYNC);
+		             snd::osc::scalar::process(&unit_dsp->oscs[1], fm1_freq / unit_dsp->SR.value, 0.5f, snd::osc::scalar::MULTIWAVE_SINE, snd::osc::scalar::NO_SYNC);
 	}
 	auto out_vec = ml::repeatRows<2>(osc_out);
 	out_vec =
