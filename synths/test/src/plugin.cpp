@@ -57,11 +57,13 @@ auto add_param_env_carrier_pitch(const blink::Plugin& plugin) -> blink_ParamIdx 
 auto add_param_env_carrier_waveform(const blink::Plugin& plugin) -> blink_ParamIdx {
 	const auto idx = blink::add::param::env(plugin, {"337b8f6f-1d7a-41a7-ab05-802b23887b7a"});
 	const auto flags = blink_ParamFlags_HostClamp | blink_ParamFlags_DefaultActive | blink_ParamFlags_CanManipulate;
+	const auto env_idx = blink::add::env::percentage(plugin.host);
 	blink::write::param::group(plugin, idx, {"Carrier"});
 	blink::write::param::name(plugin, idx, {"Waveform"});
 	blink::write::param::add_flags(plugin, idx, flags);
 	blink::write::param::clamp_range(plugin, idx, {0.0f, 1.0f});
-	blink::write::param::offset_env(plugin, idx, blink::add::env::percentage_bipolar(plugin.host));
+	blink::write::param::env(plugin, idx, env_idx);
+	blink::write::param::offset_env(plugin, idx, env_idx);
 	blink::write::param::override_env(plugin, idx, blink::add::env::percentage(plugin.host));
 	return idx;
 }
@@ -81,8 +83,9 @@ auto add_param_env_modulator_fm(const blink::Plugin& plugin) -> blink_ParamIdx {
 }
 
 auto add_param_env_modulator_pitch(const blink::Plugin& plugin) -> blink_ParamIdx {
-	const auto idx = blink::add::param::env(plugin, {"fc48a5e2-48a6-4021-8467-c196b215938d"});
+	const auto idx = blink::add::param::env(plugin, {BLINK_STD_UUID_PITCH});
 	const auto flags = blink_ParamFlags_DefaultActive | blink_ParamFlags_CanManipulate;
+	blink::write::param::uuid(plugin, idx, {"fc48a5e2-48a6-4021-8467-c196b215938d"});
 	blink::write::param::group(plugin, idx, {"Modulator"});
 	blink::write::param::name(plugin, idx, {"Modulator Pitch"});
 	blink::write::param::short_name(plugin, idx, {"Pitch"});
