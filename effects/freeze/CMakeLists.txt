@@ -7,14 +7,14 @@ include(CPM)
 include(plugin)
 
 list(APPEND SRC
-    ./src/dsp.hpp
-    ./src/model
-    ./src/buffer.h
-    ./src/plugin.cpp
+	./src/dsp.hpp
+	./src/model.h
+	./src/buffer.h
+	./src/plugin.cpp
 )
 
 list(APPEND RES
-    ./res/icon.png
+	./res/icon.png
 )
 
 blink_plugin_add_effect("freeze" "${SRC}" "${RES}")
