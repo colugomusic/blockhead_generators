@@ -3,11 +3,10 @@
 #include <atomic>
 #include <vector>
 #include <blink.h>
-#include "shared/autocorrelation.hpp"
+#include <snd/audio/autocorrelation.hpp>
 
-struct SampleAnalysis
-{
-	std::vector<std::vector<autocorrelation::FrameAnalysis>> data;
+struct SampleAnalysis {
+	std::vector<snd::poka::result> analysis;
 	std::atomic<bool> done = false;
 };
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "controller.h"
-#include "particle.h"
 #include "sample_analysis.h"
+#include "shared/noise_generator.h"
 #include <blink.h>
 #include <blink/plugin_impl.hpp>
 #include <blink/transform/stretch.hpp>
 #include <map>
 #include <memory>
-#include "shared/noise_generator.h"
+#include <snd/audio/fudge.hpp>
+#include <snd/audio/scale.hpp>
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
@@ -59,13 +59,21 @@ struct DrawState {
 	blink::transform::Stretch stretch_transformer;
 };
 
+struct Controller {
+	blink::transform::Stretch stretch_transformer;
+	ml::DSPVector ff;
+	ml::DSPVector spread;
+	ml::DSPVectorInt scale = ml::DSPVectorInt();
+	snd::fudge::vector_info v;
+};
+
 struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
 	blink::Traverser block_traverser;
 	NoiseGenerator noise_gen;
-	fudge::Controller controller;
-	std::array<fudge::Particle, 4> particles;
+	Controller controller;
+	std::array<snd::fudge::particle, 4> particles;
 };
 
 using Instance = blink::Instance<>;

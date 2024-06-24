@@ -1,3 +1,4 @@
+/* TODELETE:
 #pragma once
 
 #pragma warning(push, 0)
@@ -18,7 +19,16 @@ struct Particle {
 	std::array<Grain, 2> grains;
 };
 
+struct playback_positions {
+	std::array<double, kFloatsPerDSPVector> value;
+};
+
+struct sample_positions {
+	std::array<double, kFloatsPerDSPVector> value;
+};
+
 auto init(Particle* p, int harmonic) -> void;
-auto process(Particle* p, Controller* controller, const ml::DSPVector& amp) -> ml::DSPVectorArray<2>;
+auto process(Particle* p, const Controller& controller, const playback_positions& positions, const ml::DSPVector& amp) -> ml::DSPVectorArray<2>;
 
 } // fudge
+*/

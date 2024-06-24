@@ -2,23 +2,22 @@
 #include <blink/types.hpp>
 
 bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out) {
-	constexpr auto ANALYSIS_DEPTH = 128; 
 	blink_ChannelCount channel = {0};
 	float total_progress = 0.0f;
-	autocorrelation::AnalysisCallbacks analysis_callbacks; 
-	analysis_callbacks.get_frames = [host, sample_info, &channel](std::uint64_t index, std::uint32_t n, float* out) {
+	auto poka_get_frames = [host, sample_info, &channel](size_t index, size_t n, float* out) {
 		sample_info.get_data(sample_info.host, channel, {index}, {n}, out);
-	}; 
-	analysis_callbacks.report_progress = [host, callbacks, sample_info, &total_progress](float progress) {
-		callbacks.report_progress(host, total_progress + (progress / sample_info.num_channels.value));
-	}; 
-	analysis_callbacks.should_abort = [host, callbacks]() {
+	};
+	auto poka_should_abort = [host, callbacks]() {
 		return callbacks.should_abort(host);
-	}; 
-	out->data.resize(2); 
+	};
+	auto poka_report_progress = [host, callbacks, sample_info, &total_progress](float progress) {
+		callbacks.report_progress(host, total_progress + (progress / sample_info.num_channels.value));
+	};
+	auto cbs = snd::poka::make_cbs(poka_get_frames, poka_report_progress, poka_should_abort);
+	snd::poka::work poka_work;
+	out->analysis.resize(2); 
 	for (; channel.value < sample_info.num_channels.value; channel++) {
-		out->data[channel.value].resize(sample_info.num_frames.value);
-		if (!autocorrelation::analyze(analysis_callbacks, sample_info.num_frames.value, ANALYSIS_DEPTH, out->data[channel.value].data())) {
+		if (!snd::poka::autocorrelation(&poka_work, cbs, sample_info.num_frames.value, 64, sample_info.SR.value, &out->analysis[channel.value])) {
 			return false;
 		}
 		total_progress += 1.0f / sample_info.num_channels.value;

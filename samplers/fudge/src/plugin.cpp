@@ -2,47 +2,13 @@
 
 #include <blink_std.h>
 #include <blink/math.hpp>
+#include "convert.h"
 #include "draw.hpp"
 #include "dsp.hpp"
 #include "model.h"
 #include "shared/harmonics.hpp"
 
 static Model model;
-
-namespace convert {
-
-constexpr auto GRAIN_SIZE_MIN_MS = 1.0f;
-constexpr auto GRAIN_SIZE_MAX_MS = 1000.0f;
-
-[[nodiscard]] static
-auto linear_to_ms(float linear) -> float {
-	return blink::math::lerp(GRAIN_SIZE_MIN_MS, GRAIN_SIZE_MAX_MS, std::pow(linear, 4.0f));
-}
-
-[[nodiscard]] static
-auto ms_to_linear(float ms) -> float {
-	return std::pow(blink::math::inverse_lerp(GRAIN_SIZE_MIN_MS, GRAIN_SIZE_MAX_MS, ms), 0.25f);
-}
-
-[[nodiscard]] static
-auto linear_to_ms(const ml::DSPVector& linear) -> ml::DSPVector {
-	return ml::select(
-		ml::DSPVector(GRAIN_SIZE_MIN_MS),
-		ml::lerp(ml::DSPVector(GRAIN_SIZE_MIN_MS), ml::DSPVector(GRAIN_SIZE_MAX_MS), ml::pow(linear, ml::DSPVector(4.0f))),
-		ml::lessThanOrEqual(linear, ml::DSPVector(0.0f)));
-}
-
-[[nodiscard]] static
-auto ms_to_linear(const ml::DSPVector& ms) -> ml::DSPVector {
-	return ml::pow(ml::inverseLerp(ml::DSPVector(GRAIN_SIZE_MIN_MS), ml::DSPVector(GRAIN_SIZE_MAX_MS), ms), ml::DSPVector(0.25f));
-}
-
-[[nodiscard]] static
-auto ms_to_samples(const ml::DSPVector& ms, int SR) -> ml::DSPVector {
-	return (ms / GRAIN_SIZE_MAX_MS) * float(SR);
-}
-
-} // convert
 
 namespace tweak {
 namespace grain_size {
@@ -313,5 +279,6 @@ auto blink_unit_reset(blink_UnitIdx unit_idx) -> blink_Error {
 auto blink_unit_stream_init(blink_UnitIdx unit_idx, blink_SR SR) -> blink_Error {
 	auto& unit_dsp = model.entities.unit.get<UnitDSP>(unit_idx.value);
 	unit_dsp.SR = SR;
+	dsp::init(&model, &unit_dsp);
 	return BLINK_OK;
 }
