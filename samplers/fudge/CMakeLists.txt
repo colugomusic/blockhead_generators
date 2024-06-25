@@ -14,7 +14,6 @@ list(APPEND SRC
     ./src/draw.hpp
     ./src/dsp.hpp
     ./src/grain.h
-    ./src/limits.h
     ./src/model.h
     ./src/particle.h
     ./src/particle.cpp
