@@ -89,10 +89,11 @@ auto process(
 	c->v.sample_frame_count = {varying.sample_info->num_frames.value};
 	c->v.size               = {blink::math::convert::p_to_ff(blink::math::convert::ff_to_p(size_in_samples) - transpose)};
 	c->v.uniformity         = {blink::search::vec(data.env.grain_uniformity, block_positions)};
+	c->v.uniformity.value   = c->v.uniformity.value * c->v.uniformity.value * c->v.uniformity.value;
 	c->v.channel_count      = {varying.sample_info->num_channels.value};
 	c->v.channel_mode       = make_fudge_channel_mode(uniform.channel_mode);
 	c->ff                   = blink::math::convert::p_to_ff(pitch);
-	c->scale              = {blink::search::vec(data.chord.scale, block_positions)};
+	c->scale                = {blink::search::vec(data.chord.scale, block_positions)};
 	c->spread               = blink::search::vec(data.env.harmonics_spread, block_positions);
 }
 
@@ -163,7 +164,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_SamplerVaryingData& va
 	ml::DSPVectorArray<2> out_vec;
 	ml::DSPVector total_amp;
 	const auto sample_data = blink::SampleData(varying.sample_info, uniform.channel_mode);
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < 4; i++) {
 		auto& particle = unit_dsp->particles[i];
 		if (i == 0) {
 			unit_dsp->controller.v.amp            = {1.0f};

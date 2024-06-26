@@ -13,7 +13,7 @@ using namespace blink;
 auto make_sampler_info() -> blink_SamplerInfo {
 	blink_SamplerInfo out = {0};
 	out.baked_waveform_could_be_different = {false};
-	out.requires_preprocessing            = {false};
+	out.requires_sample_analysis          = {false};
 	return out;
 }
 
@@ -79,8 +79,8 @@ auto blink_sampler_draw(const blink_SamplerVaryingData* varying, const blink_Sam
 	return draw(&model, *varying, *uniform, n, out);
 }
 
-auto blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_Error {
-	return blink_StdError_NotImplemented;
+auto blink_sampler_analyze_sample(void* host, blink_AnalysisCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_AnalysisResult {
+	return blink_AnalysisResult_Error;
 }
 
 auto blink_sampler_sample_deleted(blink_ID sample_id) -> blink_Error {

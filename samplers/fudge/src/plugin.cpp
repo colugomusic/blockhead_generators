@@ -164,7 +164,7 @@ auto add_param_env_speed(const blink::Plugin& plugin) -> blink_ParamIdx {
 auto make_sampler_info() -> blink_SamplerInfo {
 	blink_SamplerInfo out = {0};
 	out.baked_waveform_could_be_different = {false};
-	out.requires_preprocessing            = {true};
+	out.requires_sample_analysis          = {true};
 	return out;
 }
 
@@ -233,16 +233,17 @@ auto blink_instance_stream_init(blink_InstanceIdx instance_idx, blink_SR SR) -> 
 	return BLINK_OK;
 }
 
-auto blink_sampler_preprocess_sample(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_Error {
+auto blink_sampler_analyze_sample(void* host, blink_AnalysisCallbacks callbacks, const blink_SampleInfo* sample_info) -> blink_AnalysisResult {
 	auto pos = model.sample_analysis.find(sample_info->id);
 	if (pos != model.sample_analysis.end()) {
-		return BLINK_OK;
+		return blink_AnalysisResult_OK;
 	}
 	auto analysis = std::make_shared<SampleAnalysis>();
-	if (analyze(host, callbacks, *sample_info, analysis.get())) {
+	const auto result = analyze(host, callbacks, *sample_info, analysis.get());
+	if (result == blink_AnalysisResult_OK) {
 		model.sample_analysis[sample_info->id] = analysis;
 	}
-	return BLINK_OK;
+	return result;
 }
 
 auto blink_sampler_sample_deleted(blink_ID sample_id) -> blink_Error {

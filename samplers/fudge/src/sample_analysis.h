@@ -6,8 +6,8 @@
 #include <snd/audio/autocorrelation.hpp>
 
 struct SampleAnalysis {
-	std::vector<snd::poka::result> analysis;
+	std::vector<snd::poka::output> analysis;
 	std::atomic<bool> done = false;
 };
 
-bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out);
+auto analyze(void* host, blink_AnalysisCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out) -> blink_AnalysisResult;

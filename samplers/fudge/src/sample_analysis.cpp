@@ -1,7 +1,7 @@
 #include "sample_analysis.h"
 #include <blink/types.hpp>
 
-bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out) {
+auto analyze(void* host, blink_AnalysisCallbacks callbacks, const blink_SampleInfo& sample_info, SampleAnalysis* out) -> blink_AnalysisResult {
 	blink_ChannelCount channel = {0};
 	float total_progress = 0.0f;
 	auto poka_get_frames = [host, sample_info, &channel](size_t index, size_t n, float* out) {
@@ -17,11 +17,14 @@ bool analyze(void* host, blink_PreprocessCallbacks callbacks, const blink_Sample
 	snd::poka::work poka_work;
 	out->analysis.resize(2); 
 	for (; channel.value < sample_info.num_channels.value; channel++) {
-		if (!snd::poka::autocorrelation(&poka_work, cbs, sample_info.num_frames.value, 64, sample_info.SR.value, &out->analysis[channel.value])) {
-			return false;
+		const auto result =
+			snd::poka::autocorrelation<snd::poka::mode::classic>(
+				&poka_work, cbs, sample_info.num_frames.value, 64, sample_info.SR.value, &out->analysis[channel.value]);
+		if (result == snd::poka::result::aborted) {
+			return blink_AnalysisResult_Abort;
 		}
 		total_progress += 1.0f / sample_info.num_channels.value;
 	}
 	out->done = true;
-	return true;
+	return blink_AnalysisResult_OK;
 }
