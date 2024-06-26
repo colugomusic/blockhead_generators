@@ -15,7 +15,7 @@ auto analyze(void* host, blink_AnalysisCallbacks callbacks, const blink_SampleIn
 	};
 	auto cbs = snd::poka::make_cbs(poka_get_frames, poka_report_progress, poka_should_abort);
 	snd::poka::work poka_work;
-	out->analysis.resize(2); 
+	out->analysis.resize(sample_info.num_channels.value); 
 	for (; channel.value < sample_info.num_channels.value; channel++) {
 		const auto result =
 			snd::poka::autocorrelation<snd::poka::mode::classic>(
