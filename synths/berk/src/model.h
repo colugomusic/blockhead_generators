@@ -1,9 +1,9 @@
 #pragma once
 
 #include "glottis.h"
-#include "shared/tract.h"
 #include "shared/resampler.h"
 #include <blink/plugin_impl.hpp>
+#include <snd/audio/filter/tract.hpp>
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
@@ -40,7 +40,7 @@ struct UnitDSP {
 	ml::Bandpass fricative_filter;
 	ml::NoiseGen noise;
 	Glottis glottis;
-	Tract tract;
+	snd::audio::filter::tract::model tract;
 	Resampler<1> resampler;
 };
 

@@ -47,18 +47,18 @@ auto is_silent(const ml::DSPVectorArray<ROWS>& x) -> bool {
 auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, const blink_UniformData& uniform, const float* in, float* out) -> blink_Error {
 	unit_dsp->block_positions.add(varying.positions, BLINK_VECTOR_SIZE);
 	const auto data = make_audio_data(*model, uniform.param_data);
-	const auto index = blink::search::vec(data.env.throat.position, unit_dsp->block_positions);
+	const auto throat_position = blink::search::vec(data.env.throat.position, unit_dsp->block_positions);
 	const auto diameter = blink::search::vec(data.env.throat.diameter, unit_dsp->block_positions);
-	const auto tongue_index = blink::search::vec(data.env.tongue.position, unit_dsp->block_positions);
+	const auto tongue_position = blink::search::vec(data.env.tongue.position, unit_dsp->block_positions);
 	const auto tongue_diameter = blink::search::vec(data.env.tongue.diameter, unit_dsp->block_positions);
 	const auto quality = blink::search::one(data.env.quality, unit_dsp->block_positions);
 	const auto mix = blink::search::vec(data.env.mix, unit_dsp->block_positions);
-	static const ml::DSPVector MIN_INDEX(4.0f);
-	static const ml::DSPVector MAX_INDEX(44.0f);
+	static const ml::DSPVector MIN_THROAT_POSITION(4.0f);
+	static const ml::DSPVector MAX_THROAT_POSITION(44.0f);
 	static const ml::DSPVector MIN_DIAMETER(-1.0f);
 	static const ml::DSPVector MAX_DIAMETER(3.0f);
-	static const ml::DSPVector MIN_TONGUE_INDEX(12.0f);
-	static const ml::DSPVector MAX_TONGUE_INDEX(29.0f);
+	static const ml::DSPVector MIN_TONGUE_POSITION(12.0f);
+	static const ml::DSPVector MAX_TONGUE_POSITION(29.0f);
 	static const ml::DSPVector MIN_TONGUE_DIAMETER(2.05f);
 	static const ml::DSPVector MAX_TONGUE_DIAMETER(3.5f);
 	const auto min_position = ml::min(ml::intToFloat(unit_dsp->block_positions.positions.pos));
@@ -80,14 +80,14 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 			ml::DSPVectorArray<2> tract_out; 
 			if (is_silent(tract_in)) return tract_out; 
 			for (int r = 0; r < 2; r++) {
-				::Tract::Input tract_input; 
-				tract_input.diameter = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
-				tract_input.fricative_intensity = 0.0f;
-				tract_input.glottal_output = tract_in.constRow(r);
-				tract_input.index = ml::lerp(MIN_INDEX, MAX_INDEX, blink::math::convert::bi_to_uni(index));
-				tract_input.tongue.diameter = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
-				tract_input.tongue.index = ml::lerp(MIN_TONGUE_INDEX, MAX_TONGUE_INDEX, blink::math::convert::bi_to_uni(tongue_index)); 
-				tract_out.row(r) = unit_dsp->tract[r](model_SR, speed, tract_input);
+				snd::audio::filter::tract::input tract_input;
+				tract_input.throat.diameter      = ml::lerp(MIN_DIAMETER, MAX_DIAMETER, diameter);
+				tract_input.fricatives.intensity = 0.0f;
+				tract_input.glottis              = tract_in.constRow(r);
+				tract_input.throat.position      = ml::lerp(MIN_THROAT_POSITION, MAX_THROAT_POSITION, blink::math::convert::bi_to_uni(throat_position));
+				tract_input.tongue.diameter      = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, tongue_diameter);
+				tract_input.tongue.position      = ml::lerp(MIN_TONGUE_POSITION, MAX_TONGUE_POSITION, blink::math::convert::bi_to_uni(tongue_position)); 
+				tract_out.row(r) = snd::audio::filter::tract::process(&unit_dsp->tract[r], model_SR, speed, tract_input);
 			} 
 			return tract_out;
 		}; 
@@ -104,12 +104,13 @@ auto init(Model* model, UnitDSP* unit_dsp) -> void {
 	const auto buffer_size = 2 * int(std::ceil(kFloatsPerDSPVector * ROWS * (float(unit_dsp->SR.value) / float(MIN_MODEL_SR))));
 	unit_dsp->input_buffer = std::make_unique<ml::DSPBuffer>();
 	unit_dsp->input_buffer->resize(buffer_size);
+	unit_dsp->tract[0] = snd::audio::filter::tract::make();
+	unit_dsp->tract[1] = snd::audio::filter::tract::make();
 }
 
 auto reset(Model* model, UnitDSP* unit_dsp) -> void {
-	for (int r = 0; r < 2; r++) {
-		unit_dsp->tract[r].reset();
-	}
+	snd::audio::filter::tract::reset(&unit_dsp->tract[0]);
+	snd::audio::filter::tract::reset(&unit_dsp->tract[1]);
 }
 
 } // dsp

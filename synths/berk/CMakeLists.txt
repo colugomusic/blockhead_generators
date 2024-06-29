@@ -15,8 +15,6 @@ list(APPEND SRC
     ./src/simplexnoise1234.h
     ./src/simplexnoise1234.cpp
 	../../shared/resampler.h
-	../../shared/tract.h
-	../../shared/tract.cpp
 	../../shared/tract_params.hpp
 )
 

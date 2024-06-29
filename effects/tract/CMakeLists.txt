@@ -11,8 +11,6 @@ list(APPEND SRC
   ./src/model.h
   ./src/plugin.cpp
 	../../shared/resampler.h
-	../../shared/tract.h
-	../../shared/tract.cpp
 	../../shared/tract_params.hpp
 )
 
