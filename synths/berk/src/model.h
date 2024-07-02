@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glottis.h"
 #include <blink/plugin_impl.hpp>
 #include <snd/audio/filter/tract.hpp>
 #include <snd/audio/glottis.hpp>

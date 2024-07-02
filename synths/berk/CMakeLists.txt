@@ -8,8 +8,6 @@ include(plugin)
 
 list(APPEND SRC
     ./src/dsp.hpp
-    ./src/glottis.h
-    ./src/glottis.cpp
     ./src/model.h
     ./src/plugin.cpp
 	../../shared/tract_params.hpp
