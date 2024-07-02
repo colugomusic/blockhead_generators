@@ -12,9 +12,6 @@ list(APPEND SRC
     ./src/glottis.cpp
     ./src/model.h
     ./src/plugin.cpp
-    ./src/simplexnoise1234.h
-    ./src/simplexnoise1234.cpp
-	../../shared/resampler.h
 	../../shared/tract_params.hpp
 )
 
