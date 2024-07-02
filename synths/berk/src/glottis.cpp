@@ -78,9 +78,9 @@ ml::DSPVector Glottis::operator()(int SR, float speed, const Input& input)
 
 	float intensity = input.auto_attack ? intensity_ : 1.0f;
 
-	out *= intensity_ * loudness;
+	out *= intensity * loudness;
 
-	auto aspiration = intensity_ * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator_ * input.aspirate_noise;
+	auto aspiration = intensity * (1.0f - std::sqrt(ui_tenseness_)) * noise_modulator_ * input.aspirate_noise;
 
 	aspiration *= 0.2f + 0.02f * snoise1(total_time_vec_ * 1.99f);
 

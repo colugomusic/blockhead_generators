@@ -30,7 +30,7 @@ struct UnitDSP {
 	blink_SR SR;
 	blink::BlockPositions block_positions;
 	std::unique_ptr<ml::DSPBuffer> input_buffer;
-	std::array<snd::audio::filter::tract::model, 2> tract;
+	std::array<snd::audio::filter::tract::dsp, 2> tract;
 	Resampler<2> resampler;
 	Resampler<2> input_resampler;
 };

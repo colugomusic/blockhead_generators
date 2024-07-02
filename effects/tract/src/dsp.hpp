@@ -104,8 +104,8 @@ auto init(Model* model, UnitDSP* unit_dsp) -> void {
 	const auto buffer_size = 2 * int(std::ceil(kFloatsPerDSPVector * ROWS * (float(unit_dsp->SR.value) / float(MIN_MODEL_SR))));
 	unit_dsp->input_buffer = std::make_unique<ml::DSPBuffer>();
 	unit_dsp->input_buffer->resize(buffer_size);
-	unit_dsp->tract[0] = snd::audio::filter::tract::make();
-	unit_dsp->tract[1] = snd::audio::filter::tract::make();
+	unit_dsp->tract[0] = snd::audio::filter::tract::make_dsp();
+	unit_dsp->tract[1] = snd::audio::filter::tract::make_dsp();
 }
 
 auto reset(Model* model, UnitDSP* unit_dsp) -> void {

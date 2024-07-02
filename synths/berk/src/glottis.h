@@ -11,10 +11,10 @@ public:
 
 	struct Input
 	{
-		bool gate;
-		bool auto_attack;
-		float pitch;
-		float buzz;
+		bool gate = false;
+		bool auto_attack = true;
+		float pitch = 0.0f;
+		float buzz = 0.0f;
 		ml::DSPVector aspirate_noise;
 	};
 

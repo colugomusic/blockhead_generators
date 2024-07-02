@@ -4,6 +4,7 @@
 #include "shared/resampler.h"
 #include <blink/plugin_impl.hpp>
 #include <snd/audio/filter/tract.hpp>
+#include <snd/audio/glottis.hpp>
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
@@ -39,8 +40,8 @@ struct UnitDSP {
 	ml::Bandpass aspirate_filter;
 	ml::Bandpass fricative_filter;
 	ml::NoiseGen noise;
-	Glottis glottis;
-	snd::audio::filter::tract::model tract;
+	snd::audio::glottis::dsp glottis;
+	snd::audio::filter::tract::dsp tract;
 	Resampler<1> resampler;
 };
 

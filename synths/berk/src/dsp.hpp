@@ -2,6 +2,7 @@
 
 #include <blink/dsp.hpp>
 #include <blink/search.hpp>
+#include <snd/flags.hpp>
 #include "model.h"
 
 namespace dsp {
@@ -112,21 +113,22 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 	auto source = [&]() {
 		if (!gate) return ml::DSPVector(); 
 		const auto noise = unit_dsp->noise();
-		unit_dsp->aspirate_filter.mCoeffs = ml::Bandpass::coeffs(500.0f / model_SR, 0.9f);
-		unit_dsp->fricative_filter.mCoeffs = ml::Bandpass::coeffs(1000.0f / model_SR, 0.9f);
+		unit_dsp->aspirate_filter.mCoeffs = ml::Bandpass::coeffs(500.0f / model_SR, 0.5f);
+		unit_dsp->fricative_filter.mCoeffs = ml::Bandpass::coeffs(1000.0f / model_SR, 0.5f);
 		const auto fricative_noise = unit_dsp->fricative_filter(noise);
 		const auto aspirate_noise = unit_dsp->aspirate_filter(noise); 
-		Glottis::Input glottis_input; 
+		snd::audio::glottis::input glottis_input;
+		glottis_input.flags          = snd::set_flag(glottis_input.flags, glottis_input.flags.auto_attack);
 		glottis_input.aspirate_noise = aspirate_noise;
-		glottis_input.buzz = blink::math::convert::bi_to_uni(input_values.env.buzz);
-		glottis_input.pitch = input_values.env.pitch + input_values.slider.pitch; 
-		const auto glottal_output = unit_dsp->glottis(model_SR, speed, glottis_input); 
+		glottis_input.buzz           = blink::math::convert::bi_to_uni(input_values.env.buzz);
+		glottis_input.pitch          = input_values.env.pitch + input_values.slider.pitch; 
+		const auto glottis_result = snd::audio::glottis::process(&unit_dsp->glottis, glottis_input, float(model_SR), speed);
 		snd::audio::filter::tract::input tract_input;
 		tract_input.fricatives.active    = true;
 		tract_input.throat.diameter      = ml::lerp(MIN_THROAT_DIAMETER, MAX_THROAT_DIAMETER, input_values.env.throat.diameter);
 		tract_input.fricatives.intensity = input_values.env.fricative_intensity;
-		tract_input.fricatives.noise     = fricative_noise * unit_dsp->glottis.noise_modulator();
-		tract_input.glottis              = glottal_output;
+		tract_input.fricatives.noise     = fricative_noise * glottis_result.noise_modulator;
+		tract_input.glottis              = glottis_result.voice + glottis_result.aspiration;
 		tract_input.throat.position      = ml::lerp(MIN_THROAT_POSITION, MAX_THROAT_POSITION, blink::math::convert::bi_to_uni(input_values.env.throat.position));
 		tract_input.tongue.diameter      = ml::lerp(MIN_TONGUE_DIAMETER, MAX_TONGUE_DIAMETER, input_values.env.tongue.diameter);
 		tract_input.tongue.position      = ml::lerp(MIN_TONGUE_POSITION, MAX_TONGUE_POSITION, blink::math::convert::bi_to_uni(input_values.env.tongue.position));
@@ -140,12 +142,13 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 }
 
 auto init(Model* model, UnitDSP* unit_dsp) -> void {
-	unit_dsp->tract = snd::audio::filter::tract::make();
+	unit_dsp->tract   = snd::audio::filter::tract::make_dsp();
+	unit_dsp->glottis = snd::audio::glottis::make_dsp();
 }
 
 auto reset(Model* model, UnitDSP* unit_dsp) -> void {
-	unit_dsp->glottis.reset();
 	snd::audio::filter::tract::reset(&unit_dsp->tract);
+	snd::audio::glottis::reset(&unit_dsp->glottis);
 }
 
 } // dsp
