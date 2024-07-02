@@ -20,7 +20,6 @@ list(APPEND SRC
     ./src/plugin.cpp
 	./src/sample_analysis.h
 	./src/sample_analysis.cpp
-	../shared/autocorrelation.hpp
 	../../shared/noise_generator.h
 	../../shared/noise_generator.cpp
 )
