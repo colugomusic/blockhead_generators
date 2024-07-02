@@ -1,8 +1,8 @@
 #pragma once
 
-#include "shared/resampler.h"
 #include <blink/plugin_impl.hpp>
 #include <snd/audio/filter/tract.hpp>
+#include <snd/resampler.hpp>
 #pragma warning(push, 0)
 #include <DSP/MLDSPBuffer.h>
 #pragma warning(pop)
@@ -31,8 +31,8 @@ struct UnitDSP {
 	blink::BlockPositions block_positions;
 	std::unique_ptr<ml::DSPBuffer> input_buffer;
 	std::array<snd::audio::filter::tract::dsp, 2> tract;
-	Resampler<2> resampler;
-	Resampler<2> input_resampler;
+	snd::resampler<2> resampler;
+	snd::resampler<2> input_resampler;
 };
 
 using Instance = blink::Instance<InstanceInfo>;

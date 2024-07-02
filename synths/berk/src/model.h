@@ -1,10 +1,10 @@
 #pragma once
 
 #include "glottis.h"
-#include "shared/resampler.h"
 #include <blink/plugin_impl.hpp>
 #include <snd/audio/filter/tract.hpp>
 #include <snd/audio/glottis.hpp>
+#include <snd/resampler.hpp>
 #pragma warning(push, 0)
 #include <DSP/MLDSPFilters.h>
 #include <DSP/MLDSPGens.h>
@@ -42,7 +42,7 @@ struct UnitDSP {
 	ml::NoiseGen noise;
 	snd::audio::glottis::dsp glottis;
 	snd::audio::filter::tract::dsp tract;
-	Resampler<1> resampler;
+	snd::resampler<1> resampler;
 };
 
 using Instance = blink::Instance<>;

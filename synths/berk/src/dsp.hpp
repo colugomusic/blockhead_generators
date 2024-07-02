@@ -123,6 +123,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 		glottis_input.buzz           = blink::math::convert::bi_to_uni(input_values.env.buzz);
 		glottis_input.pitch          = input_values.env.pitch + input_values.slider.pitch; 
 		const auto glottis_result = snd::audio::glottis::process(&unit_dsp->glottis, glottis_input, float(model_SR), speed);
+		const auto voice          = ml::lerp(glottis_result.voice, glottis_result.voice * glottis_result.aspiration, 0.5f);
 		snd::audio::filter::tract::input tract_input;
 		tract_input.fricatives.active    = true;
 		tract_input.throat.diameter      = ml::lerp(MIN_THROAT_DIAMETER, MAX_THROAT_DIAMETER, input_values.env.throat.diameter);
@@ -134,7 +135,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 		tract_input.tongue.position      = ml::lerp(MIN_TONGUE_POSITION, MAX_TONGUE_POSITION, blink::math::convert::bi_to_uni(input_values.env.tongue.position));
 		return snd::audio::filter::tract::process(&unit_dsp->tract, model_SR, speed, tract_input);
 	};
-	auto out_vec = blink::stereo_pan(ml::repeatRows<2>(unit_dsp->resampler(source, speed)), input_values.slider.pan, input_values.env.pan);
+	auto out_vec = blink::stereo_pan(ml::repeatRows<2>(snd::process(&unit_dsp->resampler, source, speed)), input_values.slider.pan, input_values.env.pan);
 	out_vec *= ml::repeatRows<2>(input_values.env.amp) * input_values.slider.amp;
 	ml::storeAligned(out_vec.constRow(0), out);
 	ml::storeAligned(out_vec.constRow(1), out + kFloatsPerDSPVector);

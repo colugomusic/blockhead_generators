@@ -76,7 +76,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 				unit_dsp->input_buffer->read(out); 
 				return out;
 			}; 
-			ml::DSPVectorArray<2> tract_in{unit_dsp->input_resampler(input_source, 1.0f / speed)};
+			ml::DSPVectorArray<2> tract_in{snd::process(&unit_dsp->input_resampler, input_source, 1.0f / speed)};
 			ml::DSPVectorArray<2> tract_out; 
 			if (is_silent(tract_in)) return tract_out; 
 			for (int r = 0; r < 2; r++) {
@@ -91,7 +91,7 @@ auto process(Model* model, UnitDSP* unit_dsp, const blink_VaryingData& varying, 
 			} 
 			return tract_out;
 		}; 
-		out_vec = unit_dsp->resampler(source, speed);
+		out_vec = snd::process(&unit_dsp->resampler, source, speed);
 	} 
 	out_vec = ml::lerp(in_vec, out_vec, ml::repeatRows<2>(mix)); 
 	ml::storeAligned(out_vec.constRow(0), out);
