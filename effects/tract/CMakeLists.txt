@@ -10,7 +10,6 @@ list(APPEND SRC
   ./src/dsp.hpp
   ./src/model.h
   ./src/plugin.cpp
-	../../shared/resampler.h
 	../../shared/tract_params.hpp
 )
 
