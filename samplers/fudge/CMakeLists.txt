@@ -8,15 +8,11 @@ include(plugin)
 
 list(APPEND SRC
     ./src/audio_data.h
-    ./src/controller.h
-    ./src/controller.cpp
     ./src/convert.h
     ./src/draw.hpp
     ./src/dsp.hpp
     ./src/grain.h
     ./src/model.h
-    ./src/particle.h
-    ./src/particle.cpp
     ./src/plugin.cpp
 	./src/sample_analysis.h
 	./src/sample_analysis.cpp
