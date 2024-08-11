@@ -22,7 +22,7 @@ auto stepify(float x) -> float {
 	return x;
 }
 
-[[nodiscard]] inline
+inline
 auto to_string(float x, char buffer[BLINK_STRING_MAX]) -> void {
 	std::stringstream ss;
 	ss << blink::tweak::stepify<1000>(convert::linear_to_attack(x)) << " ms";
@@ -75,7 +75,7 @@ auto stepify(float x) -> float {
 	return x;
 }
 
-[[nodiscard]] inline
+inline
 auto to_string(float x, char buffer[BLINK_STRING_MAX]) -> void {
 	std::stringstream ss;
 	ss << blink::tweak::stepify<1000>(convert::linear_to_release(x)) << " ms";
@@ -145,7 +145,7 @@ auto stepify(float x) -> float {
 	return blink::math::convert::ratio_to_linear(blink::tweak::stepify<1000>(blink::math::convert::linear_to_ratio(x)));
 }
 
-[[nodiscard]] inline
+inline
 auto to_string(float x, char buffer[BLINK_STRING_MAX]) -> void {
 	std::stringstream ss;
 	ss << blink::math::convert::linear_to_ratio(x) << " : 1";
