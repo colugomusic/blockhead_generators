@@ -30,8 +30,8 @@ auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	model.params.env.pan = blink::add::param::env(model.plugin, {BLINK_STD_UUID_PAN});
 	model.params.slider.amp = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_AMP});
 	model.params.slider.pan = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PAN});
-	blink::write::param::add_flags(model.plugin, model.params.env.amp, {blink_ParamFlags_DefaultActive});
-	blink::write::param::add_flags(model.plugin, model.params.env.pan, {blink_ParamFlags_DefaultActive});
+	blink::write::param::add_flags(model.plugin, model.params.env.amp, blink_ParamFlags_DefaultActive);
+	blink::write::param::add_flags(model.plugin, model.params.env.pan, blink_ParamFlags_DefaultActive);
 	blink::write::param::manip_delegate(model.plugin, model.params.slider.amp, model.params.env.amp);
 	blink::write::param::manip_delegate(model.plugin, model.params.slider.pan, model.params.env.pan);
 	return BLINK_OK;

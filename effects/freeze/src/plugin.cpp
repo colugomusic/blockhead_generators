@@ -30,9 +30,9 @@ auto blink_init(blink_PluginIdx plugin_idx, blink_HostFns host) -> blink_Error {
 	model.params.env.formant  = blink::add::param::env(model.plugin, {BLINK_STD_UUID_FORMANT});
 	model.params.env.mix      = blink::add::param::env(model.plugin, {BLINK_STD_UUID_MIX});
 	model.params.slider.pitch = blink::add::param::slider_real(model.plugin, {BLINK_STD_UUID_PITCH});
-	blink::write::param::add_flags(model.plugin, model.params.env.pitch, {blink_ParamFlags_DefaultActive});
-	blink::write::param::add_flags(model.plugin, model.params.env.formant, {blink_ParamFlags_DefaultActive});
-	blink::write::param::add_flags(model.plugin, model.params.env.mix, {blink_ParamFlags_DefaultActive});
+	blink::write::param::add_flags(model.plugin, model.params.env.pitch, blink_ParamFlags_DefaultActive);
+	blink::write::param::add_flags(model.plugin, model.params.env.formant, blink_ParamFlags_DefaultActive);
+	blink::write::param::add_flags(model.plugin, model.params.env.mix, blink_ParamFlags_DefaultActive);
 	blink::write::param::manip_delegate(model.plugin, model.params.slider.pitch, model.params.env.pitch);
 	return BLINK_OK;
 }

@@ -67,7 +67,6 @@ auto to_string(float value) -> std::string {
 	return ss.str();
 }
 
-[[nodiscard]]
 auto to_string(float value, char buffer[BLINK_STRING_MAX]) -> void {
 	blink::tweak::write_string(to_string(value), buffer);
 }

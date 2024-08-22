@@ -38,7 +38,7 @@ auto drag(float v, int amount, bool precise) -> float {
 	return blink::tweak::drag<float, 100, 1000>(v, amount / 5, precise);
 }
 
-[[nodiscard]] static
+static
 auto to_string(float v, char buffer[BLINK_STRING_MAX]) -> void {
 	std::stringstream ss;
 	ss << convert::linear_to_ms(v) << " ms";
