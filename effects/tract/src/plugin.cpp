@@ -1,5 +1,6 @@
 #define BLINK_EXPORT
 
+#define _USE_MATH_DEFINES
 #include "dsp.hpp"
 #include "model.h"
 #include "shared/tract_params.hpp"
