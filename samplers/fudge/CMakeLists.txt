@@ -3,7 +3,6 @@ project(sampler_fudge VERSION 0.5.1)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(CPM)
 include(plugin)
 
 list(APPEND SRC

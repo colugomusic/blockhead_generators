@@ -1,0 +1,3 @@
+[submodule "extern/submodules/blink"]
+	path = extern/submodules/blink
+	url = https://github.com/colugomusic/blink

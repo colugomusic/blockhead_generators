@@ -3,7 +3,6 @@ project(sampler_classic VERSION 0.5.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../cmake/Modules)
 
-include(CPM)
 include(plugin)
 
 list(APPEND SRC
